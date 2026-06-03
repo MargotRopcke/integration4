@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Green Screen Algorithm</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .canvas-wrapper {
+            width: 32%;
+            aspect-ratio: 16 / 9;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="range"] {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 48%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #mergeButton {
+            background-color: #008CBA;
+        }
+
+        #mergeButton:hover {
+            background-color: #007B9A;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Modern Green Screen Algorithm</h1>
+        <div class="canvas-container">
+            <div class="canvas-wrapper">
+                <canvas id="foregroundCanvas"></canvas>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="backgroundCanvas"></canvas>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="outputCanvas"></canvas>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="foregroundInput">Foreground Image (with green screen):</label>
+            <input type="file" id="foregroundInput" accept="image/*">
+        </div>
+        <div class="input-group">
+            <label for="backgroundInput">Background Image:</label>
+            <input type="file" id="backgroundInput" accept="image/*">
+        </div>
+        <div class="slider-container">
+            <label for="thresholdSlider">Green Threshold:</label>
+            <input type="range" id="thresholdSlider" min="0" max="255" value="150">
+            <span id="thresholdValue">150</span>
+        </div>
+        <div class="button-container">
+            <button id="mergeButton">Merge Images</button>
+            <button id="clearButton">Clear Images</button>
+        </div>
+    </div>
+
+    <script>
+        const foregroundCanvas = document.getElementById('foregroundCanvas');
+        const backgroundCanvas = document.getElementById('backgroundCanvas');
+        const outputCanvas = document.getElementById('outputCanvas');
+        const foregroundCtx = foregroundCanvas.getContext('2d');
+        const backgroundCtx = backgroundCanvas.getContext('2d');
+        const outputCtx = outputCanvas.getContext('2d');
+
+        let foregroundImage = null;
+        let backgroundImage = null;
+
+        function loadImage(file, canvas, ctx) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = canvas.clientWidth;
+                    canvas.height = canvas.clientHeight;
+                    ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+                    resolve(img);
+                };
+                img.onerror = reject;
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        document.getElementById('foregroundInput').addEventListener('change', async (e) => {
+            foregroundImage = await loadImage(e.target.files[0], foregroundCanvas, foregroundCtx);
+        });
+
+        document.getElementById('backgroundInput').addEventListener('change', async (e) => {
+            backgroundImage = await loadImage(e.target.files[0], backgroundCanvas, backgroundCtx);
+        });
+
+        document.getElementById('mergeButton').addEventListener('click', () => {
+            if (!foregroundImage || !backgroundImage) {
+                alert('Please upload both foreground and background images.');
+                return;
+            }
+
+            const threshold = parseInt(document.getElementById('thresholdSlider').value);
+            mergeImages(threshold);
+        });
+
+        document.getElementById('clearButton').addEventListener('click', () => {
+            foregroundCtx.clearRect(0, 0, foregroundCanvas.width, foregroundCanvas.height);
+            backgroundCtx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+            outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+            foregroundImage = null;
+            backgroundImage = null;
+            document.getElementById('foregroundInput').value = '';
+            document.getElementById('backgroundInput').value = '';
+        });
+
+        const thresholdSlider = document.getElementById('thresholdSlider');
+        const thresholdValue = document.getElementById('thresholdValue');
+        thresholdSlider.addEventListener('input', (e) => {
+            thresholdValue.textContent = e.target.value;
+            if (foregroundImage && backgroundImage) {
+                mergeImages(parseInt(e.target.value));
+            }
+        });
+
+        function mergeImages(threshold) {
+            outputCanvas.width = outputCanvas.clientWidth;
+            outputCanvas.height = outputCanvas.clientHeight;
+
+            const fgData = foregroundCtx.getImageData(0, 0, foregroundCanvas.width, foregroundCanvas.height);
+            const bgData = backgroundCtx.getImageData(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+            const outData = outputCtx.createImageData(outputCanvas.width, outputCanvas.height);
+
+            for (let y = 0; y < outputCanvas.height; y++) {
+                for (let x = 0; x < outputCanvas.width; x++) {
+                    const i = (y * outputCanvas.width + x) * 4;
+                    const fgI = (Math.floor(y * foregroundCanvas.height / outputCanvas.height) * foregroundCanvas.width + Math.floor(x * foregroundCanvas.width / outputCanvas.width)) * 4;
+                    const bgI = (Math.floor(y * backgroundCanvas.height / outputCanvas.height) * backgroundCanvas.width + Math.floor(x * backgroundCanvas.width / outputCanvas.width)) * 4;
+
+                    const r = fgData.data[fgI];
+                    const g = fgData.data[fgI + 1];
+                    const b = fgData.data[fgI + 2];
+
+                    if (g > threshold && g > r && g > b) {
+                        outData.data[i] = bgData.data[bgI];
+                        outData.data[i + 1] = bgData.data[bgI + 1];
+                        outData.data[i + 2] = bgData.data[bgI + 2];
+                        outData.data[i + 3] = bgData.data[bgI + 3];
+                    } else {
+                        outData.data[i] = r;
+                        outData.data[i + 1] = g;
+                        outData.data[i + 2] = b;
+                        outData.data[i + 3] = fgData.data[fgI + 3];
+                    }
+                }
+            }
+
+            outputCtx.putImageData(outData, 0, 0);
+        }
+    </script>
+</body>
+
+</html>

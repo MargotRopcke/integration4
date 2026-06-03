@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+</head>
+
+<body>
+    <h1 class="h1">BodySegmentation</h1>
+    <h2 id="state"></h2>
+    <canvas id="canvas" class="fancy-shadow hidden display-running"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@0.0.4"></script>
+</body>
+<!-- Place your code in the script tag below. You can also use an external .js file -->
+<script>
+    var outputStride = 16;
+    var flipHorizontal = false;
+    var segmentationThreshold = 0.5;
+
+    var imageElement = document.getElementById('image');
+
+    bodyPix.load().then(function (net) {
+        return net.estimatePartSegmentation(imageElement, flipHorizontal, outputStride, segmentationThreshold)
+    }).then(function (partSegmentation) {
+        console.log(partSegmentation);
+    })
+
+    const imageElement = documet.getElementById('person');
+
+    const net = await bodyPix.load();
+    const personSegmentation = await net.estimatePersonSegmentation(imageElement);
+
+    const invertMask = false;
+    const maskImage = bodyBix.toMaskImageData(personSegmentation, invertMask);
+</script>
+
+</html>

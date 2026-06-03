@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        <canvas id="output-canvas" width="450" height="900"></canvas>
+        <canvas id="output-canvas" width="450" height="900"></canvas>
+    </div>
+    <script>
+        let video, background, c1, ctx1, c_tmp, ctx_tmp;
+        async function init() {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: 450,
+                    height: 900
+                }
+            });
+            video = document.createElement('video');
+            video.srcObject = stream;
+            video.play();
+
+            c1 = document.getElementById('output-canvas');
+            ctx1 = c1.getContext('2d');
+
+            background = document.createElement('img');
+            background.src = "img/background.png"
+
+            c_tmp = document.createElement('canvas');
+            c_tmp.setAttribute('width', 450);
+            c_tmp.setAttribute('height', 900);
+            ctx_tmp = c_tmp.getContext('2d');
+
+            background.addEventListener('load', () => {
+                video.addEventListener('playing', computeFrame);
+            });
+        }
+        function computeFrame() {
+
+            ctx_tmp.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            let frame = ctx_tmp.getImageData(0, 0, video.videoWidth, video.videoHeight);
+
+            ctx_tmp.drawImage(background, 0, 0, 450, 900);
+            let frame2 = ctx_tmp.getImageData(0, 0, 450, 900);
+
+            for (let i = 0; i < frame.data.length / 4; i++) {
+                let r = frame.data[i * 4 + 0];
+                let g = frame.data[i * 4 + 1];
+                let b = frame.data[i * 4 + 2];
+                if (r > 126 && r < 204 && g > 39 && g < 108 && b > 68 && b < 145) {
+                    frame.data[i * 4 + 0] = frame2.data[i * 4 + 0];
+                    frame.data[i * 4 + 1] = frame2.data[i * 4 + 1];
+                    frame.data[i * 4 + 2] = frame2.data[i * 4 + 2];
+                }
+            }
+
+            ctx1.putImageData(frame, 0, 0);
+            setTimeout(computeFrame, 0);
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            init();
+        });
+    </script>
+</body>
+
+</html>

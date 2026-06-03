@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaPipe Background Replacement</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <div class="loader-text">Initializing AI models & camera...</div>
+    </div>
+
+    <!-- Gesture Indicator -->
+    <div id="gestureIndicator" class="gesture-indicator">
+        <div class="gesture-header">
+            <span class="gesture-icon">👍</span>
+            <span class="gesture-label">Thumbs Up Detected</span>
+            <span id="gestureTimer" class="gesture-timer">(0.0s)</span>
+        </div>
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+    </div>
+
+    <video class="input_video" style="display:none;"></video>
+    <div class="video-wrapper">
+        <img class="bg-image" src="../img/background.png" alt="background">
+        <canvas class="output_canvas"></canvas>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
