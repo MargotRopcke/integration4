@@ -23,7 +23,7 @@ const progressBar = document.getElementById('progressBar');
 const bgImg = document.querySelector('.bg-image');
 
 // Background Swapping Settings
-const bgImages = ['../img/background.png', '../img/images.jpeg'];
+const bgImages = ['../img/background.jpg', '../img/images.jpg'];
 let currentBgIndex = 0;
 
 // Gesture Hold Tracker
