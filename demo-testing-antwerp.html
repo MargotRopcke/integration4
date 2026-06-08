@@ -9,894 +9,55 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
         crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=DM+Sans:wght@300;400;500;600&family=Caveat:wght@400;600&display=swap');
 
         *,
         *::before,
         *::after {
             box-sizing: border-box;
             margin: 0;
-            padding: 0;
+            padding: 0
         }
 
         :root {
-            --bg: #0a0a0f;
-            --surface: #13131a;
-            --surface2: #1c1c26;
-            --accent: #ff6b35;
-            --accent2: #4ecdc4;
-            --like: #2ecc71;
-            --dislike: #e74c3c;
-            --text: #f0f0f5;
-            --text2: #9999b0;
-            --gold: #f5c842;
-            --radius: 20px;
+            --bg: #f5f0e8;
+            --bg2: #ede6d6;
+            --paper: #faf7f0;
+            --polar: #fffef9;
+            --ink: #1a1208;
+            --ink2: #5c4d35;
+            --ink3: #9a8a72;
+            --accent: #c8392b;
+            --accent2: #2d6a4f;
+            --gold: #c9972a;
+            --like: #2d6a4f;
+            --dislike: #c8392b;
+            --tape: rgba(230, 210, 160, 0.55);
+            --radius: 4px;
+            --shadow: 4px 6px 20px rgba(26, 18, 8, .18);
         }
 
         body {
             font-family: 'DM Sans', sans-serif;
             background: var(--bg);
-            color: var(--text);
+            color: var(--ink);
             min-height: 100vh;
             overflow: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E")
         }
 
         .screen {
             display: none;
             width: 100vw;
-            height: 100vh;
+            height: 100vh
         }
 
         .screen.active {
-            display: flex;
+            display: flex
         }
 
-        /* ── INTRO ── */
-        #intro {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(ellipse at 30% 50%, #1a0a2e 0%, var(--bg) 60%);
-            gap: 2rem;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        #intro h1 {
-            font-family: 'DM Serif Display', serif;
-            font-size: clamp(2.5rem, 6vw, 5rem);
-            line-height: 1.1;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 50%, var(--accent2) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        #intro p {
-            color: var(--text2);
-            font-size: 1.1rem;
-            max-width: 480px;
-            line-height: 1.6;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-            letter-spacing: .03em;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            background: #ff8555;
-            box-shadow: 0 8px 30px rgba(255, 107, 53, .4);
-        }
-
-        .category-pills {
-            display: flex;
-            gap: .75rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .pill {
-            background: var(--surface2);
-            border: 1px solid rgba(255, 255, 255, .1);
-            padding: .5rem 1.25rem;
-            border-radius: 50px;
-            font-size: .9rem;
-            color: var(--text2);
-            cursor: pointer;
-            transition: all .2s;
-        }
-
-        .pill.active,
-        .pill:hover {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
-        }
-
-        /* ── SWIPE ── */
-        #swipe {
-            position: relative;
-            overflow: hidden;
-        }
-
-        #video-bg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: .35;
-            filter: blur(1px);
-            transform: scaleX(-1);
-        }
-
-        #canvas-overlay {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            transform: scaleX(-1);
-            pointer-events: none;
-        }
-
-        /* hidden canvas for photo capture */
-        #capture-canvas {
-            display: none;
-        }
-
-        .swipe-ui {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.25rem 1.5rem;
-            background: linear-gradient(to bottom, rgba(10, 10, 15, .9) 0%, transparent 100%);
-        }
-
-        .top-bar .logo {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.5rem;
-            color: var(--accent);
-        }
-
-        .likes-counter {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            background: rgba(255, 255, 255, .08);
-            border: 1px solid rgba(255, 255, 255, .12);
-            padding: .4rem 1rem;
-            border-radius: 50px;
-            font-size: .9rem;
-            font-weight: 500;
-        }
-
-        .likes-counter .heart {
-            color: var(--like);
-            font-size: 1rem;
-        }
-
-        .category-badge {
-            background: rgba(255, 107, 53, .2);
-            color: var(--accent);
-            border: 1px solid rgba(255, 107, 53, .3);
-            padding: .35rem .9rem;
-            border-radius: 50px;
-            font-size: .85rem;
-            font-weight: 500;
-        }
-
-        .card-area {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: left;
-            padding: 0 1.5rem;
-        }
-
-        .location-card {
-            width: min(400px, 90vw);
-            position: relative;
-            transition: transform .15s ease, opacity .15s ease;
-        }
-
-        .location-card.dragging {
-            transition: none;
-        }
-
-        .card-inner {
-            background: var(--surface);
-            border-radius: var(--radius);
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, .08);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
-        }
-
-        .card-image {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            background: var(--surface2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-        }
-
-        .card-body {
-            padding: 1.25rem 1.5rem 1.5rem;
-        }
-
-        .card-type {
-            font-size: .75rem;
-            font-weight: 600;
-            letter-spacing: .1em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: .3rem;
-        }
-
-        .card-name {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.5rem;
-            margin-bottom: .4rem;
-        }
-
-        .card-meta {
-            color: var(--text2);
-            font-size: .9rem;
-            margin-bottom: .75rem;
-            display: flex;
-            align-items: center;
-            gap: .4rem;
-        }
-
-        .card-tags {
-            display: flex;
-            gap: .4rem;
-            flex-wrap: wrap;
-        }
-
-        .tag {
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .1);
-            padding: .25rem .65rem;
-            border-radius: 8px;
-            font-size: .78rem;
-            color: var(--text2);
-        }
-
-        .card-vote-overlay {
-            position: absolute;
-            top: 1rem;
-            padding: .6rem 1.2rem;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            opacity: 0;
-            transition: opacity .15s;
-            letter-spacing: .05em;
-            pointer-events: none;
-        }
-
-        .card-vote-overlay.like {
-            left: 1rem;
-            background: rgba(46, 204, 113, .25);
-            color: var(--like);
-            border: 2px solid var(--like);
-        }
-
-        .card-vote-overlay.nope {
-            right: 1rem;
-            background: rgba(231, 76, 60, .25);
-            color: var(--dislike);
-            border: 2px solid var(--dislike);
-        }
-
-        .gesture-indicator {
-            position: absolute;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 2rem;
-            z-index: 20;
-        }
-
-        .gesture-btn {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, .15);
-            background: rgba(255, 255, 255, .05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            cursor: pointer;
-            transition: all .2s;
-            color: var(--text);
-        }
-
-        .gesture-btn:hover,
-        .gesture-btn.active-gesture {
-            transform: scale(1.15);
-        }
-
-        .gesture-btn.dislike:hover,
-        .gesture-btn.dislike.active-gesture {
-            background: rgba(231, 76, 60, .25);
-            border-color: var(--dislike);
-            color: var(--dislike);
-            box-shadow: 0 0 30px rgba(231, 76, 60, .4);
-        }
-
-        .gesture-btn.like:hover,
-        .gesture-btn.like.active-gesture {
-            background: rgba(46, 204, 113, .25);
-            border-color: var(--like);
-            color: var(--like);
-            box-shadow: 0 0 30px rgba(46, 204, 113, .4);
-        }
-
-        .gesture-status {
-            position: absolute;
-            top: 5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, .1);
-            backdrop-filter: blur(10px);
-            padding: .4rem 1rem;
-            border-radius: 50px;
-            font-size: .8rem;
-            color: var(--text2);
-            white-space: nowrap;
-            z-index: 20;
-            transition: all .3s;
-        }
-
-        .gesture-status.detected {
-            background: rgba(78, 205, 196, .2);
-            color: var(--accent2);
-            border: 1px solid var(--accent2);
-        }
-
-        .progress-bar {
-            height: 3px;
-            background: rgba(255, 255, 255, .1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 0 1.5rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 2px;
-            transition: width .3s;
-        }
-
-        .done-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 30;
-            background: rgba(10, 10, 15, .92);
-            backdrop-filter: blur(8px);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .done-overlay.visible {
-            display: flex;
-        }
-
-        .done-emoji {
-            font-size: 4rem;
-        }
-
-        .done-overlay h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2rem;
-        }
-
-        .done-overlay p {
-            color: var(--text2);
-            max-width: 320px;
-            line-height: 1.6;
-        }
-
-        /* ── COUNTDOWN OVERLAY ── */
-        #countdown-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, .55);
-            backdrop-filter: blur(2px);
-            pointer-events: none;
-        }
-
-        #countdown-overlay.visible {
-            display: flex;
-        }
-
-        .countdown-number {
-            font-family: 'DM Serif Display', serif;
-            font-size: clamp(6rem, 20vw, 14rem);
-            color: #fff;
-            text-shadow: 0 0 60px rgba(255, 107, 53, .8);
-            animation: countdown-pop .6s ease-out forwards;
-            user-select: none;
-        }
-
-        .countdown-number.cheese {
-            font-size: clamp(3rem, 10vw, 7rem);
-            color: var(--gold);
-            text-shadow: 0 0 60px rgba(245, 200, 66, .9);
-            letter-spacing: .04em;
-        }
-
-        @keyframes countdown-pop {
-            0% {
-                transform: scale(1.6);
-                opacity: 0;
-            }
-
-            40% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            80% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            100% {
-                opacity: 0;
-                transform: scale(.7);
-            }
-        }
-
-        /* flash effect */
-        #flash-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 110;
-            background: #fff;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .05s;
-        }
-
-        #flash-overlay.flash {
-            opacity: 1;
-        }
-
-        /* ── RESULTS ── */
-        #results {
-            flex-direction: column;
-            overflow-y: auto;
-            background: var(--bg);
-        }
-
-        .results-header {
-            padding: 2rem 2rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, .08);
-            background: var(--surface);
-            flex-shrink: 0;
-        }
-
-        .results-header h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2rem;
-            margin-bottom: .25rem;
-        }
-
-        .results-header p {
-            color: var(--text2);
-            font-size: .95rem;
-        }
-
-        .tabs {
-            display: flex;
-            padding: .75rem 2rem;
-            gap: 1rem;
-            background: var(--surface);
-            border-bottom: 1px solid rgba(255, 255, 255, .08);
-            flex-shrink: 0;
-        }
-
-        .tab {
-            padding: .5rem 1.25rem;
-            border-radius: 50px;
-            font-size: .9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all .2s;
-            border: 1px solid transparent;
-            color: var(--text2);
-        }
-
-        .tab.active {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        .tab:hover:not(.active) {
-            border-color: rgba(255, 255, 255, .15);
-            color: var(--text);
-        }
-
-        .tab-content {
-            display: none;
-            flex: 1;
-            overflow: auto;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .liked-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.25rem;
-            padding: 1.5rem 2rem;
-        }
-
-        .liked-card {
-            background: var(--surface);
-            border: 1px solid rgba(255, 255, 255, .08);
-            border-radius: var(--radius);
-            overflow: hidden;
-            transition: transform .2s;
-        }
-
-        .liked-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .liked-card-img {
-            width: 100%;
-            height: 140px;
-            object-fit: cover;
-            background: var(--surface2);
-            font-size: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .liked-card-body {
-            padding: 1rem 1.25rem;
-        }
-
-        .liked-card-body .card-type {
-            font-size: .7rem;
-        }
-
-        .liked-card-body .card-name {
-            font-size: 1.1rem;
-        }
-
-        .liked-card-body .card-meta {
-            font-size: .82rem;
-            margin-bottom: .5rem;
-        }
-
-        .liked-card-body a {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            color: var(--accent);
-            font-size: .82rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: opacity .2s;
-        }
-
-        .liked-card-body a:hover {
-            opacity: .75;
-        }
-
-        #map-tab {
-            padding: 1.5rem 2rem;
-        }
-
-        #results-map {
-            width: 100%;
-            height: 450px;
-            border-radius: var(--radius);
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, .08);
-        }
-
-        .map-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .map-actions a,
-        .map-actions button {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
-            padding: .65rem 1.25rem;
-            border-radius: 12px;
-            font-size: .9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all .2s;
-            text-decoration: none;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        .btn-maps {
-            background: #4285f4;
-            color: #fff;
-            border: none;
-        }
-
-        .btn-maps:hover {
-            background: #2b6fd9;
-        }
-
-        .btn-heatmap {
-            background: var(--surface2);
-            color: var(--text);
-            border: 1px solid rgba(255, 255, 255, .12);
-        }
-
-        .btn-heatmap:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .btn-heatmap.on {
-            background: rgba(255, 107, 53, .2);
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .heatmap-legend {
-            display: none;
-            margin-top: .75rem;
-            padding: 1rem 1.25rem;
-            background: var(--surface);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, .08);
-        }
-
-        .heatmap-legend.visible {
-            display: block;
-        }
-
-        .heatmap-legend h4 {
-            font-size: .85rem;
-            margin-bottom: .75rem;
-            color: var(--text2);
-        }
-
-        .heatmap-gradient {
-            height: 12px;
-            border-radius: 6px;
-            background: linear-gradient(to right, #00f5ff 0%, #00ff88 30%, #ffff00 55%, #ff8800 80%, #ff0000 100%);
-            margin-bottom: .4rem;
-        }
-
-        .heatmap-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: .75rem;
-            color: var(--text2);
-        }
-
-        .heatmap-note {
-            font-size: .78rem;
-            color: var(--text2);
-            margin-top: .5rem;
-            opacity: .7;
-        }
-
-        .btn-back {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
-            background: var(--surface2);
-            border: 1px solid rgba(255, 255, 255, .12);
-            color: var(--text2);
-            padding: .5rem 1.25rem;
-            border-radius: 50px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: .9rem;
-            cursor: pointer;
-            transition: all .2s;
-            margin: 1rem 2rem 0;
-        }
-
-        .btn-back:hover {
-            color: var(--text);
-            border-color: rgba(255, 255, 255, .25);
-        }
-
-        /* ── PHOTOS TAB ── */
-        #photos-tab {
-            padding: 1.5rem 2rem;
-        }
-
-        .photos-section-title {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.4rem;
-            margin-bottom: 1.25rem;
-            color: var(--text);
-        }
-
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .photo-cell {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, .1);
-            background: var(--surface2);
-            aspect-ratio: 4/3;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, .4);
-            transition: transform .2s;
-        }
-
-        .photo-cell:hover {
-            transform: scale(1.03);
-        }
-
-        .photo-cell img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            /* mirror so it looks natural */
-            transform: scaleX(-1);
-        }
-
-        .photo-cell-label {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: .5rem .75rem;
-            background: linear-gradient(to top, rgba(0, 0, 0, .8) 0%, transparent 100%);
-            font-size: .8rem;
-            font-weight: 500;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: .35rem;
-        }
-
-        .photo-cell-emoji {
-            font-size: 1.1rem;
-        }
-
-        .photo-download {
-            position: absolute;
-            top: .6rem;
-            right: .6rem;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, .5);
-            border: 1px solid rgba(255, 255, 255, .2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .85rem;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity .2s;
-            text-decoration: none;
-            color: var(--text);
-        }
-
-        .photo-cell:hover .photo-download {
-            opacity: 1;
-        }
-
-        .no-photos-msg {
-            color: var(--text2);
-            padding: 2rem 0;
-            font-size: .95rem;
-        }
-
-        @keyframes pulse-like {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.2);
-            }
-        }
-
-        .heart-pulse {
-            animation: pulse-like .4s ease;
-        }
-
-        .no-camera-notice {
-            position: absolute;
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 107, 53, .15);
-            border: 1px solid rgba(255, 107, 53, .3);
-            padding: .6rem 1.2rem;
-            border-radius: 12px;
-            font-size: .82rem;
-            color: var(--accent);
-            z-index: 20;
-            white-space: nowrap;
-            display: none;
-        }
-
-        @keyframes swipe-out-right {
-            to {
-                transform: translateX(120%) rotate(20deg);
-                opacity: 0;
-            }
-        }
-
-        @keyframes swipe-out-left {
-            to {
-                transform: translateX(-120%) rotate(-20deg);
-                opacity: 0;
-            }
-        }
-
-        .swipe-right {
-            animation: swipe-out-right .35s forwards;
-        }
-
-        .swipe-left {
-            animation: swipe-out-left .35s forwards;
-        }
-
+        /* LOADING */
         #loading-screen {
             position: fixed;
             inset: 0;
@@ -906,64 +67,1400 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.25rem
         }
 
-        .loader {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255, 255, 255, .1);
+        .loader-film {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--bg2);
             border-top-color: var(--accent);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite
         }
 
         @keyframes spin {
             to {
-                transform: rotate(360deg);
+                transform: rotate(360deg)
             }
         }
 
         #loading-screen p {
-            color: var(--text2);
+            color: var(--ink3);
+            font-family: 'Caveat', cursive;
+            font-size: 1.2rem
+        }
+
+        /* INTRO */
+        #intro {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden
+        }
+
+        #intro::before,
+        #intro::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: var(--ink)
+        }
+
+        #intro::before {
+            top: 0
+        }
+
+        #intro::after {
+            bottom: 0
+        }
+
+        .film-holes {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 28px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 14px;
+            pointer-events: none
+        }
+
+        .film-holes.top {
+            top: 0
+        }
+
+        .film-holes.bottom {
+            bottom: 0
+        }
+
+        .film-hole {
+            width: 16px;
+            height: 12px;
+            border-radius: 2px;
+            background: var(--bg2);
+            flex-shrink: 0
+        }
+
+        .intro-polaroid {
+            background: var(--polar);
+            padding: 1.5rem 1.75rem 2.25rem;
+            box-shadow: var(--shadow), 2px 2px 0 rgba(0, 0, 0, .05);
+            transform: rotate(-1.2deg);
+            max-width: 400px;
+            width: 90vw;
+            position: relative
+        }
+
+        .intro-polaroid::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 22px;
+            background: var(--tape);
+            border-radius: 2px
+        }
+
+        #intro h1 {
+            font-family: 'Special Elite', serif;
+            font-size: clamp(2.2rem, 6vw, 4rem);
+            line-height: 1.05;
+            color: var(--ink);
+            margin-bottom: .5rem
+        }
+
+        #intro h1 span {
+            color: var(--accent)
+        }
+
+        #intro .sub {
+            font-family: 'Caveat', cursive;
+            font-size: 1.15rem;
+            color: var(--ink2);
+            line-height: 1.5;
+            margin-bottom: .25rem
+        }
+
+        .stamp {
+            display: inline-block;
+            border: 2.5px solid var(--accent);
+            color: var(--accent);
+            font-family: 'Special Elite', serif;
+            font-size: .72rem;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            padding: .3rem .75rem;
+            transform: rotate(-3deg);
+            opacity: .75
+        }
+
+        .category-pills {
+            display: flex;
+            gap: .6rem;
+            flex-wrap: wrap;
+            justify-content: center
+        }
+
+        .pill {
+            background: var(--paper);
+            border: 1.5px solid var(--bg2);
+            padding: .4rem 1.1rem;
+            border-radius: 2px;
+            font-size: .85rem;
+            color: var(--ink2);
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 1px 1px 0 rgba(0, 0, 0, .08)
+        }
+
+        .pill.active,
+        .pill:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent)
+        }
+
+        .btn-primary {
+            background: var(--ink);
+            color: var(--paper);
+            border: none;
+            padding: .9rem 2.5rem;
+            border-radius: 2px;
+            font-family: 'Special Elite', serif;
+            font-size: 1rem;
+            letter-spacing: .06em;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 3px 3px 0 var(--ink2)
+        }
+
+        .btn-primary:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--ink2)
+        }
+
+        .btn-primary:active {
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 var(--ink2)
+        }
+
+        .intro-note {
+            font-family: 'Caveat', cursive;
+            font-size: .95rem;
+            color: var(--ink3)
+        }
+
+        /* SWIPE */
+        #swipe {
+            position: relative;
+            overflow: hidden;
+            background: var(--bg2)
+        }
+
+        #video-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: .22;
+            filter: sepia(40%) blur(1px);
+            transform: scaleX(-1)
+        }
+
+        #canvas-overlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(-1);
+            pointer-events: none
+        }
+
+        #capture-canvas {
+            display: none
+        }
+
+        .swipe-ui {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: var(--ink);
+            color: var(--paper);
+            flex-shrink: 0
+        }
+
+        .top-bar .logo {
+            font-family: 'Special Elite', serif;
+            font-size: 1.3rem;
+            color: var(--paper);
+            letter-spacing: .04em
+        }
+
+        .top-bar .logo span {
+            color: var(--gold)
+        }
+
+        .likes-counter {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-family: 'Caveat', cursive;
+            font-size: 1.05rem;
+            color: var(--paper)
+        }
+
+        .heart {
+            color: #e07070
+        }
+
+        .category-badge {
+            font-family: 'Special Elite', serif;
+            font-size: .75rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--gold);
+            border: 1px solid rgba(201, 151, 42, .4);
+            padding: .3rem .8rem;
+            border-radius: 2px
+        }
+
+        .progress-film {
+            height: 18px;
+            background: var(--ink);
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            gap: 6px;
+            flex-shrink: 0;
+            overflow: hidden
+        }
+
+        .film-frame {
+            width: 10px;
+            height: 10px;
+            border-radius: 1px;
+            background: var(--bg2);
+            opacity: .25;
+            transition: opacity .3s;
+            flex-shrink: 0
+        }
+
+        .film-frame.done {
+            opacity: 1;
+            background: var(--gold)
+        }
+
+        .gesture-status {
+            position: absolute;
+            top: 4.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(250, 247, 240, .9);
+            border: 1.5px solid var(--ink);
+            padding: .35rem .9rem;
+            border-radius: 2px;
+            font-family: 'Caveat', cursive;
+            font-size: .95rem;
+            color: var(--ink2);
+            white-space: nowrap;
+            z-index: 20;
+            transition: all .3s;
+            box-shadow: 2px 2px 0 rgba(26, 18, 8, .12)
+        }
+
+        .gesture-status.detected {
+            background: var(--ink);
+            color: var(--gold);
+            border-color: var(--gold)
+        }
+
+        .card-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 1.5rem
+        }
+
+        /* MODERN CARD */
+        .location-card {
+            width: min(360px, 88vw);
+            position: relative;
+            transition: transform .15s ease, opacity .15s ease;
+            cursor: grab
+        }
+
+        .location-card:active {
+            cursor: grabbing
+        }
+
+        .location-card.dragging {
+            transition: none
+        }
+
+        .card-inner {
+            background: rgba(255, 254, 249, 0.72);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            box-shadow: 0 8px 32px rgba(26, 18, 8, .14), 0 2px 8px rgba(26, 18, 8, .08), inset 0 1px 0 rgba(255, 255, 255, .8);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* subtle top shine */
+        .card-inner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .9) 40%, rgba(255, 255, 255, .9) 60%, transparent);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--bg2) 0%, #e8dfc8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* gradient fade into card body */
+        .card-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 254, 249, .65));
+            pointer-events: none;
+        }
+
+        .card-body {
+            padding: 1rem 1.25rem 1.4rem
+        }
+
+        .card-type {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: .3rem;
+        }
+
+        .card-name {
+            font-family: 'Special Elite', serif;
+            font-size: 1.4rem;
+            color: var(--ink);
+            margin-bottom: .35rem;
+            line-height: 1.15;
+        }
+
+        .card-meta {
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink3);
+            font-size: .82rem;
+            margin-bottom: .75rem;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: .4rem;
+            flex-wrap: wrap
+        }
+
+        .tag {
+            background: rgba(26, 18, 8, .06);
+            border: 1px solid rgba(26, 18, 8, .1);
+            padding: .2rem .65rem;
+            border-radius: 999px;
+            font-size: .72rem;
+            color: var(--ink2);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+        }
+
+        /* vote overlays — bold pill style */
+        .card-vote-overlay {
+            position: absolute;
+            top: 1rem;
+            padding: .4rem 1rem;
+            border-radius: 999px;
+            font-family: 'DM Sans', sans-serif;
             font-size: .9rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity .15s;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
+        }
+
+        .card-vote-overlay.like {
+            left: .75rem;
+            background: rgba(45, 106, 79, .18);
+            color: var(--like);
+            border: 2px solid var(--like);
+        }
+
+        .card-vote-overlay.nope {
+            right: .75rem;
+            background: rgba(200, 57, 43, .18);
+            color: var(--dislike);
+            border: 2px solid var(--dislike);
+        }
+
+        /* gesture buttons */
+        .gesture-indicator {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2.5rem;
+            z-index: 20
+        }
+
+        .gesture-btn {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            border: 2.5px solid rgba(26, 18, 8, .2);
+            background: var(--polar);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 2px 3px 8px rgba(26, 18, 8, .25)
+        }
+
+        .gesture-btn:hover,
+        .gesture-btn.active-gesture {
+            transform: scale(1.12)
+        }
+
+        .gesture-btn.dislike:hover,
+        .gesture-btn.dislike.active-gesture {
+            background: #fbeaea;
+            border-color: var(--dislike);
+            box-shadow: 2px 3px 12px rgba(200, 57, 43, .3)
+        }
+
+        .gesture-btn.like:hover,
+        .gesture-btn.like.active-gesture {
+            background: #eaf4ee;
+            border-color: var(--like);
+            box-shadow: 2px 3px 12px rgba(45, 106, 79, .3)
+        }
+
+        .no-camera-notice {
+            position: absolute;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--polar);
+            border: 1.5px solid var(--accent);
+            padding: .5rem 1.1rem;
+            border-radius: 2px;
+            font-family: 'Caveat', cursive;
+            font-size: .95rem;
+            color: var(--accent);
+            z-index: 20;
+            white-space: nowrap;
+            display: none;
+            box-shadow: 2px 2px 0 rgba(200, 57, 43, .15)
+        }
+
+        /* done overlay */
+        .done-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+            background: rgba(245, 240, 232, .95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            text-align: center;
+            padding: 2rem
+        }
+
+        .done-overlay.visible {
+            display: flex
+        }
+
+        .done-emoji {
+            font-size: 3.5rem
+        }
+
+        .done-overlay h2 {
+            font-family: 'Special Elite', serif;
+            font-size: 2rem;
+            color: var(--ink)
+        }
+
+        .done-overlay p {
+            color: var(--ink2);
+            max-width: 300px;
+            line-height: 1.6;
+            font-family: 'Caveat', cursive;
+            font-size: 1.1rem
+        }
+
+        /* COUNTDOWN */
+        #countdown-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(245, 240, 232, .82);
+            pointer-events: none
+        }
+
+        #countdown-overlay.visible {
+            display: flex
+        }
+
+        .countdown-number {
+            font-family: 'Special Elite', serif;
+            font-size: clamp(7rem, 22vw, 15rem);
+            color: var(--ink);
+            animation: cd-pop .65s ease-out forwards;
+            user-select: none;
+            text-shadow: 3px 4px 0 rgba(26, 18, 8, .12)
+        }
+
+        .countdown-number.cheese {
+            font-family: 'Caveat', cursive;
+            font-size: clamp(3rem, 10vw, 6rem);
+            color: var(--accent);
+            letter-spacing: .02em
+        }
+
+        @keyframes cd-pop {
+            0% {
+                transform: scale(1.7) rotate(-4deg);
+                opacity: 0
+            }
+
+            35% {
+                opacity: 1;
+                transform: scale(1) rotate(1deg)
+            }
+
+            75% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg)
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(.6) rotate(3deg)
+            }
+        }
+
+        #flash-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 110;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .06s
+        }
+
+        #flash-overlay.flash {
+            opacity: 1
+        }
+
+        @keyframes swipe-out-right {
+            to {
+                transform: translateX(130%) rotate(22deg);
+                opacity: 0
+            }
+        }
+
+        @keyframes swipe-out-left {
+            to {
+                transform: translateX(-130%) rotate(-22deg);
+                opacity: 0
+            }
+        }
+
+        .swipe-right {
+            animation: swipe-out-right .38s forwards
+        }
+
+        .swipe-left {
+            animation: swipe-out-left .38s forwards
+        }
+
+        @keyframes pulse-like {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.25)
+            }
+        }
+
+        .heart-pulse {
+            animation: pulse-like .4s ease
+        }
+
+        /* ── RESULTS: FULL-SCREEN MAP ── */
+        #results {
+            position: relative;
+            overflow: hidden;
+            background: #e8e0d0
+        }
+
+        /* The map fills everything */
+        #results-map {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%
+        }
+
+        /* floating top bar */
+        .map-topbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 20;
+            padding: 1rem 1rem .75rem;
+            background: linear-gradient(to bottom, rgba(245, 240, 232, .96) 60%, transparent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .map-topbar-row {
+            display: flex;
+            gap: .6rem;
+            align-items: center;
+            width: 100%;
+            justify-content: center
+        }
+
+        .map-title-pill {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            background: rgba(250, 247, 240, .9);
+            border: 1px solid rgba(26, 18, 8, .12);
+            border-radius: 999px;
+            padding: .3rem .9rem;
+            font-family: 'Caveat', cursive;
+            font-size: .9rem;
+            color: var(--ink2);
+            backdrop-filter: blur(8px);
+        }
+
+        .map-title-pill svg {
+            flex-shrink: 0
+        }
+
+        .btn-maps {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .45rem;
+            background: var(--accent2);
+            color: #fff;
+            border: none;
+            padding: .65rem 1rem;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(45, 106, 79, .3);
+        }
+
+        .btn-maps:hover {
+            filter: brightness(1.1)
+        }
+
+        .btn-heatmap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .45rem;
+            background: rgba(250, 247, 240, .92);
+            color: var(--ink2);
+            border: 1.5px solid rgba(26, 18, 8, .15);
+            padding: .65rem 1rem;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-heatmap.on {
+            background: rgba(200, 57, 43, .12);
+            color: var(--accent);
+            border-color: var(--accent)
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 30;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(250, 247, 240, .92);
+            border: 1px solid rgba(26, 18, 8, .15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all .2s;
+            backdrop-filter: blur(8px);
+            color: var(--ink2);
+            box-shadow: 0 2px 6px rgba(26, 18, 8, .12);
+        }
+
+        .btn-back:hover {
+            background: var(--polar);
+            color: var(--ink)
+        }
+
+        /* heatmap legend — floats below topbar */
+        .heatmap-legend {
+            display: none;
+            position: absolute;
+            top: 130px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            background: rgba(250, 247, 240, .94);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(26, 18, 8, .12);
+            border-radius: 12px;
+            padding: .75rem 1rem;
+            min-width: 260px;
+            box-shadow: 0 4px 16px rgba(26, 18, 8, .12);
+        }
+
+        .heatmap-legend.visible {
+            display: block
+        }
+
+        .heatmap-legend h4 {
+            font-family: 'Caveat', cursive;
+            font-size: .9rem;
+            margin-bottom: .55rem;
+            color: var(--ink2)
+        }
+
+        .heatmap-gradient {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #00f5ff 0%, #00ff88 30%, #ffff00 55%, #ff8800 80%, #ff0000 100%);
+            margin-bottom: .3rem
+        }
+
+        .heatmap-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: .7rem;
+            color: var(--ink3);
+            font-family: 'Caveat', cursive
+        }
+
+        .heatmap-note {
+            font-size: .7rem;
+            color: var(--ink3);
+            margin-top: .4rem;
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.4
+        }
+
+        /* ── BOTTOM SHEET ── */
+        .map-bottom-sheet {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 20;
+            padding: 0 0 env(safe-area-inset-bottom, 0);
+        }
+
+        /* dot row for pagination */
+        .sheet-dots {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: .5rem;
+        }
+
+        .sheet-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(26, 18, 8, .2);
+            transition: all .2s
+        }
+
+        .sheet-dot.active {
+            background: var(--accent);
+            width: 18px;
+            border-radius: 3px
+        }
+
+        /* the sliding strip of cards */
+        .sheet-track-wrap {
+            overflow: hidden;
+            padding-bottom: 1.25rem
+        }
+
+        .sheet-track {
+            display: flex;
+            gap: .75rem;
+            padding: .25rem 1rem 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .sheet-track::-webkit-scrollbar {
+            display: none
+        }
+
+        .sheet-card {
+            scroll-snap-align: center;
+            flex-shrink: 0;
+            width: calc(100vw - 2.5rem);
+            max-width: 420px;
+            background: rgba(250, 247, 240, .95);
+            backdrop-filter: blur(16px);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, .7);
+            box-shadow: 0 -2px 20px rgba(26, 18, 8, .1), 0 6px 24px rgba(26, 18, 8, .12);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform .2s;
+        }
+
+        .sheet-card:hover {
+            transform: translateY(-2px)
+        }
+
+        .sheet-card:active {
+            transform: scale(.98)
+        }
+
+        .sheet-card-img {
+            width: 100%;
+            height: 130px;
+            background: linear-gradient(135deg, var(--bg2), #e8dfc8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* reaction photo thumbnail overlay */
+        .sheet-card-photo {
+            position: absolute;
+            top: .5rem;
+            right: .5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+        }
+
+        .sheet-card-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1)
+        }
+
+        .sheet-card-photo.empty {
+            display: none
+        }
+
+        .sheet-card-body {
+            padding: .75rem 1rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .35rem
+        }
+
+        .sheet-card-type {
+            font-size: .68rem;
+            font-weight: 600;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--accent)
+        }
+
+        .sheet-card-name {
+            font-family: 'Special Elite', serif;
+            font-size: 1.2rem;
+            color: var(--ink);
+            line-height: 1.15
+        }
+
+        .sheet-card-address {
+            font-size: .78rem;
+            color: var(--ink3);
+            font-family: 'DM Sans', sans-serif
+        }
+
+        .sheet-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: .6rem 1rem .85rem;
+            border-top: 1px solid rgba(26, 18, 8, .07);
+        }
+
+        .sheet-card-pills {
+            display: flex;
+            gap: .5rem;
+            align-items: center
+        }
+
+        .sheet-pill {
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+            background: rgba(26, 18, 8, .06);
+            border: 1px solid rgba(26, 18, 8, .1);
+            padding: .25rem .65rem;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 500;
+            color: var(--ink2);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .sheet-pill.busy {
+            background: rgba(200, 57, 43, .08);
+            border-color: rgba(200, 57, 43, .2);
+            color: var(--accent)
+        }
+
+        .sheet-pill.busy .busy-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: inline-block;
+        }
+
+        .sheet-pill.quiet .busy-dot {
+            background: var(--like)
+        }
+
+        .sheet-pill.quiet {
+            background: rgba(45, 106, 79, .08);
+            border-color: rgba(45, 106, 79, .2);
+            color: var(--like)
+        }
+
+        .sheet-gmaps-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--accent2);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 0 2px 6px rgba(45, 106, 79, .3);
+            text-decoration: none;
+        }
+
+        .sheet-gmaps-btn:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05)
+        }
+
+        /* map pin marker style */
+        .map-pin {
+            width: 32px;
+            height: 32px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            background: var(--accent);
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .map-pin:hover {
+            transform: rotate(-45deg) scale(1.15);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .3)
+        }
+
+        .map-pin.active-pin {
+            background: var(--ink);
+            transform: rotate(-45deg) scale(1.2)
+        }
+
+        .map-pin-inner {
+            transform: rotate(45deg);
+            font-size: 13px
+        }
+
+        /* reaction photo popup on pin */
+        .pin-photo-bubble {
+            position: absolute;
+            bottom: 42px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border-radius: 10px;
+            padding: 3px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+            border: 2px solid #fff;
+            width: 72px;
+            height: 72px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .pin-photo-bubble.show {
+            display: block
+        }
+
+        .pin-photo-bubble img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            border-radius: 7px
+        }
+
+        /* speech bubble tail */
+        .pin-photo-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: #fff;
         }
 
         .maplibregl-popup-content {
-            background: var(--surface) !important;
-            color: var(--text) !important;
+            background: var(--polar) !important;
+            color: var(--ink) !important;
             border-radius: 12px !important;
-            border: 1px solid rgba(255, 255, 255, .1) !important;
+            border: 1px solid rgba(26, 18, 8, .1) !important;
             padding: .75rem 1rem !important;
             font-family: 'DM Sans', sans-serif !important;
+            box-shadow: 0 4px 16px rgba(26, 18, 8, .15) !important
         }
 
         .maplibregl-popup-tip {
-            border-top-color: var(--surface) !important;
+            border-top-color: var(--polar) !important
+        }
+
+        /* PHOTOS OVERLAY — floating panel triggered from top-right */
+        .photos-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 40;
+            background: rgba(245, 240, 232, .97);
+            backdrop-filter: blur(12px);
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .photos-overlay.visible {
+            display: flex
+        }
+
+        .photos-overlay-header {
+            padding: 1.1rem 1.25rem .75rem;
+            background: var(--ink);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .photos-overlay-header h2 {
+            font-family: 'Special Elite', serif;
+            font-size: 1.4rem;
+            color: var(--paper)
+        }
+
+        .photos-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .12);
+            border: none;
+            color: var(--paper);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #photos-tab-inner {
+            padding: 1.5rem 1.25rem
+        }
+
+        .photos-section-title {
+            font-family: 'Special Elite', serif;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: .6rem
+        }
+
+        .photos-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(26, 18, 8, .12)
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 2rem 1rem
+        }
+
+        .photo-cell {
+            background: var(--polar);
+            padding: 5px 5px 42px;
+            box-shadow: var(--shadow), 0 0 0 1px rgba(0, 0, 0, .05);
+            position: relative;
+            transition: transform .25s, box-shadow .25s
+        }
+
+        .photo-cell::before {
+            content: '';
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 38px;
+            height: 16px;
+            background: var(--tape);
+            border-radius: 2px;
+            z-index: 1
+        }
+
+        .photo-cell:nth-child(1) {
+            transform: rotate(-2.1deg)
+        }
+
+        .photo-cell:nth-child(2) {
+            transform: rotate(1.6deg)
+        }
+
+        .photo-cell:nth-child(3) {
+            transform: rotate(-.8deg)
+        }
+
+        .photo-cell:nth-child(4) {
+            transform: rotate(2.2deg)
+        }
+
+        .photo-cell:nth-child(5) {
+            transform: rotate(-1.5deg)
+        }
+
+        .photo-cell:nth-child(6) {
+            transform: rotate(.9deg)
+        }
+
+        .photo-cell:hover {
+            transform: rotate(0deg) scale(1.06) !important;
+            z-index: 5;
+            box-shadow: 8px 10px 24px rgba(26, 18, 8, .2)
+        }
+
+        .photo-cell-img-wrap {
+            width: 100%;
+            aspect-ratio: 1;
+            overflow: hidden;
+            position: relative;
+            background: var(--bg2)
+        }
+
+        .photo-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transform: scaleX(-1);
+            filter: sepia(15%) contrast(1.05)
+        }
+
+        .photo-date-stamp {
+            position: absolute;
+            bottom: 3px;
+            right: 5px;
+            font-family: 'Caveat', cursive;
+            font-size: .65rem;
+            color: rgba(255, 160, 60, .85);
+            pointer-events: none
+        }
+
+        .photo-cell-label {
+            padding: .45rem .3rem .1rem;
+            text-align: center
+        }
+
+        .photo-cell-name {
+            font-family: 'Special Elite', serif;
+            font-size: .82rem;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .25rem
+        }
+
+        .photo-cell-place {
+            font-family: 'Caveat', cursive;
+            font-size: .72rem;
+            color: var(--ink3);
+            margin-top: .1rem
+        }
+
+        .photo-download {
+            position: absolute;
+            top: .4rem;
+            right: .4rem;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(250, 247, 240, .85);
+            border: 1px solid rgba(26, 18, 8, .15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity .2s;
+            text-decoration: none;
+            color: var(--ink);
+            z-index: 2
+        }
+
+        .photo-cell:hover .photo-download {
+            opacity: 1
+        }
+
+        .no-photos-msg {
+            color: var(--ink3);
+            padding: 2rem 0;
+            font-family: 'Caveat', cursive;
+            font-size: 1.1rem
         }
     </style>
 </head>
 
 <body>
-
     <div id="loading-screen">
-        <div class="loader"></div>
-        <p>Loading Antwerp Discover…</p>
+        <div class="loader-film"></div>
+        <p>developing your film…</p>
     </div>
-
-    <!-- COUNTDOWN OVERLAY -->
     <div id="countdown-overlay">
         <div class="countdown-number" id="countdown-number">3</div>
     </div>
-
-    <!-- FLASH OVERLAY -->
     <div id="flash-overlay"></div>
 
-    <!-- INTRO SCREEN -->
+    <!-- INTRO -->
     <div id="intro" class="screen">
-        <h1>Discover<br>Antwerp</h1>
-        <p>Swipe through the city's best spots with hand gestures. 👍 to like, 👎 to dislike. Collect up to 6 favourites
-            — and we'll snap your reaction for each one!</p>
+        <div class="film-holes top" id="film-top"></div>
+        <div class="film-holes bottom" id="film-bottom"></div>
+        <div class="intro-polaroid">
+            <h1>Discover<br><span>Antwerp</span></h1>
+            <p class="sub">Swipe the city's best spots.<br>👍 like · 👎 pass · we'll snap your reaction!</p>
+            <div class="stamp" style="margin:.5rem 0 1rem">est. 2025 · Belgium</div>
+        </div>
         <div class="category-pills">
             <div class="pill active" data-cat="all">All</div>
             <div class="pill" data-cat="restaurant">🍽 Restaurants</div>
@@ -971,36 +1468,27 @@
             <div class="pill" data-cat="cafe">☕ Cafés</div>
             <div class="pill" data-cat="bar">🍺 Bars</div>
         </div>
-        <button class="btn-primary" onclick="startSwipe()">✨ Start Swiping</button>
-        <p style="font-size:.8rem; color: var(--text2); opacity:.6;">Grant camera access for hand gesture detection &
-            reaction photos</p>
+        <button class="btn-primary" onclick="startSwipe()">✦ Start Swiping</button>
+        <p class="intro-note">grant camera access for gestures + reaction photos</p>
     </div>
 
-    <!-- SWIPE SCREEN -->
+    <!-- SWIPE -->
     <div id="swipe" class="screen">
         <video id="video-bg" autoplay playsinline muted></video>
         <canvas id="canvas-overlay"></canvas>
         <canvas id="capture-canvas"></canvas>
-
         <div class="swipe-ui">
             <div class="top-bar">
-                <div class="logo">Antwerp</div>
-                <div class="likes-counter">
-                    <span class="heart" id="heart-icon">♥</span>
-                    <span id="likes-count">0</span> / 6
-                </div>
+                <div class="logo">ant<span>werp</span></div>
+                <div class="likes-counter"><span class="heart" id="heart-icon">♥</span><span id="likes-count">0</span> /
+                    6</div>
                 <div class="category-badge" id="cat-badge">All</div>
             </div>
-
-            <div class="progress-bar" style="margin-bottom:.5rem">
-                <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-            </div>
-
-            <div class="gesture-status" id="gesture-status">📷 Camera loading…</div>
-
-            <div class="card-area" id="card-area">
+            <div class="progress-film" id="progress-film"></div>
+            <div class="gesture-status" id="gesture-status">📷 camera loading…</div>
+            <div class="card-area">
                 <div class="location-card" id="location-card">
-                    <div class="card-inner" id="card-inner">
+                    <div class="card-inner">
                         <div class="card-image" id="card-image"></div>
                         <div class="card-body">
                             <div class="card-type" id="card-type"></div>
@@ -1009,734 +1497,412 @@
                             <div class="card-tags" id="card-tags"></div>
                         </div>
                     </div>
-                    <div class="card-vote-overlay like" id="overlay-like">LIKE ✓</div>
-                    <div class="card-vote-overlay nope" id="overlay-nope">NOPE ✗</div>
+                    <div class="card-vote-overlay like" id="overlay-like">keeper!</div>
+                    <div class="card-vote-overlay nope" id="overlay-nope">nope</div>
                 </div>
             </div>
-
             <div class="gesture-indicator">
-                <div class="gesture-btn dislike" id="btn-dislike" onclick="vote(false)" title="Dislike">👎</div>
+                <div class="gesture-btn dislike" id="btn-dislike" onclick="vote(false)" title="Pass">👎</div>
                 <div class="gesture-btn like" id="btn-like" onclick="vote(true)" title="Like">👍</div>
             </div>
-
-            <div class="no-camera-notice" id="no-camera-notice">No camera — use buttons to vote</div>
+            <div class="no-camera-notice" id="no-camera-notice">no camera — use buttons below</div>
         </div>
-
         <div class="done-overlay" id="done-overlay">
-            <div class="done-emoji">🎉</div>
-            <h2>You've seen it all!</h2>
-            <p>You liked <strong id="done-likes">0</strong> spots. Ready to see your picks?</p>
-            <button class="btn-primary" onclick="showResults()">See My Picks →</button>
-            <button class="btn-back" onclick="resetApp()">↩ Start Over</button>
+            <div class="done-emoji">🎞</div>
+            <h2>Roll complete!</h2>
+            <p>You loved <strong id="done-likes">0</strong> spots. Time to develop the film.</p>
+            <button class="btn-primary" onclick="showResults()">See my picks →</button>
+            <button class="btn-back" onclick="resetApp()">↩ reshoot</button>
         </div>
     </div>
 
-    <!-- RESULTS SCREEN -->
+    <!-- RESULTS: full-screen map -->
     <div id="results" class="screen">
-        <div class="results-header">
-            <h2>Your Antwerp Picks 🗺</h2>
-            <p id="results-subtitle">Here are the places you loved</p>
-        </div>
 
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('list')">📋 List View</div>
-            <div class="tab" onclick="switchTab('map')">🗺 Map & Heatmap</div>
-            <div class="tab" id="photos-tab-btn" onclick="switchTab('photos')">📸 Reaction Photos</div>
-        </div>
+        <!-- Map fills entire screen -->
+        <div id="results-map"></div>
 
-        <button class="btn-back" onclick="resetApp()">← Back to swiping</button>
-
-        <div id="list-tab" class="tab-content active">
-            <div class="liked-list" id="liked-list"></div>
-        </div>
-
-        <div id="map-tab" class="tab-content">
-            <div id="results-map"></div>
-            <div class="map-actions">
-                <a id="gmaps-link" class="btn-maps" href="#" target="_blank" rel="noopener">🗺 Open in Google Maps</a>
-                <button class="btn-heatmap" id="heatmap-btn" onclick="toggleHeatmap()">🔥 Toggle Busy Heatmap</button>
-            </div>
-            <div class="heatmap-legend" id="heatmap-legend">
-                <h4>Live Busyness — Antwerp City (simulated, based on typical Friday patterns)</h4>
-                <div class="heatmap-gradient"></div>
-                <div class="heatmap-labels"><span>Quiet</span><span>Moderate</span><span>Very Busy</span></div>
-                <p class="heatmap-note">⚠ Real-time busyness data requires a Google Maps Platform Popular Times API key.
-                    This demo simulates typical Friday evening patterns for Antwerp neighbourhoods.</p>
+        <!-- API key gate — shown until a key is provided -->
+        <div id="apikey-gate">
+            <div class="apikey-card">
+                <div class="apikey-icon">🗺</div>
+                <h2>Connect Google Maps</h2>
+                <p>Paste your <strong>Google Maps JavaScript API key</strong> to load a real Google Map with all your
+                    liked spots pinned — plus a live link to open them on maps.google.com.</p>
+                <input id="apikey-input" type="text" placeholder="AIzaSy…" autocomplete="off" spellcheck="false">
+                <button class="btn-primary" onclick="loadGoogleMap()">Load my map →</button>
+                <a class="apikey-help" href="https://developers.google.com/maps/documentation/javascript/get-api-key"
+                    target="_blank" rel="noopener">How to get a free API key ↗</a>
+                <p class="apikey-note">Your key stays in this tab only — never sent anywhere.</p>
             </div>
         </div>
 
-        <div id="photos-tab-content" class="tab-content">
-            <div id="photos-tab" style="padding: 1.5rem 2rem;">
-                <div class="photos-section-title">📸 Your Reaction Shots</div>
+        <!-- Back button (top-left) -->
+        <button class="btn-back" onclick="resetApp()" title="Back">←</button>
+
+        <!-- Photos button (top-right) -->
+        <button id="photos-fab" onclick="openPhotos()"
+            style="position:absolute;top:1rem;right:1rem;z-index:30;width:36px;height:36px;border-radius:50%;background:rgba(250,247,240,.92);border:1px solid rgba(26,18,8,.15);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;backdrop-filter:blur(8px);box-shadow:0 2px 6px rgba(26,18,8,.12);"
+            title="Reaction photos">📸</button>
+
+        <!-- Floating top bar: title + action buttons -->
+        <div class="map-topbar">
+            <div class="map-topbar-row">
+                <div class="map-title-pill">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <span id="results-subtitle">your favourite spots</span>
+                </div>
+            </div>
+            <div class="map-topbar-row">
+                <a id="gmaps-link" class="btn-maps" href="#" target="_blank" rel="noopener">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    Open all in Google Maps
+                </a>
+                <button class="btn-heatmap" id="heatmap-btn" onclick="toggleHeatmap()">🔥 Heatmap</button>
+            </div>
+        </div>
+
+        <!-- Heatmap legend -->
+        <div class="heatmap-legend" id="heatmap-legend">
+            <h4>busyness — Antwerp (simulated friday evening)</h4>
+            <div class="heatmap-gradient"></div>
+            <div class="heatmap-labels"><span>quiet</span><span>moderate</span><span>very busy</span></div>
+            <p class="heatmap-note">⚠ simulated — real-time requires Google Maps Platform.</p>
+        </div>
+
+        <!-- Bottom sheet: horizontal scrolling location cards -->
+        <div class="map-bottom-sheet">
+            <div class="sheet-dots" id="sheet-dots"></div>
+            <div class="sheet-track-wrap">
+                <div class="sheet-track" id="sheet-track"></div>
+            </div>
+        </div>
+
+        <!-- Photos overlay -->
+        <div class="photos-overlay" id="photos-overlay">
+            <div class="photos-overlay-header">
+                <h2>📸 reaction roll</h2>
+                <button class="photos-close" onclick="closePhotos()">✕</button>
+            </div>
+            <div id="photos-tab-inner">
+                <div class="photos-section-title">your reaction shots</div>
                 <div id="photos-grid-container">
-                    <p class="no-photos-msg">No photos taken — camera access was required.</p>
+                    <p class="no-photos-msg">no shots taken — camera access was needed.</p>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script>
-        // ────────────────────────────────────────────────
-        // DATA
-        // ────────────────────────────────────────────────
         const LOCATIONS = [
-            { id: 1, name: 'The Jane', type: 'restaurant', category: 'restaurant', emoji: '⭐', desc: 'Michelin-starred in a chapel', address: 'Paradeplein 1', lat: 51.2089, lng: 4.3959, tags: ['Fine Dining', 'Iconic', 'Belgian'], neighborhood: 'Berchem', rating: '9.2', gmaps: 'https://maps.google.com/?q=The+Jane+Antwerp' },
-            { id: 2, name: 'Grand Central', type: 'restaurant', category: 'restaurant', emoji: '🚂', desc: 'Art Deco brasserie at Central Station', address: 'Koningin Astridplein 27', lat: 51.2170, lng: 4.4214, tags: ['Brasserie', 'Historic', 'Cocktails'], neighborhood: 'Centre', rating: '8.4', gmaps: 'https://maps.google.com/?q=Grand+Central+Antwerp' },
-            { id: 3, name: 'Dries Van Noten', type: 'fashion', category: 'fashion', emoji: '👗', desc: 'Flagship store of the Belgian fashion icon', address: 'Nationalestraat 16', lat: 51.2153, lng: 4.3996, tags: ['Luxury', 'Belgian Designer', 'Avant-garde'], neighborhood: 'Fashion Quarter', rating: '9.5', gmaps: 'https://maps.google.com/?q=Dries+Van+Noten+Antwerp' },
-            { id: 4, name: 'Café d\'Anvers', type: 'bar', category: 'bar', emoji: '🎵', desc: 'Legendary club in a 19th century church', address: 'Verversrui 15', lat: 51.2282, lng: 4.4013, tags: ['Nightlife', 'Historic', 'Electronic'], neighborhood: 'Schipperskwartier', rating: '8.8', gmaps: 'https://maps.google.com/?q=Cafe+d+Anvers+Antwerp' },
-            { id: 5, name: 'Graanmarkt 13', type: 'restaurant', category: 'restaurant', emoji: '🌿', desc: 'Plant-forward cuisine, lifestyle store & hotel', address: 'Graanmarkt 13', lat: 51.2183, lng: 4.3978, tags: ['Vegetable-forward', 'Design', 'Trendy'], neighborhood: 'Centre', rating: '8.9', gmaps: 'https://maps.google.com/?q=Graanmarkt+13+Antwerp' },
-            { id: 6, name: 'Ann Demeulemeester', type: 'fashion', category: 'fashion', emoji: '🖤', desc: 'Gothic elegance at its most refined', address: 'Verlatstraat 38', lat: 51.2100, lng: 4.3948, tags: ['Dark', 'Belgian Designer', 'Iconic'], neighborhood: 'Zuid', rating: '9.1', gmaps: 'https://maps.google.com/?q=Ann+Demeulemeester+Antwerp' },
-            { id: 7, name: 'Bouchery', type: 'restaurant', category: 'restaurant', emoji: '🥩', desc: 'Zero-waste farm-to-table experience', address: 'Dambruggestraat 23', lat: 51.2145, lng: 4.4200, tags: ['Sustainable', 'Farm-to-Table', 'Creative'], neighborhood: 'Borgerhout', rating: '8.6', gmaps: 'https://maps.google.com/?q=Bouchery+Antwerp' },
-            { id: 8, name: 'Normo Espresso', type: 'cafe', category: 'cafe', emoji: '☕', desc: 'Specialty coffee in a minimalist space', address: 'Kammenstraat 13', lat: 51.2181, lng: 4.4026, tags: ['Specialty Coffee', 'Minimal', 'Third Wave'], neighborhood: 'Centre', rating: '8.3', gmaps: 'https://maps.google.com/?q=Normo+Espresso+Antwerp' },
-            { id: 9, name: 'Essentiel Antwerp', type: 'fashion', category: 'fashion', emoji: '✨', desc: 'Colour-block prints and bold Belgian style', address: 'Nationalestraat 12', lat: 51.2155, lng: 4.3993, tags: ['Colourful', 'Belgian', 'Contemporary'], neighborhood: 'Fashion Quarter', rating: '8.7', gmaps: 'https://maps.google.com/?q=Essentiel+Antwerp' },
-            { id: 10, name: 'Bar Paniek', type: 'bar', category: 'bar', emoji: '🍺', desc: 'Cozy craft beer bar with 200+ Belgian beers', address: 'Oudevaartplaats 12', lat: 51.2220, lng: 4.4052, tags: ['Craft Beer', 'Belgian', 'Cozy'], neighborhood: 'Centre', rating: '8.5', gmaps: 'https://maps.google.com/?q=Bar+Paniek+Antwerp' },
-            { id: 11, name: 'Fiskebar', type: 'restaurant', category: 'restaurant', emoji: '🐟', desc: 'Sustainable Nordic-inspired seafood', address: 'Marnixplaats 17', lat: 51.2197, lng: 4.3962, tags: ['Seafood', 'Nordic', 'Sustainable'], neighborhood: 'Centre', rating: '8.8', gmaps: 'https://maps.google.com/?q=Fiskebar+Antwerp' },
-            { id: 12, name: 'Louis Vuitton MAS', type: 'fashion', category: 'fashion', emoji: '👜', desc: 'Luxury flagship near the waterfront museum', address: 'Meir 34', lat: 51.2194, lng: 4.4081, tags: ['Luxury', 'Flagship', 'Iconic'], neighborhood: 'Meir', rating: '8.0', gmaps: 'https://maps.google.com/?q=Louis+Vuitton+Antwerp' },
-            { id: 13, name: 'Bocca Negra', type: 'cafe', category: 'cafe', emoji: '🫖', desc: 'Art Nouveau café with legendary hot chocolate', address: 'Falconrui 13', lat: 51.2235, lng: 4.4025, tags: ['Art Nouveau', 'Historic', 'Hot Chocolate'], neighborhood: 'Centre', rating: '8.6', gmaps: 'https://maps.google.com/?q=Bocca+Negra+Antwerp' },
-            { id: 14, name: 'Zeppelin', type: 'bar', category: 'bar', emoji: '🎸', desc: 'Rock-n-roll bar with local Antwerp vibe', address: 'Sint-Pietersvliet 20', lat: 51.2271, lng: 4.4008, tags: ['Rock', 'Local', 'Live Music'], neighborhood: 'Eilandje', rating: '8.2', gmaps: 'https://maps.google.com/?q=Zeppelin+Bar+Antwerp' },
-            { id: 15, name: 'Walter Van Beirendonck', type: 'fashion', category: 'fashion', emoji: '🦄', desc: 'Surreal, playful avant-garde fashion world', address: 'Sint-Antoniusstraat 12', lat: 51.2147, lng: 4.3980, tags: ['Avant-garde', 'Surreal', 'Iconic'], neighborhood: 'Fashion Quarter', rating: '9.3', gmaps: 'https://maps.google.com/?q=Walter+Van+Beirendonck+Antwerp' },
+            { id: 1, name: 'The Jane', type: 'restaurant', category: 'restaurant', emoji: '⭐', address: 'Paradeplein 1', lat: 51.2089, lng: 4.3959, tags: ['Fine Dining', 'Iconic', 'Belgian'], neighborhood: 'Berchem', rating: '9.2', gmaps: 'https://maps.google.com/?q=The+Jane+Antwerp' },
+            { id: 2, name: 'Grand Central', type: 'restaurant', category: 'restaurant', emoji: '🚂', address: 'Koningin Astridplein 27', lat: 51.2170, lng: 4.4214, tags: ['Brasserie', 'Historic', 'Cocktails'], neighborhood: 'Centre', rating: '8.4', gmaps: 'https://maps.google.com/?q=Grand+Central+Antwerp' },
+            { id: 3, name: 'Dries Van Noten', type: 'fashion', category: 'fashion', emoji: '👗', address: 'Nationalestraat 16', lat: 51.2153, lng: 4.3996, tags: ['Luxury', 'Belgian Designer', 'Avant-garde'], neighborhood: 'Fashion Quarter', rating: '9.5', gmaps: 'https://maps.google.com/?q=Dries+Van+Noten+Antwerp' },
+            { id: 4, name: "Café d'Anvers", type: 'bar', category: 'bar', emoji: '🎵', address: 'Verversrui 15', lat: 51.2282, lng: 4.4013, tags: ['Nightlife', 'Historic', 'Electronic'], neighborhood: 'Schipperskwartier', rating: '8.8', gmaps: "https://maps.google.com/?q=Cafe+d+Anvers+Antwerp" },
+            { id: 5, name: 'Graanmarkt 13', type: 'restaurant', category: 'restaurant', emoji: '🌿', address: 'Graanmarkt 13', lat: 51.2183, lng: 4.3978, tags: ['Vegetable-forward', 'Design', 'Trendy'], neighborhood: 'Centre', rating: '8.9', gmaps: 'https://maps.google.com/?q=Graanmarkt+13+Antwerp' },
+            { id: 6, name: 'Ann Demeulemeester', type: 'fashion', category: 'fashion', emoji: '🖤', address: 'Verlatstraat 38', lat: 51.2100, lng: 4.3948, tags: ['Dark', 'Belgian Designer', 'Iconic'], neighborhood: 'Zuid', rating: '9.1', gmaps: 'https://maps.google.com/?q=Ann+Demeulemeester+Antwerp' },
+            { id: 7, name: 'Bouchery', type: 'restaurant', category: 'restaurant', emoji: '🥩', address: 'Dambruggestraat 23', lat: 51.2145, lng: 4.4200, tags: ['Sustainable', 'Farm-to-Table', 'Creative'], neighborhood: 'Borgerhout', rating: '8.6', gmaps: 'https://maps.google.com/?q=Bouchery+Antwerp' },
+            { id: 8, name: 'Normo Espresso', type: 'cafe', category: 'cafe', emoji: '☕', address: 'Kammenstraat 13', lat: 51.2181, lng: 4.4026, tags: ['Specialty Coffee', 'Minimal', 'Third Wave'], neighborhood: 'Centre', rating: '8.3', gmaps: 'https://maps.google.com/?q=Normo+Espresso+Antwerp' },
+            { id: 9, name: 'Essentiel Antwerp', type: 'fashion', category: 'fashion', emoji: '✨', address: 'Nationalestraat 12', lat: 51.2155, lng: 4.3993, tags: ['Colourful', 'Belgian', 'Contemporary'], neighborhood: 'Fashion Quarter', rating: '8.7', gmaps: 'https://maps.google.com/?q=Essentiel+Antwerp' },
+            { id: 10, name: 'Bar Paniek', type: 'bar', category: 'bar', emoji: '🍺', address: 'Oudevaartplaats 12', lat: 51.2220, lng: 4.4052, tags: ['Craft Beer', 'Belgian', 'Cozy'], neighborhood: 'Centre', rating: '8.5', gmaps: 'https://maps.google.com/?q=Bar+Paniek+Antwerp' },
+            { id: 11, name: 'Fiskebar', type: 'restaurant', category: 'restaurant', emoji: '🐟', address: 'Marnixplaats 17', lat: 51.2197, lng: 4.3962, tags: ['Seafood', 'Nordic', 'Sustainable'], neighborhood: 'Centre', rating: '8.8', gmaps: 'https://maps.google.com/?q=Fiskebar+Antwerp' },
+            { id: 12, name: 'Louis Vuitton MAS', type: 'fashion', category: 'fashion', emoji: '👜', address: 'Meir 34', lat: 51.2194, lng: 4.4081, tags: ['Luxury', 'Flagship', 'Iconic'], neighborhood: 'Meir', rating: '8.0', gmaps: 'https://maps.google.com/?q=Louis+Vuitton+Antwerp' },
+            { id: 13, name: 'Bocca Negra', type: 'cafe', category: 'cafe', emoji: '🫖', address: 'Falconrui 13', lat: 51.2235, lng: 4.4025, tags: ['Art Nouveau', 'Historic', 'Hot Chocolate'], neighborhood: 'Centre', rating: '8.6', gmaps: 'https://maps.google.com/?q=Bocca+Negra+Antwerp' },
+            { id: 14, name: 'Zeppelin', type: 'bar', category: 'bar', emoji: '🎸', address: 'Sint-Pietersvliet 20', lat: 51.2271, lng: 4.4008, tags: ['Rock', 'Local', 'Live Music'], neighborhood: 'Eilandje', rating: '8.2', gmaps: 'https://maps.google.com/?q=Zeppelin+Bar+Antwerp' },
+            { id: 15, name: 'Walter Van Beirendonck', type: 'fashion', category: 'fashion', emoji: '🦄', address: 'Sint-Antoniusstraat 12', lat: 51.2147, lng: 4.3980, tags: ['Avant-garde', 'Surreal', 'Iconic'], neighborhood: 'Fashion Quarter', rating: '9.3', gmaps: 'https://maps.google.com/?q=Walter+Van+Beirendonck+Antwerp' },
         ];
-
-        const HEATMAP_POINTS = [
-            [51.2194, 4.4082, 0.95], [51.2183, 4.4050, 0.9], [51.2200, 4.4060, 0.88],
-            [51.2175, 4.4020, 0.85], [51.2210, 4.4030, 0.82],
-            [51.2153, 4.3996, 0.78], [51.2160, 4.4010, 0.75], [51.2145, 4.4000, 0.70],
-            [51.2202, 4.4003, 0.88], [51.2195, 4.3990, 0.85],
-            [51.2120, 4.3970, 0.65], [51.2100, 4.3950, 0.62], [51.2135, 4.3975, 0.68],
-            [51.2285, 4.4045, 0.72], [51.2295, 4.4030, 0.68], [51.2270, 4.4038, 0.70],
-            [51.2258, 4.4015, 0.75], [51.2270, 4.4000, 0.72],
-            [51.2175, 4.4215, 0.92], [51.2165, 4.4200, 0.88], [51.2180, 4.4205, 0.90],
-            [51.2140, 4.4175, 0.55], [51.2150, 4.4185, 0.52],
-            [51.2092, 4.3960, 0.60], [51.2080, 4.3970, 0.58],
-        ];
-
-        // ────────────────────────────────────────────────
-        // STATE
-        // ────────────────────────────────────────────────
-        let currentCategory = 'all';
-        let deck = [];
-        let deckIndex = 0;
-        let likedLocations = [];
-        let likesCount = 0;
+        const HEATMAP_POINTS = [[51.2194, 4.4082, .95], [51.2183, 4.405, .9], [51.22, 4.406, .88], [51.2175, 4.402, .85], [51.221, 4.403, .82], [51.2153, 4.3996, .78], [51.216, 4.401, .75], [51.2145, 4.4, .7], [51.2202, 4.4003, .88], [51.2195, 4.399, .85], [51.212, 4.397, .65], [51.21, 4.395, .62], [51.2135, 4.3975, .68], [51.2285, 4.4045, .72], [51.2295, 4.403, .68], [51.227, 4.4038, .7], [51.2258, 4.4015, .75], [51.227, 4.4, .72], [51.2175, 4.4215, .92], [51.2165, 4.42, .88], [51.218, 4.4205, .9], [51.214, 4.4175, .55], [51.215, 4.4185, .52], [51.2092, 4.396, .6], [51.208, 4.397, .58]];
+        let currentCategory = 'all', deck = [], deckIndex = 0, likedLocations = [], reactionPhotos = [], likesCount = 0;
         const MAX_LIKES = 6;
-        let cameraReady = false;
-        let videoElement = null;
-        let handsModel = null;
-        let gestureTimeout = null;
-        let lastGesture = null;
-        let gestureHoldCount = 0;
+        let cameraReady = false, videoElement = null, gestureHoldCount = 0, lastGesture = null;
         const GESTURE_HOLD_FRAMES = 12;
-        let resultsMapInstance = null;
-        let heatmapVisible = false;
-        let reactionPhotos = []; // { dataUrl, locationName, locationEmoji }
-        let countdownActive = false;
-        let pendingVoteLike = null; // stored while countdown runs
+        let resultsMapInstance = null, heatmapVisible = false, countdownActive = false;
 
-        // ────────────────────────────────────────────────
-        // INIT
-        // ────────────────────────────────────────────────
         window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loading-screen').style.display = 'none';
-                document.getElementById('intro').classList.add('active');
-            }, 800);
-
-            document.querySelectorAll('.pill').forEach(p => {
-                p.addEventListener('click', () => {
-                    document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
-                    p.classList.add('active');
-                    currentCategory = p.dataset.cat;
-                });
-            });
+            ['film-top', 'film-bottom'].forEach(id => { const el = document.getElementById(id); for (let i = 0; i < 22; i++) { const h = document.createElement('div'); h.className = 'film-hole'; el.appendChild(h) } });
+            setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; document.getElementById('intro').classList.add('active') }, 900);
+            document.querySelectorAll('.pill').forEach(p => p.addEventListener('click', () => { document.querySelectorAll('.pill').forEach(x => x.classList.remove('active')); p.classList.add('active'); currentCategory = p.dataset.cat }));
         });
 
-        function buildDeck() {
-            const all = currentCategory === 'all'
-                ? [...LOCATIONS]
-                : LOCATIONS.filter(l => l.category === currentCategory);
-            for (let i = all.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [all[i], all[j]] = [all[j], all[i]];
-            }
-            return all;
-        }
+        function buildDeck() { const all = currentCategory === 'all' ? [...LOCATIONS] : LOCATIONS.filter(l => l.category === currentCategory); for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[all[i], all[j]] = [all[j], all[i]] } return all }
+        function startSwipe() { deck = buildDeck(); deckIndex = 0; likedLocations = []; reactionPhotos = []; likesCount = 0; updateLikesUI(); showScreen('swipe'); document.getElementById('cat-badge').textContent = currentCategory === 'all' ? 'All Spots' : currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1) + 's'; buildFilmStrip(); renderCard(); initCamera() }
+        function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active') }
+        function buildFilmStrip() { const el = document.getElementById('progress-film'); el.innerHTML = ''; deck.forEach(() => { const f = document.createElement('div'); f.className = 'film-frame'; el.appendChild(f) }) }
+        function updateFilmStrip() { document.querySelectorAll('.film-frame').forEach((f, i) => f.classList.toggle('done', i < deckIndex)) }
 
-        function startSwipe() {
-            deck = buildDeck();
-            deckIndex = 0;
-            likedLocations = [];
-            reactionPhotos = [];
-            likesCount = 0;
-            updateLikesUI();
-            showScreen('swipe');
-            document.getElementById('cat-badge').textContent =
-                currentCategory === 'all' ? 'All Spots' :
-                    currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1) + 's';
-            renderCard();
-            initCamera();
-        }
-
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        // ────────────────────────────────────────────────
-        // CARD RENDER
-        // ────────────────────────────────────────────────
         function renderCard() {
-            if (deckIndex >= deck.length) {
-                showDoneOverlay();
-                return;
-            }
+            if (deckIndex >= deck.length) { showDoneOverlay(); return }
             const loc = deck[deckIndex];
             document.getElementById('card-image').textContent = loc.emoji;
-            document.getElementById('card-type').textContent = loc.type.toUpperCase() + ' · ' + loc.neighborhood;
+            document.getElementById('card-type').textContent = loc.type + ' · ' + loc.neighborhood;
             document.getElementById('card-name').textContent = loc.name;
             document.getElementById('card-meta').textContent = '📍 ' + loc.address + '  ⭐ ' + loc.rating;
-            const tagsEl = document.getElementById('card-tags');
-            tagsEl.innerHTML = loc.tags.map(t => `<span class="tag">${t}</span>`).join('');
-
+            document.getElementById('card-tags').innerHTML = loc.tags.map(t => `<span class="tag">${t}</span>`).join('');
             document.getElementById('overlay-like').style.opacity = 0;
             document.getElementById('overlay-nope').style.opacity = 0;
-
-            const pct = (deckIndex / deck.length) * 100;
-            document.getElementById('progress-fill').style.width = pct + '%';
-
+            updateFilmStrip();
             const card = document.getElementById('location-card');
-            card.style.transform = '';
-            card.style.opacity = '';
-            card.classList.remove('swipe-right', 'swipe-left');
+            card.style.transform = ''; card.style.opacity = ''; card.classList.remove('swipe-right', 'swipe-left');
         }
 
-        // ────────────────────────────────────────────────
-        // COUNTDOWN + PHOTO CAPTURE
-        // ────────────────────────────────────────────────
         function triggerCountdownAndVote(liked) {
             if (countdownActive) return;
-
-            // For dislikes, skip the countdown entirely
-            if (!liked) {
-                commitVote(false);
-                return;
-            }
-
-            if (likesCount >= MAX_LIKES) {
-                document.getElementById('heart-icon').classList.add('heart-pulse');
-                setTimeout(() => document.getElementById('heart-icon').classList.remove('heart-pulse'), 400);
-                return;
-            }
-
+            if (!liked) { commitVote(false); return }
+            if (likesCount >= MAX_LIKES) { document.getElementById('heart-icon').classList.add('heart-pulse'); setTimeout(() => document.getElementById('heart-icon').classList.remove('heart-pulse'), 400); return }
             countdownActive = true;
-            const overlay = document.getElementById('countdown-overlay');
-            const numEl = document.getElementById('countdown-number');
+            const overlay = document.getElementById('countdown-overlay'), numEl = document.getElementById('countdown-number');
             overlay.classList.add('visible');
-
-            const steps = ['3', '2', '1', '📸 Say Cheese!'];
-            let step = 0;
-
+            const steps = ['3', '2', '1', '📸 Say Cheese!']; let step = 0;
             function nextStep() {
-                if (step >= steps.length) {
-                    overlay.classList.remove('visible');
-                    capturePhoto();
-                    countdownActive = false;
-                    commitVote(true);
-                    return;
-                }
+                if (step >= steps.length) { overlay.classList.remove('visible'); capturePhoto(); countdownActive = false; commitVote(true); return }
                 numEl.className = 'countdown-number' + (step === 3 ? ' cheese' : '');
                 numEl.textContent = steps[step];
-                // re-trigger animation
-                numEl.style.animation = 'none';
-                numEl.offsetHeight; // reflow
-                numEl.style.animation = '';
-                step++;
-                setTimeout(nextStep, step === 4 ? 900 : 800);
+                numEl.style.animation = 'none'; numEl.offsetHeight; numEl.style.animation = '';
+                step++; setTimeout(nextStep, step === 4 ? 950 : 820);
             }
-
             nextStep();
         }
 
         function capturePhoto() {
             if (!videoElement || !cameraReady) return;
-
-            // Flash effect
-            const flash = document.getElementById('flash-overlay');
-            flash.classList.add('flash');
-            setTimeout(() => flash.classList.remove('flash'), 200);
-
-            const captureCanvas = document.getElementById('capture-canvas');
-            const vw = videoElement.videoWidth || 640;
-            const vh = videoElement.videoHeight || 480;
-            captureCanvas.width = vw;
-            captureCanvas.height = vh;
-            const ctx = captureCanvas.getContext('2d');
-            ctx.drawImage(videoElement, 0, 0, vw, vh);
-
-            const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.85);
-            const loc = deck[deckIndex];
-            reactionPhotos.push({
-                dataUrl,
-                locationName: loc.name,
-                locationEmoji: loc.emoji,
-            });
+            const flash = document.getElementById('flash-overlay'); flash.classList.add('flash'); setTimeout(() => flash.classList.remove('flash'), 220);
+            const cc = document.getElementById('capture-canvas');
+            cc.width = videoElement.videoWidth || 640; cc.height = videoElement.videoHeight || 480;
+            cc.getContext('2d').drawImage(videoElement, 0, 0, cc.width, cc.height);
+            reactionPhotos.push({ dataUrl: cc.toDataURL('image/jpeg', .82), locationName: deck[deckIndex].name, locationEmoji: deck[deckIndex].emoji });
         }
 
-        // ────────────────────────────────────────────────
-        // VOTING
-        // ────────────────────────────────────────────────
-        function vote(liked) {
-            if (deckIndex >= deck.length) return;
-            if (countdownActive) return;
-            triggerCountdownAndVote(liked);
-        }
-
+        function vote(liked) { if (deckIndex >= deck.length || countdownActive) return; triggerCountdownAndVote(liked) }
         function commitVote(liked) {
-            const loc = deck[deckIndex];
             const card = document.getElementById('location-card');
-
-            if (liked) {
-                likedLocations.push(loc);
-                likesCount++;
-                updateLikesUI();
-                card.classList.add('swipe-right');
-                document.getElementById('btn-like').classList.add('active-gesture');
-                setTimeout(() => document.getElementById('btn-like').classList.remove('active-gesture'), 400);
-            } else {
-                card.classList.add('swipe-left');
-                document.getElementById('btn-dislike').classList.add('active-gesture');
-                setTimeout(() => document.getElementById('btn-dislike').classList.remove('active-gesture'), 400);
-            }
-
-            setTimeout(() => {
-                deckIndex++;
-                if (deckIndex >= deck.length || likesCount >= MAX_LIKES) {
-                    showDoneOverlay();
-                } else {
-                    renderCard();
-                }
-            }, 360);
+            if (liked) { likedLocations.push(deck[deckIndex]); likesCount++; updateLikesUI(); card.classList.add('swipe-right'); document.getElementById('btn-like').classList.add('active-gesture'); setTimeout(() => document.getElementById('btn-like').classList.remove('active-gesture'), 400) }
+            else { card.classList.add('swipe-left'); document.getElementById('btn-dislike').classList.add('active-gesture'); setTimeout(() => document.getElementById('btn-dislike').classList.remove('active-gesture'), 400) }
+            setTimeout(() => { deckIndex++; if (deckIndex >= deck.length || likesCount >= MAX_LIKES) showDoneOverlay(); else renderCard() }, 370);
         }
-
-        function updateLikesUI() {
-            document.getElementById('likes-count').textContent = likesCount;
-        }
-
-        function showDoneOverlay() {
-            document.getElementById('done-likes').textContent = likesCount;
-            document.getElementById('done-overlay').classList.add('visible');
-        }
+        function updateLikesUI() { document.getElementById('likes-count').textContent = likesCount }
+        function showDoneOverlay() { document.getElementById('done-likes').textContent = likesCount; document.getElementById('done-overlay').classList.add('visible') }
 
         function showResults() {
             showScreen('results');
-            document.getElementById('results-subtitle').textContent =
-                `You loved ${likesCount} spots in Antwerp`;
-
-            // Update photos tab badge
-            const photosBtn = document.getElementById('photos-tab-btn');
-            photosBtn.textContent = `📸 Reaction Photos (${reactionPhotos.length})`;
-
-            renderLikedList();
+            const n = likedLocations.length;
+            document.getElementById('results-subtitle').textContent = `your ${n} favourite spot${n !== 1 ? 's' : ''}`;
             renderPhotosGrid();
+            buildBottomSheet();
             setTimeout(buildResultsMap, 300);
         }
+        function resetApp() { document.getElementById('done-overlay').classList.remove('visible'); likedLocations = []; reactionPhotos = []; likesCount = 0; resultsMapInstance = null; heatmapVisible = false; countdownActive = false; videoElement = null; cameraReady = false; showScreen('intro') }
+        function openPhotos() { document.getElementById('photos-overlay').classList.add('visible') }
+        function closePhotos() { document.getElementById('photos-overlay').classList.remove('visible') }
 
-        function resetApp() {
-            document.getElementById('done-overlay').classList.remove('visible');
-            likedLocations = [];
-            reactionPhotos = [];
-            likesCount = 0;
-            resultsMapInstance = null;
-            heatmapVisible = false;
-            countdownActive = false;
-            videoElement = null;
-            cameraReady = false;
-            showScreen('intro');
-            if (handsModel) { handsModel = null; }
+        // ── BUSY SIMULATION ──
+        const BUSY_LEVELS = ['quiet', 'moderate', 'busy', 'very busy'];
+        function getBusy(loc) {
+            // Simulate busyness based on location type + some determinism
+            const seed = (loc.id * 7 + 3) % 4;
+            return BUSY_LEVELS[seed];
         }
+        function getWalkMin(loc) { return 5 + ((loc.id * 3 + 1) % 18) }
 
-        // ────────────────────────────────────────────────
-        // TABS
-        // ────────────────────────────────────────────────
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-
-            const tabMap = { list: 0, map: 1, photos: 2 };
-            document.querySelectorAll('.tab')[tabMap[tab]].classList.add('active');
-
-            const contentMap = { list: 'list-tab', map: 'map-tab', photos: 'photos-tab-content' };
-            document.getElementById(contentMap[tab]).classList.add('active');
-
-            if (tab === 'map' && !resultsMapInstance) {
-                setTimeout(buildResultsMap, 100);
-            }
-        }
-
-        // ────────────────────────────────────────────────
-        // LIKED LIST
-        // ────────────────────────────────────────────────
-        function renderLikedList() {
-            const el = document.getElementById('liked-list');
-            if (likedLocations.length === 0) {
-                el.innerHTML = '<p style="padding:2rem;color:var(--text2)">You didn\'t like any spots! Go back and swipe some. 😊</p>';
-                return;
-            }
-            el.innerHTML = likedLocations.map(loc => `
-    <div class="liked-card">
-      <div class="liked-card-img">${loc.emoji}</div>
-      <div class="liked-card-body">
-        <div class="card-type">${loc.type.toUpperCase()} · ${loc.neighborhood}</div>
-        <div class="card-name">${loc.name}</div>
-        <div class="card-meta">📍 ${loc.address} · ⭐ ${loc.rating}</div>
-        <div class="card-tags" style="margin-bottom:.75rem">${loc.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-        <a href="${loc.gmaps}" target="_blank" rel="noopener">Open in Google Maps ↗</a>
-      </div>
-    </div>
-  `).join('');
-        }
-
-        // ────────────────────────────────────────────────
-        // PHOTOS GRID
-        // ────────────────────────────────────────────────
-        function renderPhotosGrid() {
-            const container = document.getElementById('photos-grid-container');
-            if (reactionPhotos.length === 0) {
-                container.innerHTML = '<p class="no-photos-msg">No reaction photos — camera access was needed to capture them.</p>';
-                return;
-            }
-            const grid = document.createElement('div');
-            grid.className = 'photos-grid';
-
-            reactionPhotos.forEach((photo, i) => {
-                const cell = document.createElement('div');
-                cell.className = 'photo-cell';
-
-                const img = document.createElement('img');
-                img.src = photo.dataUrl;
-                img.alt = `Reaction to ${photo.locationName}`;
-
-                const label = document.createElement('div');
-                label.className = 'photo-cell-label';
-                label.innerHTML = `<span class="photo-cell-emoji">${photo.locationEmoji}</span> ${photo.locationName}`;
-
-                const dlLink = document.createElement('a');
-                dlLink.className = 'photo-download';
-                dlLink.href = photo.dataUrl;
-                dlLink.download = `reaction-${photo.locationName.replace(/\s+/g, '-').toLowerCase()}.jpg`;
-                dlLink.title = 'Download photo';
-                dlLink.textContent = '⬇';
-
-                cell.appendChild(img);
-                cell.appendChild(label);
-                cell.appendChild(dlLink);
-                grid.appendChild(cell);
+        // ── BOTTOM SHEET ──
+        function buildBottomSheet() {
+            const track = document.getElementById('sheet-track');
+            const dotsEl = document.getElementById('sheet-dots');
+            track.innerHTML = ''; dotsEl.innerHTML = '';
+            if (!likedLocations.length) { track.innerHTML = '<p style="padding:1rem;font-family:Caveat,cursive;color:var(--ink3)">no liked spots yet!</p>'; return }
+            likedLocations.forEach((loc, i) => {
+                // dot
+                const dot = document.createElement('div'); dot.className = 'sheet-dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(dot);
+                // card
+                const card = document.createElement('div'); card.className = 'sheet-card';
+                const busy = getBusy(loc); const walk = getWalkMin(loc);
+                const isBusy = busy === 'busy' || busy === 'very busy';
+                const photo = reactionPhotos[i];
+                // Per-place Google Maps search URL (official Maps URL, no API key needed)
+                const placeUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(loc.name + ', ' + loc.address + ', Antwerp');
+                card.innerHTML = `
+              <div class="sheet-card-img">
+                <span style="position:relative;z-index:1">${loc.emoji}</span>
+                <div class="sheet-card-photo ${photo ? '' : 'empty'}" id="scp-${i}">
+                  ${photo ? `<img src="${photo.dataUrl}" alt="reaction">` : ''}
+                </div>
+              </div>
+              <div class="sheet-card-body">
+                <div class="sheet-card-type">${loc.type} · ${loc.neighborhood}</div>
+                <div class="sheet-card-name">${loc.name}</div>
+                <div class="sheet-card-address">📍 ${loc.address}</div>
+              </div>
+              <div class="sheet-card-footer">
+                <div class="sheet-card-pills">
+                  <div class="sheet-pill">🚶 ${walk} min</div>
+                  <div class="sheet-pill ${isBusy ? 'busy' : 'quiet'}"><span class="busy-dot"></span> ${busy.charAt(0).toUpperCase() + busy.slice(1)}</div>
+                </div>
+                <a class="sheet-gmaps-btn" href="${placeUrl}" target="_blank" rel="noopener" title="Open in Google Maps">→</a>
+              </div>`;
+                // clicking card focuses pin on map
+                card.addEventListener('click', () => focusPin(i));
+                track.appendChild(card);
             });
-
-            container.innerHTML = '';
-            container.appendChild(grid);
+            // scroll spy → sync dots + fly map
+            track.addEventListener('scroll', () => {
+                const w = track.clientWidth, idx = Math.round(track.scrollLeft / w);
+                document.querySelectorAll('.sheet-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+                if (resultsMapInstance && likedLocations[idx]) {
+                    resultsMapInstance.flyTo({ center: [likedLocations[idx].lng, likedLocations[idx].lat], zoom: 15, duration: 600 });
+                    highlightPin(idx);
+                }
+            }, { passive: true });
         }
 
-        // ────────────────────────────────────────────────
-        // MAPLIBRE RESULTS MAP
-        // ────────────────────────────────────────────────
+        let pinMarkers = [];
+        function focusPin(idx) {
+            const loc = likedLocations[idx];
+            if (!resultsMapInstance || !loc) return;
+            resultsMapInstance.flyTo({ center: [loc.lng, loc.lat], zoom: 15, duration: 500 });
+            highlightPin(idx);
+            // scroll sheet to card
+            const track = document.getElementById('sheet-track');
+            track.scrollTo({ left: idx * track.clientWidth, behavior: 'smooth' });
+        }
+        function highlightPin(activeIdx) {
+            pinMarkers.forEach((m, i) => {
+                const el = m.getElement();
+                el.classList.toggle('active-pin', i === activeIdx);
+            });
+        }
+
+        // ── RESULTS MAP ──
         function buildResultsMap() {
             if (resultsMapInstance) return;
             const el = document.getElementById('results-map');
-            if (!el || likedLocations.length === 0) {
-                el.innerHTML = '<p style="padding:2rem;color:var(--text2)">Like some locations first!</p>';
-                return;
-            }
-
+            if (!el || !likedLocations.length) return;
             resultsMapInstance = new maplibregl.Map({
                 container: 'results-map',
-                style: {
-                    version: 8,
-                    sources: {
-                        'osm': {
-                            type: 'raster',
-                            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                            tileSize: 256,
-                            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        }
-                    },
-                    layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
-                },
-                center: [4.4025, 51.2194],
-                zoom: 13,
+                style: { version: 8, sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '© OpenStreetMap' } }, layers: [{ id: 'osm', type: 'raster', source: 'osm' }] },
+                center: [4.4025, 51.2194], zoom: 13
             });
-
-            const bounds = likedLocations.reduce((b, loc) => {
-                return b.extend([loc.lng, loc.lat]);
-            }, new maplibregl.LngLatBounds([likedLocations[0].lng, likedLocations[0].lat], [likedLocations[0].lng, likedLocations[0].lat]));
-
+            const bounds = likedLocations.reduce((b, l) => b.extend([l.lng, l.lat]),
+                new maplibregl.LngLatBounds([likedLocations[0].lng, likedLocations[0].lat], [likedLocations[0].lng, likedLocations[0].lat]));
             resultsMapInstance.on('load', () => {
-                likedLocations.forEach((loc) => {
-                    const markerEl = document.createElement('div');
-                    markerEl.style.cssText = `
-                        width:36px;height:36px;border-radius:50%;
-                        background:#ff6b35;border:2px solid #fff;
-                        display:flex;align-items:center;justify-content:center;
-                        font-size:16px;cursor:pointer;
-                        box-shadow:0 2px 10px rgba(0,0,0,.4);
-                    `;
-                    markerEl.textContent = loc.emoji;
-
-                    new maplibregl.Marker({ element: markerEl })
+                pinMarkers = [];
+                likedLocations.forEach((loc, i) => {
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;';
+                    // reaction photo bubble above pin
+                    const photo = reactionPhotos[i];
+                    const bubble = document.createElement('div'); bubble.className = 'pin-photo-bubble' + (photo ? ' show' : '');
+                    if (photo) { const img = document.createElement('img'); img.src = photo.dataUrl; bubble.appendChild(img) }
+                    // pin
+                    const pin = document.createElement('div'); pin.className = 'map-pin';
+                    const inner = document.createElement('div'); inner.className = 'map-pin-inner'; inner.textContent = loc.emoji;
+                    pin.appendChild(inner);
+                    wrap.appendChild(bubble); wrap.appendChild(pin);
+                    pin.addEventListener('click', () => focusPin(i));
+                    const marker = new maplibregl.Marker({ element: wrap, anchor: 'bottom' })
                         .setLngLat([loc.lng, loc.lat])
-                        .setPopup(new maplibregl.Popup({ offset: 20 }).setHTML(`
-                            <strong style="font-family:'DM Serif Display',serif;font-size:1rem">${loc.name}</strong><br>
-                            <span style="font-size:.82rem;color:#9999b0">${loc.address}</span><br>
-                            <a href="${loc.gmaps}" target="_blank" style="color:#ff6b35;font-size:.82rem;text-decoration:none;font-weight:500">Open in Google Maps ↗</a>
-                        `))
                         .addTo(resultsMapInstance);
+                    pinMarkers.push(marker);
                 });
-
-                resultsMapInstance.fitBounds(bounds, { padding: 80, maxZoom: 15 });
-
-                resultsMapInstance.addSource('heatmap-source', {
-                    type: 'geojson',
-                    data: {
-                        type: 'FeatureCollection',
-                        features: HEATMAP_POINTS.map(([lat, lng, weight]) => ({
-                            type: 'Feature',
-                            properties: { weight },
-                            geometry: { type: 'Point', coordinates: [lng, lat] }
-                        }))
-                    }
-                });
-
-                resultsMapInstance.addLayer({
-                    id: 'heatmap-layer',
-                    type: 'heatmap',
-                    source: 'heatmap-source',
-                    layout: { visibility: 'none' },
-                    paint: {
-                        'heatmap-weight': ['get', 'weight'],
-                        'heatmap-intensity': 1.2,
-                        'heatmap-radius': 50,
-                        'heatmap-opacity': 0.75,
-                        'heatmap-color': [
-                            'interpolate', ['linear'], ['heatmap-density'],
-                            0, 'rgba(0,0,0,0)',
-                            0.1, '#00f5ff',
-                            0.3, '#00ff88',
-                            0.55, '#ffff00',
-                            0.8, '#ff8800',
-                            1, '#ff0000'
-                        ]
-                    }
-                });
+                resultsMapInstance.fitBounds(bounds, { padding: { top: 140, bottom: 230, left: 40, right: 40 }, maxZoom: 15 });
+                // heatmap source
+                resultsMapInstance.addSource('hs', { type: 'geojson', data: { type: 'FeatureCollection', features: HEATMAP_POINTS.map(([lat, lng, w]) => ({ type: 'Feature', properties: { weight: w }, geometry: { type: 'Point', coordinates: [lng, lat] } })) } });
+                resultsMapInstance.addLayer({ id: 'hl', type: 'heatmap', source: 'hs', layout: { visibility: 'none' }, paint: { 'heatmap-weight': ['get', 'weight'], 'heatmap-intensity': 1.2, 'heatmap-radius': 50, 'heatmap-opacity': .72, 'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', .1, '#00f5ff', .3, '#00ff88', .55, '#ffff00', .8, '#ff8800', 1, '#ff0000'] } });
             });
-
-            const gmapsBase = 'https://www.google.com/maps/dir/';
-            const waypoints = likedLocations.map(l => `${l.lat},${l.lng}`).join('/');
-            document.getElementById('gmaps-link').href = gmapsBase + waypoints;
+            // Build a Google Maps URL that opens all liked spots as a custom map.
+            // We encode every location as "Name, Address, Antwerp" and pass them
+            // as waypoints in /maps/dir/ — this opens Google Maps showing all pins
+            // on the map with labels, and lets the user open turn-by-turn from there.
+            // Each waypoint uses the human-readable name so Google resolves the actual place.
+            const waypoints = likedLocations.map(l => encodeURIComponent(l.name + ', ' + l.address + ', Antwerp')).join('/');
+            document.getElementById('gmaps-link').href = 'https://www.google.com/maps/dir/' + waypoints;
         }
 
         function toggleHeatmap() {
-            if (!resultsMapInstance) return;
-            heatmapVisible = !heatmapVisible;
-            resultsMapInstance.setLayoutProperty('heatmap-layer', 'visibility', heatmapVisible ? 'visible' : 'none');
-            const btn = document.getElementById('heatmap-btn');
-            const legend = document.getElementById('heatmap-legend');
-            btn.classList.toggle('on', heatmapVisible);
-            btn.textContent = heatmapVisible ? '🔥 Hide Busy Heatmap' : '🔥 Toggle Busy Heatmap';
-            legend.classList.toggle('visible', heatmapVisible);
+            if (!resultsMapInstance) return; heatmapVisible = !heatmapVisible;
+            resultsMapInstance.setLayoutProperty('hl', 'visibility', heatmapVisible ? 'visible' : 'none');
+            document.getElementById('heatmap-btn').classList.toggle('on', heatmapVisible);
+            document.getElementById('heatmap-btn').textContent = heatmapVisible ? '🔥 Hide' : '🔥 Heatmap';
+            document.getElementById('heatmap-legend').classList.toggle('visible', heatmapVisible);
         }
 
-        // ────────────────────────────────────────────────
-        // MEDIAPIPE HANDS
-        // ────────────────────────────────────────────────
+        function renderPhotosGrid() {
+            const container = document.getElementById('photos-grid-container');
+            if (!reactionPhotos.length) { container.innerHTML = '<p class="no-photos-msg">no reaction photos — camera access was needed.</p>'; return }
+            const d = new Date(); const ds = [String(d.getDate()).padStart(2, '0'), String(d.getMonth() + 1).padStart(2, '0'), String(d.getFullYear()).slice(-2)].join('.');
+            const grid = document.createElement('div'); grid.className = 'photos-grid';
+            reactionPhotos.forEach(photo => {
+                const cell = document.createElement('div'); cell.className = 'photo-cell';
+                const wrap = document.createElement('div'); wrap.className = 'photo-cell-img-wrap';
+                const img = document.createElement('img'); img.src = photo.dataUrl; img.alt = 'Reaction to ' + photo.locationName;
+                const stamp = document.createElement('div'); stamp.className = 'photo-date-stamp'; stamp.textContent = ds;
+                wrap.appendChild(img); wrap.appendChild(stamp);
+                const label = document.createElement('div'); label.className = 'photo-cell-label';
+                label.innerHTML = `<div class="photo-cell-name"><span>${photo.locationEmoji}</span> ${photo.locationName}</div><div class="photo-cell-place">antwerp, BE</div>`;
+                const dl = document.createElement('a'); dl.className = 'photo-download'; dl.href = photo.dataUrl; dl.download = 'antwerp-' + photo.locationName.replace(/\s+/g, '-').toLowerCase() + '.jpg'; dl.title = 'download'; dl.textContent = '⬇';
+                cell.appendChild(wrap); cell.appendChild(label); cell.appendChild(dl); grid.appendChild(cell);
+            });
+            container.innerHTML = ''; container.appendChild(grid);
+        }
+
+
+
         async function initCamera() {
-            const video = document.getElementById('video-bg');
-            const canvas = document.getElementById('canvas-overlay');
-            const ctx = canvas.getContext('2d');
-            const statusEl = document.getElementById('gesture-status');
-
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-
-            let stream;
+            const video = document.getElementById('video-bg'), canvas = document.getElementById('canvas-overlay'), ctx = canvas.getContext('2d'), statusEl = document.getElementById('gesture-status');
+            function rc() { canvas.width = window.innerWidth; canvas.height = window.innerHeight } rc(); window.addEventListener('resize', rc);
+            try { const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 1280, height: 720 } }); video.srcObject = s; videoElement = video; cameraReady = true; statusEl.textContent = '🤖 loading hand tracking…' }
+            catch (e) { document.getElementById('no-camera-notice').style.display = 'block'; statusEl.textContent = '📵 no camera — use buttons below'; return }
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 1280, height: 720 } });
-                video.srcObject = stream;
-                videoElement = video;
-                cameraReady = true;
-                statusEl.textContent = '🤖 Initialising hand tracking…';
-            } catch (e) {
-                document.getElementById('no-camera-notice').style.display = 'block';
-                statusEl.textContent = '📵 No camera — use buttons below';
-                return;
-            }
-
-            try {
-                const Hands = window.Hands;
-                if (!Hands) throw new Error('MediaPipe not loaded');
-
-                const hands = new Hands({
-                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-                });
-
-                hands.setOptions({
-                    maxNumHands: 1,
-                    modelComplexity: 1,
-                    minDetectionConfidence: 0.7,
-                    minTrackingConfidence: 0.6
-                });
-
-                hands.onResults((results) => {
+                const Hands = window.Hands; if (!Hands) throw new Error('no mp');
+                const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+                hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: .7, minTrackingConfidence: .6 });
+                hands.onResults(res => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                    if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
-                        gestureHoldCount = 0;
-                        lastGesture = null;
-                        statusEl.textContent = '✋ Show your hand to the camera';
-                        statusEl.classList.remove('detected');
-                        return;
-                    }
-
-                    const landmarks = results.multiHandLandmarks[0];
-
-                    if (window.drawConnectors && window.drawLandmarks) {
-                        drawConnectors(ctx, landmarks, window.HAND_CONNECTIONS, { color: 'rgba(78,205,196,0.5)', lineWidth: 2 });
-                        drawLandmarks(ctx, landmarks, { color: 'rgba(255,107,53,0.8)', lineWidth: 1, radius: 4 });
-                    }
-
-                    // Don't process gestures during countdown
+                    if (!res.multiHandLandmarks?.length) { gestureHoldCount = 0; lastGesture = null; statusEl.textContent = '✋ show your hand'; statusEl.classList.remove('detected'); return }
+                    const lm = res.multiHandLandmarks[0];
+                    if (window.drawConnectors) drawConnectors(ctx, lm, window.HAND_CONNECTIONS, { color: 'rgba(201,151,42,.5)', lineWidth: 2 });
+                    if (window.drawLandmarks) drawLandmarks(ctx, lm, { color: 'rgba(200,57,43,.8)', lineWidth: 1, radius: 3 });
                     if (countdownActive) return;
-
-                    const gesture = classifyGesture(landmarks);
-
-                    if (gesture) {
-                        if (gesture === lastGesture) {
-                            gestureHoldCount++;
-                            if (gestureHoldCount === GESTURE_HOLD_FRAMES) {
-                                triggerGesture(gesture);
-                            }
-                        } else {
-                            lastGesture = gesture;
-                            gestureHoldCount = 1;
-                        }
-
+                    const g = classifyGesture(lm);
+                    if (g) {
+                        if (g === lastGesture) { gestureHoldCount++; if (gestureHoldCount === GESTURE_HOLD_FRAMES) triggerGesture(g) } else { lastGesture = g; gestureHoldCount = 1 }
                         const pct = Math.min(gestureHoldCount / GESTURE_HOLD_FRAMES, 1);
-                        if (gesture === 'thumbsUp') {
-                            statusEl.textContent = `👍 Thumbs Up detected ${pct < 1 ? '— hold…' : '✓ LIKED!'}`;
-                            statusEl.classList.add('detected');
-                        } else {
-                            statusEl.textContent = `👎 Thumbs Down detected ${pct < 1 ? '— hold…' : '✓ NOPE!'}`;
-                            statusEl.classList.add('detected');
-                        }
-
-                        const cx = canvas.width * 0.5, cy = 80;
-                        ctx.beginPath();
-                        ctx.arc(cx, cy, 30, -Math.PI / 2, -Math.PI / 2 + pct * 2 * Math.PI);
-                        ctx.strokeStyle = gesture === 'thumbsUp' ? '#2ecc71' : '#e74c3c';
-                        ctx.lineWidth = 4;
-                        ctx.stroke();
-                    } else {
-                        gestureHoldCount = 0;
-                        lastGesture = null;
-                        statusEl.textContent = '👋 Show thumbs up or thumbs down';
-                        statusEl.classList.remove('detected');
-                    }
+                        statusEl.textContent = g === 'thumbsUp' ? `👍 thumbs up ${pct < 1 ? '— hold…' : '→ liked!'}` : `👎 thumbs down ${pct < 1 ? '— hold…' : '→ nope!'}`;
+                        statusEl.classList.add('detected');
+                        const cx = canvas.width * .5, cy = 72; ctx.beginPath(); ctx.arc(cx, cy, 26, -Math.PI / 2, -Math.PI / 2 + pct * 2 * Math.PI); ctx.strokeStyle = g === 'thumbsUp' ? '#2d6a4f' : '#c8392b'; ctx.lineWidth = 3.5; ctx.stroke();
+                    } else { gestureHoldCount = 0; lastGesture = null; statusEl.textContent = '👋 thumbs up or down'; statusEl.classList.remove('detected') }
                 });
-
-                const camera = new window.Camera(video, {
-                    onFrame: async () => { await hands.send({ image: video }); },
-                    width: 1280, height: 720
-                });
-                await camera.start();
-                statusEl.textContent = '👋 Show thumbs up or thumbs down';
-
-            } catch (e) {
-                console.warn('MediaPipe failed:', e);
-                statusEl.textContent = '⚠ Hand tracking unavailable — use buttons';
-                document.getElementById('no-camera-notice').style.display = 'block';
-            }
+                const cam = new window.Camera(video, { onFrame: async () => await hands.send({ image: video }), width: 1280, height: 720 }); await cam.start(); statusEl.textContent = '👋 show thumbs up or down';
+            } catch (e) { console.warn(e); statusEl.textContent = '⚠ tracking unavailable — use buttons'; document.getElementById('no-camera-notice').style.display = 'block' }
         }
 
-        // ────────────────────────────────────────────────
-        // GESTURE CLASSIFICATION
-        // ────────────────────────────────────────────────
         function classifyGesture(lm) {
-            const fingerExtended = (tipIdx, baseIdx) => lm[tipIdx].y < lm[baseIdx].y;
-
-            const indexUp = fingerExtended(8, 6);
-            const middleUp = fingerExtended(12, 10);
-            const ringUp = fingerExtended(16, 14);
-            const pinkyUp = fingerExtended(20, 18);
-            const fingersDown = !indexUp && !middleUp && !ringUp && !pinkyUp;
-
-            const thumbTip = lm[4];
-            const thumbMCP = lm[2];
-            const wrist = lm[0];
-
-            const thumbUp = thumbTip.y < wrist.y - 0.1 && thumbTip.y < thumbMCP.y;
-            const thumbDown = thumbTip.y > wrist.y + 0.05 && thumbTip.y > thumbMCP.y;
-
-            if (fingersDown && thumbUp) return 'thumbsUp';
-            if (fingersDown && thumbDown) return 'thumbsDown';
+            const fe = (t, b) => lm[t].y < lm[b].y;
+            const fd = !fe(8, 6) && !fe(12, 10) && !fe(16, 14) && !fe(20, 18);
+            const tt = lm[4], tm = lm[2], w = lm[0];
+            if (fd && tt.y < w.y - .1 && tt.y < tm.y) return 'thumbsUp';
+            if (fd && tt.y > w.y + .05 && tt.y > tm.y) return 'thumbsDown';
             return null;
         }
+        function triggerGesture(g) { gestureHoldCount = 0; lastGesture = null; vote(g === 'thumbsUp') }
 
-        function triggerGesture(gesture) {
-            gestureHoldCount = 0;
-            lastGesture = null;
-            if (gesture === 'thumbsUp') vote(true);
-            else if (gesture === 'thumbsDown') vote(false);
-        }
-
-        // ────────────────────────────────────────────────
-        // DRAG TO SWIPE
-        // ────────────────────────────────────────────────
         (function setupDrag() {
             let startX = 0, isDragging = false, currentX = 0;
-
-            const getCard = () => document.getElementById('location-card');
-
-            function onStart(e) {
-                if (document.getElementById('done-overlay').classList.contains('visible')) return;
-                if (countdownActive) return;
-                isDragging = true;
-                startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-                getCard().classList.add('dragging');
-            }
-            function onMove(e) {
-                if (!isDragging) return;
-                currentX = (e.type === 'touchmove' ? e.touches[0].clientX : e.clientX) - startX;
-                const card = getCard();
-                const rotate = currentX * 0.05;
-                card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
-                const likeO = Math.max(0, currentX / 100);
-                const nopeO = Math.max(0, -currentX / 100);
-                document.getElementById('overlay-like').style.opacity = Math.min(likeO, 1);
-                document.getElementById('overlay-nope').style.opacity = Math.min(nopeO, 1);
-            }
-            function onEnd() {
-                if (!isDragging) return;
-                isDragging = false;
-                const card = getCard();
-                card.classList.remove('dragging');
-                if (currentX > 80) vote(true);
-                else if (currentX < -80) vote(false);
-                else {
-                    card.style.transform = '';
-                    document.getElementById('overlay-like').style.opacity = 0;
-                    document.getElementById('overlay-nope').style.opacity = 0;
-                }
-                currentX = 0;
-            }
-
+            const gc = () => document.getElementById('location-card');
+            function onStart(e) { if (document.getElementById('done-overlay').classList.contains('visible') || countdownActive) return; isDragging = true; startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX; gc().classList.add('dragging') }
+            function onMove(e) { if (!isDragging) return; currentX = (e.type === 'touchmove' ? e.touches[0].clientX : e.clientX) - startX; gc().style.transform = `translateX(${currentX}px) rotate(${currentX * .05}deg)`; document.getElementById('overlay-like').style.opacity = Math.min(Math.max(0, currentX / 100), 1); document.getElementById('overlay-nope').style.opacity = Math.min(Math.max(0, -currentX / 100), 1) }
+            function onEnd() { if (!isDragging) return; isDragging = false; gc().classList.remove('dragging'); if (currentX > 80) vote(true); else if (currentX < -80) vote(false); else { gc().style.transform = ''; document.getElementById('overlay-like').style.opacity = 0; document.getElementById('overlay-nope').style.opacity = 0 } currentX = 0 }
             document.getElementById('location-card').addEventListener('mousedown', onStart);
-            document.addEventListener('mousemove', onMove);
-            document.addEventListener('mouseup', onEnd);
+            document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onEnd);
             document.getElementById('location-card').addEventListener('touchstart', onStart, { passive: true });
-            document.addEventListener('touchmove', onMove, { passive: true });
-            document.addEventListener('touchend', onEnd);
+            document.addEventListener('touchmove', onMove, { passive: true }); document.addEventListener('touchend', onEnd);
         })();
     </script>
 </body>
