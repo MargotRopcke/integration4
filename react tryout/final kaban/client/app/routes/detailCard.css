@@ -1,0 +1,79 @@
+
+
+/* Priority section styles */
+.priority-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.priority-section h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.priority-display {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.priority-color-indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 10px;
+  display: inline-block;
+}
+
+
+/* Edit Link */
+.edit-link-container {
+  margin: 1rem 0;
+  text-align: right;
+}
+
+.bottom-drawer-action {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.edit-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #4a90e2;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.edit-link:hover {
+  background-color: #3a7bc8;
+}
+
+/* Description List Styling */
+dl {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+dt {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+dd {
+  margin-left: 0;
+  margin-bottom: 1rem;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}

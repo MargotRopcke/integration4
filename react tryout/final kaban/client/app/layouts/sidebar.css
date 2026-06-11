@@ -1,0 +1,36 @@
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--drawer-width);
+  background-color: var(--drawer-background);
+  box-shadow: -2px 0 5px var(--drawer-shadow);
+  z-index: 1000;
+  /*animation: slide-in var(--drawer-animation-duration) ease-out;*/
+}
+
+.drawer__content {
+  height: 100%;
+  padding: 1.5rem;
+  overflow-y: auto;
+  position: relative;
+}
+
+.drawer__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: #333;
+}
+
+.drawer__title {
+  margin-top: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.drawer__body {
+  margin-top: 1.5rem;
+}

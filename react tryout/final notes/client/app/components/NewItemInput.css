@@ -1,0 +1,105 @@
+/* Button Styles */
+.app__new-item-btn {
+  background-color: transparent;
+  border: none;
+  color: #4c84ff;
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  padding: var(--spacer-1) var(--spacer-2);
+  border-radius: var(--spacer-1);
+  transition: background-color 0.2s;
+}
+
+.app__new-item-btn:hover{
+  background-color: rgba(76, 132, 255, 0.1);
+}
+
+.app__new-item-btn:disabled {
+  color: #c0c0c0;
+  cursor: not-allowed;
+}
+
+
+/* NewItemInput-specific styles */
+.app__new-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-2);
+}
+
+.app__new-item-input {
+  padding: var(--spacer-2);
+  border: 1px solid #ddd;
+  border-radius: var(--spacer-1);
+  font-size: var(--font-size-md);
+}
+
+.app__new-item-actions {
+  display: flex;
+  gap: var(--spacer-2);
+}
+
+.app__new-item-save,
+.app__new-item-cancel {
+  padding: var(--spacer-1) var(--spacer-3);
+  border: none;
+  border-radius: var(--spacer-1);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.app__new-item-save {
+  background-color: #4c84ff;
+  color: white;
+}
+
+.app__new-item-save:hover {
+  background-color: #3b73e5;
+}
+
+.app__new-item-cancel {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.app__new-item-cancel:hover {
+  background-color: #e0e0e0;
+}
+
+/* Dark mode overrides */
+.app--dark .app__new-item-btn{
+  color: #7c8fff;
+}
+
+.app--dark .app__new-item-btn:hover {
+  background-color: rgba(124, 143, 255, 0.1);
+}
+
+.app--dark .app__new-item-btn:disabled {
+  color: #5d5d7a;
+}
+
+
+.app--dark .app__new-item-input {
+  background-color: #3a3a50;
+  border-color: #5d5d7a;
+  color: #e6e6e6;
+}
+
+.app--dark .app__new-item-save {
+  background-color: #7c8fff;
+}
+
+.app--dark .app__new-item-save:hover {
+  background-color: #6a7adf;
+}
+
+.app--dark .app__new-item-cancel {
+  background-color: #44445a;
+  color: #e6e6e6;
+}
+
+.app--dark .app__new-item-cancel:hover {
+  background-color: #52526a;
+}

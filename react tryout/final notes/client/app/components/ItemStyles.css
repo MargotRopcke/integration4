@@ -1,0 +1,94 @@
+/* Shared styles for folder and note items */
+.app__item {
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+}
+
+.app--dark .app__item{
+  border-bottom-color: #3d3d5c;
+}
+
+/* Links styling */
+.app__item-link {
+  display: flex;
+  width: 100%;
+  padding: var(--spacer-3) var(--spacer-5);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.app__item-link--folder {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app__item-link--note {
+  display: block;
+}
+
+.app__item-link:hover{
+  background-color: #f2f2f2;
+}
+
+.app--dark .app__item-link:hover {
+  background-color: #333346;
+}
+
+/* Active state styling */
+.app__item:has(.active) {
+  border-left: 3px solid #4c84ff;
+}
+
+.active {
+  background-color: #ebf5ff !important;
+}
+
+.app--dark .active{
+  background-color: #3a3a50 !important;
+}
+
+.app--dark .app__item:has(.active) {
+  border-left: 3px solid #7c8fff;
+}
+
+/* Titles and icons */
+.app__item-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.app__item-icon {
+  font-size: 16px;
+}
+
+/* Folder-specific styles */
+.app__item-folder-count {
+  background-color: #e0e0e0;
+  color: #616161;
+  font-size: var(--font-size-sm);
+  padding: var(--spacer-1) var(--spacer-2);
+  border-radius: var(--spacer-2);
+}
+
+.app--dark .app__item-folder-count {
+  background-color: #44445a;
+  color: #c9c9d9;
+}
+
+/* Note-specific styles */
+.app__item-note-preview {
+  font-size: var(--font-size-sm);
+  color: #757575;
+  margin-top: var(--spacer-1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.app--dark .app__item-note-preview {
+  color: #a6a6bf;
+}

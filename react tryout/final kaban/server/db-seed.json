@@ -1,0 +1,78 @@
+{
+  "lanes": [
+    {
+      "id": 1,
+      "title": "To Do"
+    },
+    {
+      "id": 2,
+      "title": "In Progress"
+    },
+    {
+      "id": 3,
+      "title": "Review"
+    },
+    {
+      "id": 4,
+      "title": "Done"
+    }
+  ],
+  "cards": [
+    {
+      "id": 1,
+      "title": "Research UI components",
+      "description": "Find suitable React component libraries for the dashboard",
+      "priority": "low",
+      "laneId": 3
+    },
+    {
+      "id": 2,
+      "title": "Fix navigation bug",
+      "description": "Navigation links don't work correctly on mobile devices",
+      "priority": "high",
+      "laneId": 2
+    },
+    {
+      "id": 3,
+      "title": "Setup API endpoints",
+      "description": "Create REST API endpoints for user authentication",
+      "priority": "high",
+      "laneId": 2
+    },
+    {
+      "id": 4,
+      "title": "Implement drag and dropp",
+      "description": "Add drag and drop functionality to the kanban board",
+      "priority": "medium",
+      "laneId": 1
+    },
+    {
+      "id": 5,
+      "title": "Update documentation",
+      "description": "Update the API documentation with new endpoints",
+      "priority": "low",
+      "laneId": 1
+    },
+    {
+      "id": 6,
+      "title": "Refactor authentication logic",
+      "description": "Clean up and optimize the authentication flow",
+      "priority": "high",
+      "laneId": 2
+    },
+    {
+      "id": 7,
+      "title": "Design homepage layout",
+      "description": "Create wireframes for the new homepage design",
+      "priority": "medium",
+      "laneId": 4
+    },
+    {
+      "id": 8,
+      "title": "Add unit tests",
+      "description": "Write unit tests for utility functions",
+      "priority": "high",
+      "laneId": 4
+    }
+  ]
+}

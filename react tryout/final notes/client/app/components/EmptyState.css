@@ -1,0 +1,39 @@
+/* EmptyState-specific styles */
+.app__empty-state {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+
+  padding: 1rem;
+}
+
+.app__empty-content {
+  text-align: center;
+  padding: var(--spacer-10);
+}
+
+.app__empty-icon {
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacer-4);
+  display: block;
+}
+
+.app__empty-content h2 {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.app__empty-content p {
+  color: #757575;
+}
+
+/* Dark mode overrides */
+.app--dark .app__empty-state {
+  background-color: #252535;
+}
+
+.app--dark .app__empty-content p {
+  color: #a6a6bf;
+}

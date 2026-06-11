@@ -1,0 +1,65 @@
+@import url('./reset.css');
+
+:root {
+  /* Colors */
+  --color-white: #ffffff;
+  --color-background: #f8f9fa;
+  --color-primary: #3498db;
+  --color-secondary: #2ecc71;
+  --color-text-primary: #2c3e50;
+  --color-text-secondary: #7f8c8d;
+  
+  --color-lane-bg: #ebecf0;
+  --color-border: #dfe1e6;
+  --color-button-hover: #dfe1e6;
+  
+  --color-count-bg: #0d0e10;
+  --color-count-text: #6b778c;
+
+  --color-highlight: #f0f0f0;
+  
+  /* Font sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+
+  --drawer-width: 30rem;
+  --drawer-animation-duration: 0.3s;
+  --drawer-background: #ffffff;
+  --drawer-shadow: rgba(0, 0, 0, 0.2);
+  
+}
+
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+img {
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+
