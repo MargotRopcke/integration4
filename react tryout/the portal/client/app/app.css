@@ -1,0 +1,165 @@
+/* ============================================
+   THE PORTAL — Global Styles & Design Tokens
+   ============================================ */
+
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+/* --- CSS Reset --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0a0a0f;
+  color: #e8e8ed;
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* --- Design Tokens --- */
+:root {
+  /* Colors - Dark palette */
+  --color-bg-primary: #0a0a0f;
+  --color-bg-secondary: #12121a;
+  --color-bg-elevated: #1a1a2e;
+  --color-bg-glass: rgba(20, 20, 35, 0.85);
+  --color-bg-glass-hover: rgba(30, 30, 50, 0.9);
+
+  /* Accent colors */
+  --color-accent-primary: #7c5bf5;
+  --color-accent-secondary: #00d4aa;
+  --color-accent-warm: #ff6b6b;
+  --color-accent-gold: #fbbf24;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #7c5bf5 0%, #00d4aa 100%);
+  --gradient-dark: linear-gradient(180deg, #0a0a0f 0%, #12121a 50%, #1a1a2e 100%);
+  --gradient-glow: radial-gradient(circle at 50% 50%, rgba(124, 91, 245, 0.15) 0%, transparent 70%);
+  --gradient-card: linear-gradient(135deg, rgba(124, 91, 245, 0.08) 0%, rgba(0, 212, 170, 0.05) 100%);
+
+  /* Text */
+  --color-text-primary: #e8e8ed;
+  --color-text-secondary: #9191a8;
+  --color-text-muted: #5a5a72;
+  --color-text-accent: #a78bfa;
+
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+  --color-border-accent: rgba(124, 91, 245, 0.3);
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px rgba(124, 91, 245, 0.2);
+  --shadow-glow-strong: 0 0 60px rgba(124, 91, 245, 0.35);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Typography */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Glass effect */
+  --glass-blur: 20px;
+  --glass-bg: rgba(16, 16, 28, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Utility: visually hidden --- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* --- MapLibre GL overrides --- */
+.maplibregl-ctrl-bottom-left,
+.maplibregl-ctrl-bottom-right {
+  display: none !important;
+}
+
+.maplibregl-ctrl-top-right {
+  top: var(--space-md);
+  right: var(--space-md);
+}
+
+/* --- Scrollbar styling --- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
