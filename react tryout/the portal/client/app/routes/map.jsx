@@ -9,8 +9,34 @@ import "./map.css";
 const ANTWERP_CENTER = [4.4025, 51.2194];
 const ANTWERP_ZOOM = 13;
 
-// Free dark basemap style (CARTO Dark Matter - no API key needed)
-const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+// OpenStreetMap raster tiles basemap style (matching demo-mila maplibre)
+const MAP_STYLE = {
+  version: 8,
+  sources: {
+    osm: {
+      type: "raster",
+      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tileSize: 256,
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    },
+  },
+  layers: [{ id: "osm", type: "raster", source: "osm" }],
+};
+
+const getCategoryEmoji = (categoryId) => {
+  switch (Number(categoryId)) {
+    case 3:
+      return "🍽"; // Restaurant / food
+    case 4:
+      return "👗"; // Fashion / clothing
+    case 2:
+      return "☕"; // Café
+    case 1:
+      return "🍺"; // Bar / nightlife
+    default:
+      return "📍";
+  }
+};
 
 export const clientLoader = async () => {
   try {
@@ -91,9 +117,8 @@ export default function MapPage({ loaderData }) {
     const el = document.createElement("div");
     el.className = `map-marker${isActive ? " map-marker--active" : ""}`;
     el.innerHTML = `
-      <div class="map-marker__pulse"></div>
-      <div class="map-marker__pin">
-        <div class="map-marker__inner"></div>
+      <div class="map-marker__icon">
+        ${getCategoryEmoji(location.primary_category_id)}
       </div>
     `;
     el.addEventListener("click", () => {

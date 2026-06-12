@@ -85,72 +85,40 @@
 
 /* Custom map markers */
 .map-marker {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform var(--transition-fast);
 }
 
-.map-marker:hover {
+.map-marker__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ff6b35;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  transition: transform var(--transition-fast, 0.2s ease);
+}
+
+.map-marker:hover .map-marker__icon {
   transform: scale(1.15);
 }
 
-.map-marker__pin {
-  width: 36px;
-  height: 36px;
-  border-radius: 50% 50% 50% 0;
-  background: var(--gradient-primary);
-  transform: rotate(-45deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-glow), var(--shadow-sm);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: all var(--transition-fast);
-}
-
-.map-marker:hover .map-marker__pin {
-  box-shadow: var(--shadow-glow-strong), var(--shadow-md);
-}
-
-.map-marker__inner {
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border-radius: 50%;
-  transform: rotate(45deg);
-}
-
-.map-marker--active .map-marker__pin {
+.map-marker--active .map-marker__icon {
   background: linear-gradient(135deg, #fbbf24 0%, #ff6b6b 100%);
-  box-shadow: 0 0 30px rgba(251, 191, 36, 0.35), var(--shadow-md);
-  transform: rotate(-45deg) scale(1.1);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.4), 0 2px 10px rgba(0, 0, 0, 0.4);
+  transform: scale(1.1);
 }
 
-/* Marker pulse animation */
-.map-marker__pulse {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(124, 91, 245, 0.2);
-  animation: marker-pulse 2s ease-out infinite;
-  pointer-events: none;
-}
-
-@keyframes marker-pulse {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(2.5);
-    opacity: 0;
-  }
+.map-marker--active:hover .map-marker__icon {
+  transform: scale(1.2);
 }
 
 /* User location marker */
