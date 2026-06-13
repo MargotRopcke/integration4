@@ -2,10 +2,10 @@
 Integration 4: Femke Denoo, Mila Jakiç, Eline Deblancq, Margot Röpcke
 
 ## List team members and roles: 
-Femke Denoo, Lead Visual Design
-Eline Deblancq, Lead Development
-Mila Jakic, Project Manager
-Margot Röpcke, Lead Experience Design
+- Femke Denoo, Lead Visual Design
+- Eline Deblancq, Lead Development
+- Margot Röpcke, Lead Experience Design
+- Mila Jakic, Project Manager
 
 ## List agreements:
 - Communicate
