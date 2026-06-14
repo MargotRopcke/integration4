@@ -488,12 +488,12 @@
 
 .summary-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
   width: 100%;
 }
 
-@media (max-width: 650px) {
+@media (max-width: 750px) {
   .summary-grid {
     grid-template-columns: 1fr;
   }
@@ -599,3 +599,61 @@
   width: 100%;
   margin-top: 1rem;
 }
+
+/* --- STEP 2.5: CATEGORY CHOICE (STYLE vs FLAVOUR) --- */
+.category-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+@media (max-width: 500px) {
+  .category-choice-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.category-choice-card {
+  background: var(--form-surface);
+  border: 1px solid var(--form-glass-border);
+  border-radius: 16px;
+  padding: 2.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.category-choice-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--form-accent);
+  background: var(--form-surface-hover);
+  box-shadow: 0 15px 30px var(--form-accent-glow), 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.category-choice-card:active {
+  transform: translateY(-1px);
+}
+
+.category-choice-icon {
+  font-size: 3.2rem;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.category-choice-card:hover .category-choice-icon {
+  transform: scale(1.1);
+}
+
+.category-choice-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #fff;
+}
+

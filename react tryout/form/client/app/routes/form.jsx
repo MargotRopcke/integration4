@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getPrimaryCategories, getVibeCategories } from "../data";
 import "./form.css";
 
 const TRAVELER_TYPES = [
@@ -9,14 +10,27 @@ const TRAVELER_TYPES = [
   { id: "vulture", name: "Culture Vulture", emoji: "🎭", desc: "Soaking up art, history, fashion houses, and local heritage." }
 ];
 
-const VIBE_OPTIONS = ["Vintage", "Bohemian", "Streetwear", "Alternative", "Minimalist", "Luxurious"];
+export const clientLoader = async () => {
+  try {
+    const [primaryCategories, vibeCategories] = await Promise.all([
+      getPrimaryCategories(),
+      getVibeCategories()
+    ]);
+    return { primaryCategories, vibeCategories };
+  } catch (error) {
+    console.error("Failed to load categories/vibes:", error);
+    return { primaryCategories: [], vibeCategories: [] };
+  }
+};
 
-export default function FormPage() {
+export default function FormPage({ loaderData }) {
+  const { primaryCategories = [], vibeCategories = [] } = loaderData || {};
   const [step, setStep] = useState(0);
 
   // Form selections state
   const [nameImage, setNameImage] = useState("");
   const [travelerType, setTravelerType] = useState("");
+  const [chosenCategory, setChosenCategory] = useState(null);
   const [selectedVibes, setSelectedVibes] = useState([]);
 
   // Canvas State & References
@@ -123,6 +137,13 @@ export default function FormPage() {
     setStep(3);
   };
 
+  // Category choice handler
+  const handleSelectCategory = (category) => {
+    setChosenCategory(category);
+    setSelectedVibes([]); // Reset vibes when category changes
+    setStep(4);
+  };
+
   // Vibes multi-select handler
   const handleToggleVibe = (vibe) => {
     setSelectedVibes((prev) =>
@@ -131,12 +152,13 @@ export default function FormPage() {
   };
 
   const handleFinish = () => {
-    setStep(4);
+    setStep(5);
   };
 
   const handleReset = () => {
     setNameImage("");
     setTravelerType("");
+    setChosenCategory(null);
     setSelectedVibes([]);
     setActiveCardIndex(2);
     setHasDrawn(false);
@@ -271,31 +293,60 @@ export default function FormPage() {
           </div>
         )}
 
-        {/* === STEP 3: VIBES SELECT === */}
+        {/* === STEP 3: CATEGORY CHOICE === */}
         {step === 3 && (
           <div className="step-container" id="step-3">
+            <div className="form-header">
+              <h1 className="form-heading">Your taste shapes a more personal journey.</h1>
+              <p className="form-subheading">Choose style or flavour to refine your recommendation:</p>
+            </div>
+
+            <div className="category-choice-grid">
+              {primaryCategories.map((cat) => (
+                <div
+                  key={cat.id}
+                  onClick={() => handleSelectCategory(cat)}
+                  className="category-choice-card"
+                  id={`category-choice-${cat.name.toLowerCase().trim()}`}
+                >
+                  <div className="category-choice-icon">
+                    {cat.name.trim().toLowerCase() === "style" ? "👗" : "🍽"}
+                  </div>
+                  <h3 className="category-choice-title">{cat.name.trim()}</h3>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* === STEP 4: VIBES SELECT === */}
+        {step === 4 && (
+          <div className="step-container" id="step-4">
             <div className="form-header">
               <h1 className="form-heading">Your taste shapes a more personal journey.</h1>
               <p className="form-subheading">Choose the vibe(s) that fit your taste:</p>
             </div>
 
             <div className="vibes-grid">
-              {VIBE_OPTIONS.map((vibe) => {
-                const isSelected = selectedVibes.includes(vibe);
-                return (
-                  <div
-                    key={vibe}
-                    onClick={() => handleToggleVibe(vibe)}
-                    className={`vibe-option ${isSelected ? "selected" : ""}`}
-                    id={`vibe-${vibe.toLowerCase()}`}
-                  >
-                    <div className="vibe-circle">
-                      <div className="vibe-dot" />
+              {vibeCategories
+                .filter((vibe) => vibe.primary_category_id === chosenCategory?.id)
+                .map((vibe) => {
+                  const vibeName = vibe.name.trim();
+                  const isSelected = selectedVibes.includes(vibeName);
+                  return (
+                    <div
+                      key={vibe.id}
+                      onClick={() => handleToggleVibe(vibeName)}
+                      className={`vibe-option ${isSelected ? "selected" : ""}`}
+                      id={`vibe-${vibeName.toLowerCase().replace(/\s+/g, "-")}`}
+                    >
+                      <div className="vibe-circle">
+                        <div className="vibe-dot" />
+                      </div>
+                      <span className="vibe-text">{vibeName}</span>
                     </div>
-                    <span className="vibe-text">{vibe}</span>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
 
             <div className="vibes-actions">
@@ -306,9 +357,9 @@ export default function FormPage() {
           </div>
         )}
 
-        {/* === STEP 4: SUMMARY PAGE === */}
-        {step === 4 && (
-          <div className="step-container" id="step-4">
+        {/* === STEP 5: SUMMARY PAGE === */}
+        {step === 5 && (
+          <div className="step-container" id="step-5">
             <div className="form-header">
               <h1 className="form-heading">Your Antwerp Blueprint</h1>
               <p className="form-subheading">Here is the digital passport you created for your journey.</p>
@@ -339,6 +390,16 @@ export default function FormPage() {
                         </>
                       );
                     })()}
+                  </div>
+                </div>
+
+                <div className="summary-section">
+                  <span className="summary-title">Preference Type</span>
+                  <div className="summary-traveler-badge">
+                    <div className="summary-traveler-icon">
+                      {chosenCategory?.name.trim().toLowerCase() === "style" ? "👗" : "🍽"}
+                    </div>
+                    <div className="summary-traveler-name">{chosenCategory?.name.trim()}</div>
                   </div>
                 </div>
               </div>

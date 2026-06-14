@@ -88,3 +88,49 @@ export function formatDistance(distanceKm) {
   }
   return `${distanceKm.toFixed(1)} km`;
 }
+
+/**
+ * Fetch primary categories from Supabase (Style / Flavour)
+ * @returns {Promise<Array>}
+ */
+export async function getPrimaryCategories() {
+  try {
+    const { data, error } = await supabase
+      .from("primary_categories")
+      .select("*")
+      .order("id", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching primary categories:", error);
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching primary categories:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch vibe categories from Supabase
+ * @returns {Promise<Array>}
+ */
+export async function getVibeCategories() {
+  try {
+    const { data, error } = await supabase
+      .from("vibe_categories")
+      .select("*")
+      .order("id", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching vibe categories:", error);
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching vibe categories:", error);
+    throw error;
+  }
+}
