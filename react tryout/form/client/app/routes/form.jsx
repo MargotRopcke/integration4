@@ -1,30 +1,42 @@
 import { useState, useRef, useEffect } from "react";
-import { getPrimaryCategories, getVibeCategories } from "../data";
+import { getPrimaryCategories, getVibeCategories, getTravelerTypes } from "../data";
 import "./form.css";
-
-const TRAVELER_TYPES = [
-  { id: "party", name: "Party Animal", emoji: "🥳", desc: "Always looking for the best bars, clubs, and nightlife spots." },
-  { id: "nerd", name: "New Experience Nerd", emoji: "🤓", desc: "Curious explorer seeking hidden gems, quirky cafés, and unique views." },
-  { id: "junkie", name: "Adrenaline Junkie", emoji: "🌋", desc: "Thrill-seeker seeking action, dynamic tours, and high energy adventures." },
-  { id: "connoisseur", name: "Luxury Connoisseur", emoji: "💎", desc: "Savouring the finer things: high-end shopping, upscale dining, and premium service." },
-  { id: "vulture", name: "Culture Vulture", emoji: "🎭", desc: "Soaking up art, history, fashion houses, and local heritage." }
-];
 
 export const clientLoader = async () => {
   try {
-    const [primaryCategories, vibeCategories] = await Promise.all([
+    const [primaryCategories, vibeCategories, travelerTypes] = await Promise.all([
       getPrimaryCategories(),
-      getVibeCategories()
+      getVibeCategories(),
+      getTravelerTypes()
     ]);
-    return { primaryCategories, vibeCategories };
+    return { primaryCategories, vibeCategories, travelerTypes };
   } catch (error) {
-    console.error("Failed to load categories/vibes:", error);
-    return { primaryCategories: [], vibeCategories: [] };
+    console.error("Failed to load form data:", error);
+    return { primaryCategories: [], vibeCategories: [], travelerTypes: [] };
   }
 };
 
 export default function FormPage({ loaderData }) {
-  const { primaryCategories = [], vibeCategories = [] } = loaderData || {};
+  const { primaryCategories = [], vibeCategories = [], travelerTypes = [] } = loaderData || {};
+
+  const getEmojiForType = (id, name) => {
+    const cleanId = String(id || "").toLowerCase();
+    const cleanName = String(name || "").toLowerCase();
+    if (cleanId.includes("party") || cleanName.includes("party")) return "🥳";
+    if (cleanId.includes("nerd") || cleanName.includes("nerd") || cleanId.includes("experience") || cleanName.includes("experience")) return "🤓";
+    if (cleanId.includes("junkie") || cleanName.includes("junkie") || cleanId.includes("adrenaline") || cleanName.includes("adrenaline")) return "🌋";
+    if (cleanId.includes("connoisseur") || cleanName.includes("connoisseur") || cleanId.includes("luxury") || cleanName.includes("luxury")) return "💎";
+    if (cleanId.includes("vulture") || cleanName.includes("vulture") || cleanId.includes("culture") || cleanName.includes("culture")) return "🎭";
+    return "🗺️";
+  };
+
+  const TRAVELER_TYPES = travelerTypes.length > 0
+  travelerTypes.map((t) => ({
+    id: t.id,
+    name: t.name,
+    desc: t.description
+  }));
+
   const [step, setStep] = useState(0);
 
   // Form selections state

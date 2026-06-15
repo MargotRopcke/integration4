@@ -134,3 +134,26 @@ export async function getVibeCategories() {
     throw error;
   }
 }
+
+/**
+ * Fetch traveler types from Supabase
+ * @returns {Promise<Array>}
+ */
+export async function getTravelerTypes() {
+  try {
+    const { data, error } = await supabase
+      .from("traveler_types")
+      .select("*")
+      .order("id", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching traveler types:", error);
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching traveler types:", error);
+    throw error;
+  }
+}
