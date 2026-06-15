@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antwerp Discover</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="demo-maplibre.css">
+</head>
+
+<body>
+
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <p>Loading Antwerp Discover…</p>
+    </div>
+
+    <!-- COUNTDOWN OVERLAY -->
+    <div id="countdown-overlay">
+        <div class="countdown-number" id="countdown-number">3</div>
+    </div>
+
+    <!-- FLASH OVERLAY -->
+    <div id="flash-overlay"></div>
+
+    <!-- INTRO SCREEN -->
+    <div id="intro" class="screen">
+        <h1>Discover<br>Antwerp</h1>
+        <p>Swipe through the city's best spots with hand gestures. 👍 to like, 👎 to dislike. Collect up to 6 favourites
+            — and we'll snap your reaction for each one!</p>
+        <div class="category-pills">
+            <div class="pill active" data-cat="all">All</div>
+            <div class="pill" data-cat="restaurant">🍽 Restaurants</div>
+            <div class="pill" data-cat="fashion">👗 Fashion</div>
+            <div class="pill" data-cat="cafe">☕ Cafés</div>
+            <div class="pill" data-cat="bar">🍺 Bars</div>
+        </div>
+        <button class="btn-primary" onclick="startSwipe()">✨ Start Swiping</button>
+        <p style="font-size:.8rem; color: var(--text2); opacity:.6;">Grant camera access for hand gesture detection &
+            reaction photos</p>
+    </div>
+
+    <!-- SWIPE SCREEN -->
+    <div id="swipe" class="screen">
+        <video id="video-bg" class="input_video" style="display:none;" autoplay playsinline muted></video>
+        <div class="video-wrapper">
+            <img class="bg-image" src="../img/background.jpg" alt="background">
+            <canvas class="output_canvas"></canvas>
+        </div>
+        <canvas id="canvas-overlay"></canvas>
+
+        <div class="swipe-ui">
+            <div class="top-bar">
+                <div class="logo">Antwerp</div>
+                <div class="likes-counter">
+                    <span class="heart" id="heart-icon">♥</span>
+                    <span id="likes-count">0</span> / 6
+                </div>
+                <div class="category-badge" id="cat-badge">All</div>
+            </div>
+
+            <div class="progress-bar" style="margin-bottom:.5rem">
+                <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+            </div>
+
+            <div class="gesture-status" id="gesture-status">📷 Camera loading…</div>
+
+            <div class="card-area" id="card-area">
+                <div class="location-card" id="location-card">
+                    <div class="card-inner" id="card-inner">
+                        <div class="card-image" id="card-image"></div>
+                        <div class="card-body">
+                            <div class="card-type" id="card-type"></div>
+                            <div class="card-name" id="card-name"></div>
+                            <div class="card-meta" id="card-meta"></div>
+                            <div class="card-tags" id="card-tags"></div>
+                        </div>
+                    </div>
+                    <div class="card-vote-overlay like" id="overlay-like">LIKE ✓</div>
+                    <div class="card-vote-overlay nope" id="overlay-nope">NOPE ✗</div>
+                </div>
+            </div>
+
+            <div class="gesture-indicator">
+                <div class="gesture-btn dislike" id="btn-dislike" onclick="vote(false)" title="Dislike">👎</div>
+                <div class="gesture-btn like" id="btn-like" onclick="vote(true)" title="Like">👍</div>
+            </div>
+
+            <div class="no-camera-notice" id="no-camera-notice">No camera — use buttons to vote</div>
+        </div>
+
+        <div class="done-overlay" id="done-overlay">
+            <div class="done-emoji">🎉</div>
+            <h2>You've seen it all!</h2>
+            <p>You liked <strong id="done-likes">0</strong> spots. Ready to see your picks?</p>
+            <button class="btn-primary" onclick="showResults()">See My Picks →</button>
+            <button class="btn-back" onclick="resetApp()">↩ Start Over</button>
+        </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="results" class="screen">
+        <div class="results-header">
+            <h2>Your Antwerp Picks 🗺</h2>
+            <p id="results-subtitle">Here are the places you loved</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('list')">📋 List View</div>
+            <div class="tab" onclick="switchTab('map')">🗺 Map & Heatmap</div>
+            <div class="tab" id="photos-tab-btn" onclick="switchTab('photos')">📸 Reaction Photos</div>
+        </div>
+
+        <button class="btn-back" onclick="resetApp()">← Back to swiping</button>
+
+        <div id="list-tab" class="tab-content active">
+            <div class="liked-list" id="liked-list"></div>
+        </div>
+
+        <div id="map-tab" class="tab-content">
+            <div id="results-map"></div>
+            <div class="map-actions">
+                <a id="gmaps-link" class="btn-maps" href="#" target="_blank" rel="noopener">🗺 Open in Google Maps</a>
+                <button class="btn-heatmap" id="heatmap-btn" onclick="toggleHeatmap()">🔥 Toggle Busy Heatmap</button>
+            </div>
+            <div class="heatmap-legend" id="heatmap-legend">
+                <h4>Live Busyness — Antwerp City (simulated, based on typical Friday patterns)</h4>
+                <div class="heatmap-gradient"></div>
+                <div class="heatmap-labels"><span>Quiet</span><span>Moderate</span><span>Very Busy</span></div>
+                <p class="heatmap-note">⚠ Real-time busyness data requires a Google Maps Platform Popular Times API key.
+                    This demo simulates typical Friday evening patterns for Antwerp neighbourhoods.</p>
+            </div>
+        </div>
+
+        <div id="photos-tab-content" class="tab-content">
+            <div id="photos-tab" style="padding: 1.5rem 2rem;">
+                <div class="photos-section-title">📸 Your Reaction Shots</div>
+                <div id="photos-grid-container">
+                    <p class="no-photos-msg">No photos taken — camera access was required.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="demo-maplibre.js"></script>
+</body>
+
+</html>
