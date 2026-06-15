@@ -38,13 +38,12 @@ export default function FormPage({ loaderData }) {
 
   // Canvas State & References
   const canvasRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
 
   // Traveler Slider State
   const [activeCardIndex, setActiveCardIndex] = useState(2); // Start with middle one (Adrenaline Junkie)
 
-  // Initialize canvas listeners on step 1
+  // Initialize canvas listeners on step 1 for drawing on hover
   useEffect(() => {
     if (step !== 1) return;
 
@@ -54,7 +53,7 @@ export default function FormPage({ loaderData }) {
     const ctx = canvas.getContext("2d");
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 10;
     ctx.strokeStyle = "#1477CC"; // Antwerp Blue brush color
 
     const getPos = (e) => {
@@ -67,31 +66,42 @@ export default function FormPage({ loaderData }) {
       };
     };
 
+    let lastPos = null;
+
     const handleStart = (e) => {
-      e.preventDefault();
       const pos = getPos(e);
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-      setIsDrawing(true);
+      lastPos = pos;
       setHasDrawn(true);
     };
 
     const handleMove = (e) => {
-      if (!isDrawing) return;
-      e.preventDefault();
+      if (e.touches) {
+        e.preventDefault();
+      }
       const pos = getPos(e);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
+      
+      ctx.beginPath();
+      if (lastPos) {
+        ctx.moveTo(lastPos.x, lastPos.y);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      } else {
+        ctx.arc(pos.x, pos.y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = "#1477CC";
+        ctx.fill();
+      }
+      lastPos = pos;
+      setHasDrawn(true);
     };
 
     const handleEnd = () => {
-      setIsDrawing(false);
+      lastPos = null;
     };
 
-    // Add mouse listeners
-    canvas.addEventListener("mousedown", handleStart);
+    // Add mouse listeners (drawing on hover/move)
+    canvas.addEventListener("mouseenter", handleStart);
     canvas.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", handleEnd);
+    canvas.addEventListener("mouseleave", handleEnd);
 
     // Add touch listeners
     canvas.addEventListener("touchstart", handleStart, { passive: false });
@@ -99,14 +109,14 @@ export default function FormPage({ loaderData }) {
     canvas.addEventListener("touchend", handleEnd);
 
     return () => {
-      canvas.removeEventListener("mousedown", handleStart);
+      canvas.removeEventListener("mouseenter", handleStart);
       canvas.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", handleEnd);
+      canvas.removeEventListener("mouseleave", handleEnd);
       canvas.removeEventListener("touchstart", handleStart);
       canvas.removeEventListener("touchmove", handleMove);
       canvas.removeEventListener("touchend", handleEnd);
     };
-  }, [step, isDrawing]);
+  }, [step]);
 
   // Canvas Handlers
   const handleClear = () => {
