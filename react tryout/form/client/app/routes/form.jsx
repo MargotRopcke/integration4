@@ -32,6 +32,9 @@ export default function FormPage({ loaderData }) {
   const [travelerType, setTravelerType] = useState("");
   const [chosenCategory, setChosenCategory] = useState(null);
   const [selectedVibes, setSelectedVibes] = useState([]);
+  const [budget, setBudget] = useState("€ (≤30)");
+  const [distance, setDistance] = useState("walking (0-2km)");
+  const [takePictures, setTakePictures] = useState("yes");
 
   // Canvas State & References
   const canvasRef = useRef(null);
@@ -152,7 +155,7 @@ export default function FormPage({ loaderData }) {
   };
 
   const handleFinish = () => {
-    setStep(5);
+    setStep(7);
   };
 
   const handleReset = () => {
@@ -160,6 +163,9 @@ export default function FormPage({ loaderData }) {
     setTravelerType("");
     setChosenCategory(null);
     setSelectedVibes([]);
+    setBudget("€ (≤30)");
+    setDistance("walking (0-2km)");
+    setTakePictures("yes");
     setActiveCardIndex(2);
     setHasDrawn(false);
     setStep(0);
@@ -350,16 +356,108 @@ export default function FormPage({ loaderData }) {
             </div>
 
             <div className="vibes-actions">
-              <button onClick={handleFinish} className="btn-form" id="done-button">
+              <button onClick={() => setStep(5)} className="btn-form" id="done-button">
                 Done
               </button>
             </div>
           </div>
         )}
 
-        {/* === STEP 5: SUMMARY PAGE === */}
+        {/* === STEP 5: BUDGET & DISTANCE === */}
         {step === 5 && (
           <div className="step-container" id="step-5">
+            <div className="form-header">
+              <h1 className="form-heading">Shape the path to where you want to be.</h1>
+              <p className="form-subheading">Set your budget and travel distance preferences:</p>
+            </div>
+
+            <div className="budget-distance-container">
+              <div className="question-group">
+                <span className="group-title">Budget /p.p.</span>
+                <div className="options-row">
+                  {["€ (≤30)", "€€ (≤60)", "€€€ (≥60)"].map((opt) => (
+                    <div
+                      key={opt}
+                      onClick={() => setBudget(opt)}
+                      className={`option-btn ${budget === opt ? "active" : ""}`}
+                      id={`budget-${opt.toLowerCase().replace(/[^a-z0-9]/g, "")}`}
+                    >
+                      {opt}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="question-group">
+                <span className="group-title">Distance</span>
+                <div className="options-row">
+                  {["walking (0-2km)", "bike (2-5km)", "tram (if possible)"].map((opt) => (
+                    <div
+                      key={opt}
+                      onClick={() => setDistance(opt)}
+                      className={`option-btn ${distance === opt ? "active" : ""}`}
+                      id={`distance-${opt.split(" ")[0].toLowerCase()}`}
+                    >
+                      {opt}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="vibes-actions" style={{ marginTop: "2rem" }}>
+              <button onClick={() => setStep(6)} className="btn-form" id="budget-distance-next">
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* === STEP 6: TAKE PICTURES CHOICE === */}
+        {step === 6 && (
+          <div className="step-container" id="step-6">
+            <div className="form-header">
+              <h1 className="form-heading">Take pictures during experience?</h1>
+              <p className="form-subheading" style={{ margin: "1.5rem auto", maxWidth: "600px" }}>
+                6 Pictures will be taken of you during the experience to create a photo collage.
+                <br /><br />
+                These pictures are meant as memories for your trip to Antwerp. You can share them with your friends or keep them to yourself.
+              </p>
+              <p style={{ fontSize: "0.85rem", color: "var(--form-text-muted)", opacity: 0.8, maxWidth: "500px", margin: "0 auto 1.5rem" }}>
+                These are just for yourself, we don't use these pictures outside of this experience.
+              </p>
+            </div>
+
+            <div className="camera-choice-grid">
+              <div
+                onClick={() => setTakePictures("yes")}
+                className={`camera-choice-card ${takePictures === "yes" ? "active" : ""}`}
+                id="camera-choice-yes"
+              >
+                <div className="camera-choice-icon">📸</div>
+                <div className="camera-choice-title">Yes</div>
+              </div>
+              <div
+                onClick={() => setTakePictures("no")}
+                className={`camera-choice-card ${takePictures === "no" ? "active" : ""}`}
+                id="camera-choice-no"
+              >
+                <div className="camera-choice-icon">🚫</div>
+                <div className="camera-choice-title">No</div>
+              </div>
+            </div>
+
+            <div className="vibes-actions">
+              <button onClick={handleFinish} className="btn-form" id="camera-done">
+                Done
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* === STEP 7: SUMMARY PAGE === */}
+        {step === 7 && (
+          <div className="step-container" id="step-7">
             <div className="form-header">
               <h1 className="form-heading">Your Antwerp Blueprint</h1>
               <p className="form-subheading">Here is the digital passport you created for your journey.</p>
@@ -404,7 +502,34 @@ export default function FormPage({ loaderData }) {
                 </div>
               </div>
 
-              <div className="summary-list">
+              {/* Preferences Summary cards */}
+              <div className="summary-grid" style={{ marginTop: "1rem" }}>
+                <div className="summary-info-card">
+                  <span className="group-title" style={{ fontSize: "1.5rem" }}>💰</span>
+                  <div>
+                    <div className="info-title">Budget Limit</div>
+                    <div className="info-value">{budget}</div>
+                  </div>
+                </div>
+
+                <div className="summary-info-card">
+                  <span className="group-title" style={{ fontSize: "1.5rem" }}>🏃</span>
+                  <div>
+                    <div className="info-title">Max Distance</div>
+                    <div className="info-value">{distance}</div>
+                  </div>
+                </div>
+
+                <div className="summary-info-card">
+                  <span className="group-title" style={{ fontSize: "1.5rem" }}>📸</span>
+                  <div>
+                    <div className="info-title">Take Photos</div>
+                    <div className="info-value">{takePictures.toUpperCase()}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="summary-list" style={{ marginTop: "1.5rem" }}>
                 <span className="summary-title">Selected Vibes</span>
                 <div className="summary-vibes-tags">
                   {selectedVibes.length > 0 ? (

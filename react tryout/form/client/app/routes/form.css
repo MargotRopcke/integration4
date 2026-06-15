@@ -657,3 +657,156 @@
   color: #fff;
 }
 
+/* --- STEP 5: BUDGET & DISTANCE OPTIONS --- */
+.budget-distance-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 2rem 0;
+  width: 100%;
+}
+
+.question-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.group-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.options-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (max-width: 500px) {
+  .options-row {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+}
+
+.option-btn {
+  background: var(--form-surface);
+  border: 1px solid var(--form-glass-border);
+  border-radius: 12px;
+  padding: 1.1rem 1rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--form-text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.option-btn:hover {
+  background: var(--form-surface-hover);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.option-btn.active {
+  background: rgba(255, 107, 53, 0.1);
+  border-color: var(--form-accent);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.15);
+}
+
+/* --- STEP 6: CAMERA CHOICES (YES / NO) --- */
+.camera-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin: 2.5rem 0;
+}
+
+@media (max-width: 500px) {
+  .camera-choice-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+.camera-choice-card {
+  background: var(--form-surface);
+  border: 1px solid var(--form-glass-border);
+  border-radius: 16px;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.camera-choice-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--form-accent);
+  background: var(--form-surface-hover);
+  box-shadow: 0 15px 30px var(--form-accent-glow), 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.camera-choice-card.active {
+  background: rgba(255, 107, 53, 0.1);
+  border-color: var(--form-accent);
+  box-shadow: 0 0 25px rgba(255, 107, 53, 0.25);
+  transform: scale(1.03);
+}
+
+.camera-choice-icon {
+  font-size: 3.8rem;
+  margin-bottom: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.camera-choice-card:hover .camera-choice-icon {
+  transform: scale(1.1);
+}
+
+.camera-choice-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* --- SUMMARY GRID EXPANSION --- */
+.summary-info-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.summary-info-card .info-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--form-text-muted);
+}
+
+.summary-info-card .info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+
