@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Print Photo — HP Envy 5530</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f4f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e5e3dc;
+            padding: 2rem;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .photo-frame {
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e3dc;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            display: block;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 0.4rem;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #fff;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+
+        }
+
+        .btn:hover {
+            background: #f5f4f0;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 1rem;
+            font-size: 13px;
+            min-height: 20px;
+            transition: color 0.2s;
+        }
+
+        .status.success {
+            color: #2a7a4b;
+        }
+
+        .status.error {
+            color: #c0392b;
+        }
+
+        .status.loading {
+            color: #888;
+        }
+
+        .printer-info {
+            margin-top: 1.25rem;
+            font-size: 12px;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* Printer icon */
+        .icon-printer {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <div class="photo-frame">
+
+            <img src="A2.png" alt="Photo to print" />
+        </div>
+
+        <h1>Print this photo</h1>
+        <p class="subtitle">Sends directly to the HP Envy 5530 — no dialog.</p>
+
+        <button class="btn" id="printBtn" onclick="printPhoto()">
+            <svg class="icon-printer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            Print photo
+        </button>
+
+        <p class="status" id="status"></p>
+
+        <p class="printer-info">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+            </svg>
+            HP Envy 5530 e-All-in-One
+        </p>
+    </div>
+
+    <script>
+        async function printPhoto() {
+            const btn = document.getElementById("printBtn");
+            const status = document.getElementById("status");
+
+            btn.disabled = true;
+            status.className = "status loading";
+            status.textContent = "Sending to printer…";
+
+            try {
+                const res = await fetch("http://127.0.0.1:3456/print", { method: "POST" });
+                const data = await res.json();
+
+                if (data.success) {
+                    status.className = "status success";
+                    status.textContent = "✓ Print job sent to HP Envy 5530!";
+                } else {
+                    status.className = "status error";
+                    status.textContent = "Error: " + data.error;
+                }
+            } catch (err) {
+                status.className = "status error";
+                status.textContent = "Could not reach print server. Is it running? (node print-server.js)";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+
+</body>
+
+</html>
