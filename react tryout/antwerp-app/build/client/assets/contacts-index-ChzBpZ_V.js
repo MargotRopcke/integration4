@@ -1,0 +1,1 @@
+import{F as e,t}from"./jsx-runtime-Cld90IRz.js";var n=t(),r=e(function(){return(0,n.jsxs)(`p`,{id:`zero-state`,children:[`This is a demo for React Router.`,(0,n.jsx)(`br`,{}),`Check out`,` `,(0,n.jsx)(`a`,{href:`https://reactrouter.com`,target:`_blank`,rel:`noopener noreferrer`,children:`the docs at reactrouter.com`}),`.`]})});export{r as default};
