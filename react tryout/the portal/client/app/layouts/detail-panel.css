@@ -8,12 +8,8 @@
   left: 0;
   right: 0;
   z-index: 50;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-top: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+  background: var(--color-creamy-vanilla);
+  color: var(--color-text-blue);
   transition: height var(--transition-slow), max-height var(--transition-slow);
   overflow: hidden;
   animation: panel-slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -34,6 +30,7 @@
     transform: translateY(100%);
     opacity: 0;
   }
+
   100% {
     transform: translateY(0);
     opacity: 1;
