@@ -1,35 +1,36 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { getPrimaryCategories, getVibeCategories, getFilteredLocations } from "../data";
+import { getPrimaryCategories, getVibeCategories, getFilteredLocations, getTravelerTypes } from "../data";
 import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs";
 import "./form.css";
-
-const TRAVELER_TYPES = [
-  { id: "party", name: "Party Animal", emoji: "🥳", desc: "Always looking for the best bars, clubs, and nightlife spots." },
-  { id: "nerd", name: "New Experience Nerd", emoji: "🤓", desc: "Curious explorer seeking hidden gems, quirky cafés, and unique views." },
-  { id: "junkie", name: "Adrenaline Junkie", emoji: "🌋", desc: "Thrill-seeker seeking action, dynamic tours, and high energy adventures." },
-  { id: "connoisseur", name: "Luxury Connoisseur", emoji: "💎", desc: "Savouring the finer things: high-end shopping, upscale dining, and premium service." },
-  { id: "vulture", name: "Culture Vulture", emoji: "🎭", desc: "Soaking up art, history, fashion houses, and local heritage." }
-];
 
 const MAX_LIKES = 6;
 const GESTURE_HOLD_SECONDS = 1.5;
 
 export const clientLoader = async () => {
   try {
-    const [primaryCategories, vibeCategories] = await Promise.all([
+    const [primaryCategories, vibeCategories, travelerTypes] = await Promise.all([
       getPrimaryCategories(),
-      getVibeCategories()
+      getVibeCategories(),
+      getTravelerTypes()
     ]);
-    return { primaryCategories, vibeCategories };
+    return { primaryCategories, vibeCategories, travelerTypes };
   } catch (error) {
-    console.error("Failed to load categories/vibes:", error);
-    return { primaryCategories: [], vibeCategories: [] };
+    console.error("Failed to load categories/vibes/travelers:", error);
+    return { primaryCategories: [], vibeCategories: [], travelerTypes: [] };
   }
 };
 
 export default function FormPage({ loaderData }) {
-  const { primaryCategories = [], vibeCategories = [] } = loaderData || {};
+  const { primaryCategories = [], vibeCategories = [], travelerTypes = [] } = loaderData || {};
   const [step, setStep] = useState(0);
+
+  const displayTravelers = travelerTypes && travelerTypes.length > 0 ? travelerTypes : [
+    { id: 1, name: "Party Animal", description: "Always looking for the best bars, clubs, and nightlife spots." },
+    { id: 2, name: "New Experience Nerd", description: "Curious explorer seeking hidden gems, quirky cafés, and unique views." },
+    { id: 3, name: "Adrenaline Junkie", description: "Thrill-seeker seeking action, dynamic tours, and high energy adventures." },
+    { id: 4, name: "Luxury Connoisseur", description: "Savouring the finer things: high-end shopping, upscale dining, and premium service." },
+    { id: 5, name: "Culture Vulture", description: "Soaking up art, history, fashion houses, and local heritage." }
+  ];
 
   // Form selections state
   const [nameImage, setNameImage] = useState("");
@@ -141,7 +142,7 @@ export default function FormPage({ loaderData }) {
         e.preventDefault();
       }
       const pos = getPos(e);
-      
+
       ctx.beginPath();
       if (lastPos) {
         ctx.moveTo(lastPos.x, lastPos.y);
@@ -200,15 +201,15 @@ export default function FormPage({ loaderData }) {
 
   // Slider handlers
   const handlePrevCard = () => {
-    setActiveCardIndex((prev) => (prev - 1 + TRAVELER_TYPES.length) % TRAVELER_TYPES.length);
+    setActiveCardIndex((prev) => (prev - 1 + displayTravelers.length) % displayTravelers.length);
   };
 
   const handleNextCard = () => {
-    setActiveCardIndex((prev) => (prev + 1) % TRAVELER_TYPES.length);
+    setActiveCardIndex((prev) => (prev + 1) % displayTravelers.length);
   };
 
   const handleSelectCard = () => {
-    setTravelerType(TRAVELER_TYPES[activeCardIndex].name);
+    setTravelerType(displayTravelers[activeCardIndex].name);
     setStep(3);
   };
 
@@ -402,6 +403,8 @@ export default function FormPage({ loaderData }) {
           locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
         });
         selfieSegRef.current.setOptions({ modelSelection: 1 });
+      }
+      if (selfieSegRef.current) {
         selfieSegRef.current.onResults(onSelfieResults);
       }
 
@@ -415,7 +418,12 @@ export default function FormPage({ loaderData }) {
             vision,
             "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task"
           );
-          await gestureRecognizerRef.current.setOptions({ runningMode: "VIDEO" });
+          await gestureRecognizerRef.current.setOptions({
+            runningMode: "VIDEO",
+            minHandDetectionConfidence: 0.4,
+            minHandPresenceConfidence: 0.4,
+            minTrackingConfidence: 0.4,
+          });
         } catch (error) {
           console.error("Failed to initialize Gesture Recognizer:", error);
         }
@@ -468,10 +476,13 @@ export default function FormPage({ loaderData }) {
                   if (result && result.gestures && result.gestures.length > 0) {
                     for (const gestureList of result.gestures) {
                       const top = gestureList[0];
-                      if (top && top.score > 0.6) {
-                        if (top.categoryName === "Thumb_Up") gesture = "thumbsUp";
-                        else if (top.categoryName === "Thumb_Down") gesture = "thumbsDown";
-                        else if (top.categoryName === "Open_Palm") gesture = "stopHand";
+                      if (top) {
+                        const requiredScore = top.categoryName === "Open_Palm" ? 0.45 : 0.6;
+                        if (top.score > requiredScore) {
+                          if (top.categoryName === "Thumb_Up") gesture = "thumbsUp";
+                          else if (top.categoryName === "Thumb_Down") gesture = "thumbsDown";
+                          else if (top.categoryName === "Open_Palm") gesture = "stopHand";
+                        }
                       }
                     }
                   }
@@ -882,10 +893,10 @@ export default function FormPage({ loaderData }) {
               </button>
 
               <div className="carousel-viewport">
-                {TRAVELER_TYPES.map((type, index) => {
+                {displayTravelers.map((type, index) => {
                   let positionClass = "";
-                  const prevIndex = (activeCardIndex - 1 + TRAVELER_TYPES.length) % TRAVELER_TYPES.length;
-                  const nextIndex = (activeCardIndex + 1) % TRAVELER_TYPES.length;
+                  const prevIndex = (activeCardIndex - 1 + displayTravelers.length) % displayTravelers.length;
+                  const nextIndex = (activeCardIndex + 1) % displayTravelers.length;
 
                   if (index === activeCardIndex) {
                     positionClass = "card--active";
@@ -897,9 +908,8 @@ export default function FormPage({ loaderData }) {
 
                   return (
                     <div key={type.id} className={`carousel-card ${positionClass}`}>
-                      <div className="card-icon">{type.emoji}</div>
                       <h3 className="card-title">{type.name}</h3>
-                      <p className="card-desc">{type.desc}</p>
+                      <p className="card-desc">{type.description}</p>
                     </div>
                   );
                 })}
