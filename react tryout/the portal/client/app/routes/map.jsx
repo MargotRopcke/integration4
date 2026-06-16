@@ -10,33 +10,10 @@ const ANTWERP_CENTER = [4.4025, 51.2194];
 const ANTWERP_ZOOM = 13;
 
 // OpenStreetMap raster tiles basemap style (matching demo-mila maplibre)
-const MAP_STYLE = {
-  version: 8,
-  sources: {
-    osm: {
-      type: "raster",
-      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-      tileSize: 256,
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    },
-  },
-  layers: [{ id: "osm", type: "raster", source: "osm" }],
-};
+// Replace your old MAP_STYLE with this clean, stylized vector style
+const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-const getCategoryEmoji = (categoryId) => {
-  switch (Number(categoryId)) {
-    case 3:
-      return "🍽"; // Restaurant / food
-    case 4:
-      return "👗"; // Fashion / clothing
-    case 2:
-      return "☕"; // Café
-    case 1:
-      return "🍺"; // Bar / nightlife
-    default:
-      return "📍";
-  }
-};
+
 
 export const clientLoader = async () => {
   try {
@@ -117,9 +94,8 @@ export default function MapPage({ loaderData }) {
     const el = document.createElement("div");
     el.className = `map-marker${isActive ? " map-marker--active" : ""}`;
     el.innerHTML = `
-      <div class="map-marker__icon">
-        ${getCategoryEmoji(location.primary_category_id)}
-      </div>
+      <div class="map-marker__icon"></div>
+      
     `;
     el.addEventListener("click", () => {
       navigate(`/map/${location.id}`);

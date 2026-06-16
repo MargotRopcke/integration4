@@ -61,15 +61,18 @@ export default function LocationDetail({ loaderData }) {
         <div className="location-detail__info">
           <h2 className="location-detail__name">{location.name}</h2>
           <div className="location-detail__distance">
-            <span className="location-detail__distance-icon">📍</span>
-            <span>{distanceText}</span>
+            <span className="location-detail__distance-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="21" viewBox="0 0 16 21" fill="none">
+              <path d="M9.40727 5.59188C10.816 5.59188 11.9532 4.4547 11.9532 3.04594C11.9532 1.63719 10.816 0.5 9.40727 0.5C7.99852 0.5 6.86133 1.63719 6.86133 3.04594C6.86133 4.4547 7.99852 5.59188 9.40727 5.59188Z" stroke="#144552" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M14.5156 10.5564C14.2355 9.91143 13.4802 9.62289 12.8437 9.90294C12.1733 10.2933 11.3671 10.3612 10.6457 10.0812C8.7872 9.07127 10.5778 7.62008 8.57503 6.94965C4.94282 5.73608 1.90468 6.69506 0.58079 10.3188C0.419547 10.7431 0.504412 11.2268 0.792952 11.5833C1.08149 11.9397 1.54823 12.1009 1.99802 12.0246C2.4478 11.9482 2.82122 11.6257 2.97398 11.2014C3.20312 10.3273 3.80565 9.58895 4.61186 9.1816C5.19743 8.96943 5.84241 8.95246 6.44495 9.1137L3.12673 18.33C2.90608 18.9835 3.25403 19.6963 3.899 19.934C4.55246 20.1716 5.27382 19.8406 5.51992 19.1956L7.46331 13.7982L7.08143 14.859L8.64294 19.1956C8.78721 19.6369 9.16061 19.9594 9.61888 20.0443C10.0771 20.1291 10.5354 19.9594 10.8324 19.6115C11.1295 19.255 11.2058 18.7713 11.0446 18.3385L8.89752 11.9567C9.06725 12.1009 9.24548 12.2282 9.44067 12.3386C10.8494 13.026 12.4958 12.992 13.8791 12.2622C14.1846 12.1264 14.4307 11.8718 14.558 11.5578C14.6853 11.2438 14.6768 10.8959 14.541 10.5819L14.5156 10.5564Z" stroke="#144552" stroke-linecap="round" stroke-linejoin="round" />
+            </svg></span>
+            <p>{distanceText}</p>
           </div>
         </div>
 
         {/* Expand hint */}
         {!expanded && (
           <div className="location-detail__hint">
-            <span className="location-detail__hint-text">Tap for details</span>
+      
             <span className="location-detail__hint-chevron">▲</span>
           </div>
         )}
@@ -94,7 +97,7 @@ export default function LocationDetail({ loaderData }) {
                   className="location-detail__maps-link"
                   id="google-maps-link"
                 >
-                  <span className="location-detail__maps-icon">🗺️</span>
+
                   Navigate with Google Maps
                   <span className="location-detail__maps-arrow">↗</span>
                 </a>
