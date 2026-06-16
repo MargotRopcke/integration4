@@ -41,6 +41,7 @@ export default function FormPage({ loaderData }) {
   const [budget, setBudget] = useState("€ (≤30)");
   const [distance, setDistance] = useState("walking (0-2km)");
   const [takePictures, setTakePictures] = useState("yes");
+  const [showNoPhotosPopup, setShowNoPhotosPopup] = useState(false);
 
   // Canvas State & References
   const canvasRef = useRef(null);
@@ -1223,20 +1224,52 @@ export default function FormPage({ loaderData }) {
               </p>
             </div>
             <div className="camera-choice-grid">
-              <div onClick={() => setTakePictures("yes")}
+              <div onClick={() => { setTakePictures("yes"); handleFinish(); }}
                 className={`camera-choice-card ${takePictures === "yes" ? "active" : ""}`} id="camera-choice-yes">
                 <div className="camera-choice-icon">📸</div>
                 <div className="camera-choice-title">Yes</div>
               </div>
-              <div onClick={() => setTakePictures("no")}
+              <div onClick={() => setShowNoPhotosPopup(true)}
                 className={`camera-choice-card ${takePictures === "no" ? "active" : ""}`} id="camera-choice-no">
                 <div className="camera-choice-icon">🚫</div>
                 <div className="camera-choice-title">No</div>
               </div>
             </div>
-            <div className="vibes-actions">
-              <button onClick={handleFinish} className="btn-form" id="camera-done">Done</button>
-            </div>
+
+            {/* No Photos Confirmation Popup */}
+            {showNoPhotosPopup && (
+              <div className="popup-overlay" id="no-photos-popup">
+                <div className="popup-card">
+                  <h2 className="popup-title">Are you sure?</h2>
+                  <p className="popup-desc">
+                    Taking photos during the experience leads to better outcomes and creates a more engaging overall experience.
+                  </p>
+                  <div className="popup-actions">
+                    <button
+                      className="btn-form"
+                      onClick={() => {
+                        setTakePictures("no");
+                        setShowNoPhotosPopup(false);
+                        handleFinish();
+                      }}
+                      id="popup-confirm-no-photos"
+                    >
+                      Yes, continue
+                    </button>
+                    <button
+                      className="btn-form btn-form--secondary"
+                      onClick={() => {
+                        setTakePictures("yes");
+                        setShowNoPhotosPopup(false);
+                      }}
+                      id="popup-cancel-no-photos"
+                    >
+                      No, I'm not sure
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
