@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { getPrimaryCategories, getVibeCategories, getFilteredLocations, getTravelerTypes } from "../data";
+import { getPrimaryCategories, getVibeCategories, getFilteredLocations, getTravelerTypes } from "../../data";
 import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs";
+
 import "./form.css";
 
 const MAX_LIKES = 6;
@@ -382,6 +383,7 @@ export default function FormPage({ loaderData }) {
     };
 
     const initCamera = async () => {
+      console.log("Requesting camera access...");
       let stream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({

@@ -1,4 +1,7 @@
+// react-router.config.js
+
+/** @type {import('@react-router/dev/types').Config} */
 export default {
-  // SPA mode - no server-side rendering
   ssr: false,
+  appDirectory: 'app',
 };

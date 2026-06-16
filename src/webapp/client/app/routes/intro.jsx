@@ -1,9 +1,18 @@
 import { Link } from "react-router";
 import "./intro.css";
 
+// routes/map.jsx
+import { useSearchParams } from 'react-router';
+import { getSessionLocations } from '../data';
+
+export async function clientLoader({ request }) {
+  const userId = new URL(request.url).searchParams.get('user');
+  return getSessionLocations(userId);
+}
+
 export default function Intro() {
   return (
-    
+
     <div className="intro" id="intro-screen">
 
       <div className="mobile-container">
@@ -67,8 +76,8 @@ export default function Intro() {
           <div className="type-icon">
           </div>
         </main>
-   
-        
+
+
         <Link to="/map" className="intro__button" id="enter-button">
           Let's discover your taste
         </Link>
@@ -76,7 +85,7 @@ export default function Intro() {
 
     </div>
   );
- 
+
 }
 
 export function meta() {
