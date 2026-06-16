@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import "./intro.css";
 
 // routes/map.jsx
-import { useSearchParams } from 'react-router';
+// import { useSearchParams } from 'react-router';
 import { getSessionLocations } from '../data';
 
 export async function clientLoader({ request }) {

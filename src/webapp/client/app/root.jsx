@@ -7,9 +7,9 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-// import "../../css/fonts.css";
-// import "../../css/root.css";
-// import "./app.css";
+import "./style/fonts.css";
+import "./style/root.css";
+import "./app.css";
 
 export function Layout({ children }) {
   return (
