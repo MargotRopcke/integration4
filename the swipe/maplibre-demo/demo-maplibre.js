@@ -45,10 +45,6 @@ let likesCount = 0;
 const MAX_LIKES = 6;
 let cameraReady = false;
 let videoElement = null;
-let gestureTimeout = null;
-let lastGesture = null;
-let gestureHoldCount = 0;
-const GESTURE_HOLD_FRAMES = 12;
 let resultsMapInstance = null;
 let heatmapVisible = false;
 let reactionPhotos = []; // { dataUrl, locationName, locationEmoji }
@@ -63,6 +59,12 @@ let showBackgroundReplacement = true;
 // Background Swapping Settings
 const bgImages = ['../img/background.jpg', '../img/images.jpg'];
 let currentBgIndex = 0;
+
+// Gesture Hold Tracker (Time-based system)
+let currentGesture = null; // 'thumbsUp', 'thumbsDown', or 'stopHand'
+let gestureStartTime = null;
+let hasTriggeredActiveGesture = false;
+let cardLoadedTime = 0;
 
 // ────────────────────────────────────────────────
 // INIT
@@ -139,6 +141,8 @@ function renderCard() {
     card.style.transform = '';
     card.style.opacity = '';
     card.classList.remove('swipe-right', 'swipe-left');
+
+    cardLoadedTime = performance.now();
 }
 
 // ────────────────────────────────────────────────
@@ -602,9 +606,9 @@ async function initCamera() {
                 if (gestureRecognizer) {
                     const timestamp = performance.now();
                     const result = gestureRecognizer.recognizeForVideo(video, timestamp);
-                    
+
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
+
                     // Draw hand skeleton/connectors on canvas-overlay
                     if (result && result.landmarks && result.landmarks.length > 0) {
                         const landmarks = result.landmarks[0];
@@ -614,46 +618,53 @@ async function initCamera() {
                         }
                     }
 
-                    // Classify active gesture
-                    let gesture = null;
-                    if (result && result.gestures && result.gestures.length > 0) {
-                        for (const gestureList of result.gestures) {
-                            const topGesture = gestureList[0];
-                            if (topGesture && topGesture.score > 0.6) {
-                                if (topGesture.categoryName === 'Thumb_Up') {
-                                    gesture = 'thumbsUp';
-                                } else if (topGesture.categoryName === 'Thumb_Down') {
-                                    gesture = 'thumbsDown';
-                                } else if (topGesture.categoryName === 'Open_Palm') {
-                                    gesture = 'stopHand';
+                    // Don't process gestures during countdown or for 2 seconds after a card loads
+                    if (countdownActive || (performance.now() - cardLoadedTime < 2000)) {
+                        currentGesture = null;
+                        gestureStartTime = null;
+                        hasTriggeredActiveGesture = false;
+                        statusEl.textContent = '👋 Show thumbs up, thumbs down, or stop hand';
+                        statusEl.classList.remove('detected');
+                    } else {
+                        // Classify active gesture
+                        let gesture = null;
+                        if (result && result.gestures && result.gestures.length > 0) {
+                            for (const gestureList of result.gestures) {
+                                const topGesture = gestureList[0];
+                                if (topGesture && topGesture.score > 0.6) {
+                                    if (topGesture.categoryName === 'Thumb_Up') {
+                                        gesture = 'thumbsUp';
+                                    } else if (topGesture.categoryName === 'Thumb_Down') {
+                                        gesture = 'thumbsDown';
+                                    } else if (topGesture.categoryName === 'Open_Palm') {
+                                        gesture = 'stopHand';
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    // Handle holds and trigger actions
-                    if (!countdownActive) {
-                        if (gesture) {
-                            if (gesture === lastGesture) {
-                                gestureHoldCount++;
-                                if (gestureHoldCount >= GESTURE_HOLD_FRAMES) {
-                                    triggerGesture(gesture);
-                                }
-                            } else {
-                                lastGesture = gesture;
-                                gestureHoldCount = 1;
+                        // Handle holds and trigger actions using the 1.5s timer
+                        if (gesture === null || gesture !== currentGesture) {
+                            currentGesture = gesture;
+                            gestureStartTime = gesture ? performance.now() : null;
+                            hasTriggeredActiveGesture = false;
+
+                            if (!gesture) {
+                                statusEl.textContent = '👋 Show thumbs up, thumbs down, or stop hand';
+                                statusEl.classList.remove('detected');
                             }
+                        } else if (!hasTriggeredActiveGesture) {
+                            const now = performance.now();
+                            const elapsed = (now - gestureStartTime) / 1000;
+                            const pct = Math.min(elapsed / 1.5, 1);
 
-                            const pct = Math.min(gestureHoldCount / GESTURE_HOLD_FRAMES, 1);
+                            statusEl.classList.add('detected');
                             if (gesture === 'thumbsUp') {
-                                statusEl.textContent = `👍 Thumbs Up detected ${pct < 1 ? '— hold…' : '✓ LIKED!'}`;
-                                statusEl.classList.add('detected');
+                                statusEl.textContent = `👍 Thumbs Up detected ${pct < 1 ? `— hold (${elapsed.toFixed(1)}s)` : '✓ LIKED!'}`;
                             } else if (gesture === 'thumbsDown') {
-                                statusEl.textContent = `👎 Thumbs Down detected ${pct < 1 ? '— hold…' : '✓ NOPE!'}`;
-                                statusEl.classList.add('detected');
+                                statusEl.textContent = `👎 Thumbs Down detected ${pct < 1 ? `— hold (${elapsed.toFixed(1)}s)` : '✓ NOPE!'}`;
                             } else if (gesture === 'stopHand') {
-                                statusEl.textContent = `✋ Stop Hand detected ${pct < 1 ? '— hold…' : '✓ TOGGLED!'}`;
-                                statusEl.classList.add('detected');
+                                statusEl.textContent = `✋ Stop Hand detected ${pct < 1 ? `— hold (${elapsed.toFixed(1)}s)` : '✓ GOING BACK!'}`;
                             }
 
                             const cx = canvas.width * 0.5, cy = 80;
@@ -662,11 +673,13 @@ async function initCamera() {
                             ctx.strokeStyle = gesture === 'thumbsUp' ? '#2ecc71' : (gesture === 'thumbsDown' ? '#e74c3c' : '#00c6ff');
                             ctx.lineWidth = 4;
                             ctx.stroke();
-                        } else {
-                            gestureHoldCount = 0;
-                            lastGesture = null;
-                            statusEl.textContent = '👋 Show thumbs up, thumbs down, or stop hand';
-                            statusEl.classList.remove('detected');
+
+                            if (elapsed >= 1.5) {
+                                triggerGestureAction(currentGesture);
+                                hasTriggeredActiveGesture = true;
+                                gestureStartTime = null;
+                                currentGesture = null;
+                            }
                         }
                     }
                 }
@@ -719,12 +732,14 @@ function swapBackground(direction) {
     };
 }
 
-function triggerGesture(gesture) {
-    gestureHoldCount = 0;
-    lastGesture = null;
-    if (gesture === 'thumbsUp') vote(true);
-    else if (gesture === 'thumbsDown') vote(false);
-    else if (gesture === 'stopHand') toggleBackgroundReplacement();
+function triggerGestureAction(gesture) {
+    if (gesture === 'thumbsUp') {
+        vote(true);
+    } else if (gesture === 'thumbsDown') {
+        vote(false);
+    } else if (gesture === 'stopHand') {
+        resetApp();
+    }
 }
 
 // ────────────────────────────────────────────────
