@@ -1049,6 +1049,21 @@
     box-shadow: 0 0 30px rgba(46, 204, 113, .4);
 }
 
+.gesture-btn.undo {
+    width: 52px;
+    height: 52px;
+    font-size: 1.4rem;
+    transition: all .25s ease;
+}
+
+.gesture-btn.undo:hover {
+    background: rgba(0, 198, 255, .25);
+    border-color: var(--accent2, #4ecdc4);
+    color: var(--accent2, #4ecdc4);
+    box-shadow: 0 0 30px rgba(0, 198, 255, .4);
+    transform: scale(1.15);
+}
+
 .gesture-status {
     position: absolute;
     top: 5rem;

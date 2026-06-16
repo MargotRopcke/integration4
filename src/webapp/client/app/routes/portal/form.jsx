@@ -787,6 +787,57 @@ export default function FormPage({ loaderData }) {
   // Helper to avoid ESLint issue with state setter in camera loop closure
   const setSummarySummaryFlash = (val) => setSummaryFlash(val);
 
+  const handleGoBack = useCallback(() => {
+    const currentIdx = deckIndexRef.current;
+    if (currentIdx <= 0) {
+      // Already at the first card, nothing to go back to
+      setGestureStatusText("⛔ Already at the first spot!");
+      return;
+    }
+
+    // If swipe was done, undo it
+    if (swipeDone) {
+      setSwipeDone(false);
+    }
+
+    const prevIndex = currentIdx - 1;
+    const prevLocation = deckRef.current[prevIndex];
+
+    // Check if the previous location was liked
+    if (prevLocation) {
+      const wasLiked = likedLocationsRef.current.some(
+        (loc) => (loc.keyID && loc.keyID === prevLocation.keyID) || (loc.id && loc.id === prevLocation.id)
+      );
+
+      if (wasLiked) {
+        // Remove from liked locations
+        likedLocationsRef.current = likedLocationsRef.current.filter(
+          (loc) => !((loc.keyID && loc.keyID === prevLocation.keyID) || (loc.id && loc.id === prevLocation.id))
+        );
+        setLikedLocations([...likedLocationsRef.current]);
+
+        // Decrement likes count
+        likesCountRef.current = Math.max(0, likesCountRef.current - 1);
+        setLikesCount(likesCountRef.current);
+
+        // Remove associated reaction photo
+        reactionPhotosRef.current = reactionPhotosRef.current.filter(
+          (photo) => photo.locationName !== prevLocation.name
+        );
+        setReactionPhotos([...reactionPhotosRef.current]);
+      }
+    }
+
+    // Go back one card
+    deckIndexRef.current = prevIndex;
+    setDeckIndex(prevIndex);
+    setCardSwipeClass("");
+    setOverlayLikeOpacity(0);
+    setOverlayNopeOpacity(0);
+    cardLoadedTimeRef.current = performance.now();
+    setGestureStatusText("↩ Went back one spot");
+  }, [swipeDone]);
+
   const handleGestureAction = useCallback((gesture) => {
     if (tutorialActiveRef.current) {
       handleTutorialGesture(gesture);
@@ -794,8 +845,8 @@ export default function FormPage({ loaderData }) {
     }
     if (gesture === "thumbsUp") handleVote(true);
     else if (gesture === "thumbsDown") handleVote(false);
-    else if (gesture === "stopHand") handleReset();
-  }, []);
+    else if (gesture === "stopHand") handleGoBack();
+  }, [handleGoBack]);
 
   const nextTutorialStep = useCallback(() => {
     const nextStep = tutorialStepRef.current + 1;
@@ -1297,6 +1348,7 @@ export default function FormPage({ loaderData }) {
 
                   <div className="gesture-indicator">
                     <div className="gesture-btn dislike" id="btn-dislike" onClick={() => handleVote(false)} title="Dislike">👎</div>
+                    <div className="gesture-btn undo" id="btn-undo" onClick={handleGoBack} title="Go back" style={{ opacity: deckIndex > 0 ? 1 : 0.3, pointerEvents: deckIndex > 0 ? 'auto' : 'none' }}>↩</div>
                     <div className="gesture-btn like" id="btn-like" onClick={() => handleVote(true)} title="Like">👍</div>
                   </div>
 
