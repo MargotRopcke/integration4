@@ -7,7 +7,18 @@ import { getSessionLocations } from '../data';
 
 export async function clientLoader({ request }) {
   const userId = new URL(request.url).searchParams.get('user');
+
+  // werkt alleen met een user id die dan via de qr zou gegeven moeten worden
   return getSessionLocations(userId);
+
+  // --> als we niet door heel de form willen gaan moet deze code geactiveerd worden
+  //   if (!userId) return { locations: [] };
+  // try {
+  //   return await getSessionLocations(userId);
+  // } catch (e) {
+  //   console.error("Failed to load session locations:", e);
+  //   return { locations: [] };
+  // }
 }
 
 export default function Intro() {
