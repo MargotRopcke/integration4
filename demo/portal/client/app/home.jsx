@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-import "./app.css";
+import "../../app.css";
 
 export function Layout({ children }) {
   return (
@@ -83,7 +83,7 @@ export function ErrorBoundary({ error }) {
     </main>
   );
 }
-
+/*
 export function HydrateFallback() {
   return (
     <div style={{
@@ -98,7 +98,7 @@ export function HydrateFallback() {
       <p>Loading...</p>
     </div>
   );
-}
+}*/
 
 export function meta() {
   return [{ title: "The Portal — Discover Antwerp" }];
