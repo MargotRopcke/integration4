@@ -66,6 +66,11 @@ let gestureStartTime = null;
 let hasTriggeredActiveGesture = false;
 let cardLoadedTime = 0;
 
+// Tutorial state
+let tutorialActive = false;
+let tutorialStep = 1;
+
+
 // ────────────────────────────────────────────────
 // INIT
 // ────────────────────────────────────────────────
@@ -108,6 +113,23 @@ function startSwipe() {
             currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1) + 's';
     renderCard();
     initCamera();
+
+    // Initialize gesture tutorial overlay
+    tutorialActive = true;
+    tutorialStep = 1;
+    const overlay = document.getElementById('tutorial-overlay');
+    if (overlay) {
+        overlay.classList.add('active');
+        // Reset steps visibility
+        for (let i = 1; i <= 4; i++) {
+            const stepEl = document.getElementById(`tutorial-step-${i}`);
+            if (stepEl) {
+                if (i === 1) stepEl.classList.remove('hidden');
+                else stepEl.classList.add('hidden');
+            }
+        }
+    }
+    resetTutorialHoldBars();
 }
 
 function showScreen(id) {
@@ -239,6 +261,7 @@ function capturePhoto() {
 function vote(liked) {
     if (deckIndex >= deck.length) return;
     if (countdownActive) return;
+    if (tutorialActive) return;
     triggerCountdownAndVote(liked);
 }
 
@@ -305,6 +328,13 @@ function resetApp() {
     cameraReady = false;
     showScreen('intro');
     if (handsModel) { handsModel = null; }
+
+    // Hide tutorial on reset
+    tutorialActive = false;
+    const overlay = document.getElementById('tutorial-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
 }
 
 // ────────────────────────────────────────────────
@@ -619,12 +649,13 @@ async function initCamera() {
                     }
 
                     // Don't process gestures during countdown or for 2 seconds after a card loads
-                    if (countdownActive || (performance.now() - cardLoadedTime < 2000)) {
+                    if (countdownActive || (!tutorialActive && (performance.now() - cardLoadedTime < 2000))) {
                         currentGesture = null;
                         gestureStartTime = null;
                         hasTriggeredActiveGesture = false;
                         statusEl.textContent = '👋 Show thumbs up, thumbs down, or stop hand';
                         statusEl.classList.remove('detected');
+                        resetTutorialHoldBars();
                     } else {
                         // Classify active gesture
                         let gesture = null;
@@ -653,10 +684,25 @@ async function initCamera() {
                                 statusEl.textContent = '👋 Show thumbs up, thumbs down, or stop hand';
                                 statusEl.classList.remove('detected');
                             }
+                            resetTutorialHoldBars();
                         } else if (!hasTriggeredActiveGesture) {
                             const now = performance.now();
                             const elapsed = (now - gestureStartTime) / 1000;
                             const pct = Math.min(elapsed / 1.5, 1);
+
+                            // Check if gesture matches current tutorial step's required gesture
+                            let isCorrectTutorialGesture = false;
+                            if (tutorialActive) {
+                                if (tutorialStep === 2 && gesture === 'thumbsUp') isCorrectTutorialGesture = true;
+                                else if (tutorialStep === 3 && gesture === 'thumbsDown') isCorrectTutorialGesture = true;
+                                else if (tutorialStep === 4 && gesture === 'stopHand') isCorrectTutorialGesture = true;
+
+                                if (isCorrectTutorialGesture) {
+                                    updateTutorialHoldBar(pct);
+                                } else {
+                                    resetTutorialHoldBars();
+                                }
+                            }
 
                             statusEl.classList.add('detected');
                             if (gesture === 'thumbsUp') {
@@ -675,10 +721,20 @@ async function initCamera() {
                             ctx.stroke();
 
                             if (elapsed >= 1.5) {
-                                triggerGestureAction(currentGesture);
-                                hasTriggeredActiveGesture = true;
-                                gestureStartTime = null;
-                                currentGesture = null;
+                                if (tutorialActive) {
+                                    if (isCorrectTutorialGesture) {
+                                        triggerGestureAction(currentGesture);
+                                        hasTriggeredActiveGesture = true;
+                                        gestureStartTime = null;
+                                        currentGesture = null;
+                                        resetTutorialHoldBars();
+                                    }
+                                } else {
+                                    triggerGestureAction(currentGesture);
+                                    hasTriggeredActiveGesture = true;
+                                    gestureStartTime = null;
+                                    currentGesture = null;
+                                }
                             }
                         }
                     }
@@ -733,6 +789,11 @@ function swapBackground(direction) {
 }
 
 function triggerGestureAction(gesture) {
+    if (tutorialActive) {
+        handleTutorialGesture(gesture);
+        return;
+    }
+
     if (gesture === 'thumbsUp') {
         vote(true);
     } else if (gesture === 'thumbsDown') {
@@ -753,6 +814,7 @@ function triggerGestureAction(gesture) {
     function onStart(e) {
         if (document.getElementById('done-overlay').classList.contains('visible')) return;
         if (countdownActive) return;
+        if (tutorialActive) return;
         isDragging = true;
         startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
         getCard().classList.add('dragging');
@@ -791,6 +853,57 @@ function triggerGestureAction(gesture) {
     document.addEventListener('touchend', onEnd);
 })();
 
+// ────────────────────────────────────────────────
+// GESTURE TUTORIAL
+// ────────────────────────────────────────────────
+function nextTutorialStep() {
+    const currEl = document.getElementById(`tutorial-step-${tutorialStep}`);
+    if (currEl) currEl.classList.add('hidden');
+    
+    tutorialStep++;
+    
+    const nextEl = document.getElementById(`tutorial-step-${tutorialStep}`);
+    if (nextEl) nextEl.classList.remove('hidden');
+
+    resetTutorialHoldBars();
+}
+
+function handleTutorialGesture(gesture) {
+    if (tutorialStep === 2 && gesture === 'thumbsUp') {
+        nextTutorialStep();
+    } else if (tutorialStep === 3 && gesture === 'thumbsDown') {
+        nextTutorialStep();
+    } else if (tutorialStep === 4 && gesture === 'stopHand') {
+        finishTutorial();
+    }
+}
+
+function finishTutorial() {
+    tutorialActive = false;
+    const overlay = document.getElementById('tutorial-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+    // Set load time to now to trigger 2-second gesture lockout
+    cardLoadedTime = performance.now();
+    resetTutorialHoldBars();
+}
+
+function updateTutorialHoldBar(pct) {
+    if (!tutorialActive) return;
+    const bar = document.getElementById(`tutorial-hold-bar-${tutorialStep}`);
+    if (bar) {
+        bar.style.width = (pct * 100) + '%';
+    }
+}
+
+function resetTutorialHoldBars() {
+    for (let i = 2; i <= 4; i++) {
+        const bar = document.getElementById(`tutorial-hold-bar-${i}`);
+        if (bar) bar.style.width = '0%';
+    }
+}
+
 // Expose module functions globally for HTML event handlers
 window.startSwipe = startSwipe;
 window.vote = vote;
@@ -798,3 +911,4 @@ window.showResults = showResults;
 window.resetApp = resetApp;
 window.switchTab = switchTab;
 window.toggleHeatmap = toggleHeatmap;
+window.nextTutorialStep = nextTutorialStep;

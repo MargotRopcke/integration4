@@ -57,6 +57,52 @@
         </div>
         <canvas id="canvas-overlay"></canvas>
 
+        <!-- TUTORIAL OVERLAY -->
+        <div id="tutorial-overlay" class="tutorial-overlay">
+            <div class="tutorial-card">
+                <!-- Step 1: Alignment -->
+                <div class="tutorial-step" id="tutorial-step-1">
+                    <h2 class="tutorial-title">Step onto the marker.</h2>
+                    <p class="tutorial-desc">After the instructions, we’ll give you a selection of personalised local spots.</p>
+                    <div class="tutorial-visual alignment-marker">
+                        <div class="marker-circle">👤</div>
+                    </div>
+                    <button class="btn-primary" onclick="nextTutorialStep()">I'm Ready!</button>
+                </div>
+
+                <!-- Step 2: Thumbs Up -->
+                <div class="tutorial-step hidden" id="tutorial-step-2">
+                    <h2 class="tutorial-title">Like the spot?</h2>
+                    <p class="tutorial-desc">Show a thumb up motion to try a like.</p>
+                    <div class="tutorial-visual gesture-hint">👍</div>
+                    <div class="tutorial-loader-container">
+                        <div class="tutorial-hold-bar" id="tutorial-hold-bar-2"></div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Thumbs Down -->
+                <div class="tutorial-step hidden" id="tutorial-step-3">
+                    <h2 class="tutorial-title">Don’t like the spot?</h2>
+                    <p class="tutorial-desc">Show a thumb down motion to try a dislike.</p>
+                    <div class="tutorial-visual gesture-hint">👎</div>
+                    <div class="tutorial-loader-container">
+                        <div class="tutorial-hold-bar" id="tutorial-hold-bar-3"></div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Stop Hand -->
+                <div class="tutorial-step hidden" id="tutorial-step-4">
+                    <h2 class="tutorial-title">Undo a (dis)like?</h2>
+                    <p class="tutorial-desc">Try a return by doing a stop motion.</p>
+                    <div class="tutorial-visual gesture-hint">✋</div>
+                    <div class="tutorial-loader-container">
+                        <div class="tutorial-hold-bar" id="tutorial-hold-bar-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="swipe-ui">
             <div class="top-bar">
                 <div class="logo">Antwerp</div>
