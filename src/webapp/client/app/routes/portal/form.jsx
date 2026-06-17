@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { getPrimaryCategories, getVibeCategories, getFilteredLocations, getTravelerTypes } from "../../data";
+import { getPrimaryCategories, getVibeCategories, getFilteredLocations, getTravelerTypes, saveSession, saveSessionPhotos } from "../../data";
 import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs";
-
 import "./form.css";
 
 const MAX_LIKES = 6;
@@ -49,6 +48,10 @@ export default function FormPage({ loaderData }) {
   // Traveler Slider State
   const [activeCardIndex, setActiveCardIndex] = useState(2);
 
+  // Session state (for QR code)
+  const [sessionUserId, setSessionUserId] = useState(null);
+  const [sessionSaving, setSessionSaving] = useState(false);
+
   // ──────────────────────────────────────────────
   // SWIPE EXPERIENCE STATE (Step 7)
   // ──────────────────────────────────────────────
@@ -84,7 +87,7 @@ export default function FormPage({ loaderData }) {
   const [summaryGestureStatus, setSummaryGestureStatus] = useState("📷 Camera loading…");
   const [summaryGestureDetected, setSummaryGestureDetected] = useState(false);
   const [summaryGestureProgress, setSummaryGestureProgress] = useState(0);
-  const [summaryGestureType, setSummaryGestureType] = useState(null); // 'thumbsUp' | 'thumbsDown'
+  const [summaryGestureType, setSummaryGestureType] = useState(null);
   const [summaryFlash, setSummaryFlash] = useState(false);
 
   // Summary camera refs
@@ -126,7 +129,41 @@ export default function FormPage({ loaderData }) {
   const dragCurrentXRef = useRef(0);
   const cardRef = useRef(null);
 
-  // Initialize canvas listeners on step 1 for drawing on hover
+  // ──────────────────────────────────────────────
+  // SAVE SESSION WHEN ENTERING STEP 9
+  // ──────────────────────────────────────────────
+  useEffect(() => {
+    if (step !== 9) return;
+
+    // Don't re-save if we already have a session ID
+    if (sessionUserId) return;
+
+    const save = async () => {
+      setSessionSaving(true);
+      try {
+        const userId = Date.now();
+        const matchedTravelerType = travelerTypes.find(t => t.name === travelerType);
+        await saveSession({
+          userId,
+          photoName: nameImage || '',
+          primaryCategoryId: chosenCategory?.id || null,
+          travelerTypeId: matchedTravelerType?.id || null,
+        });
+        await saveSessionPhotos(userId, reactionPhotosRef.current);
+        setSessionUserId(userId);
+      } catch (err) {
+        console.error('Failed to save session:', err);
+      } finally {
+        setSessionSaving(false);
+      }
+    };
+
+    save();
+  }, [step]);
+
+  // ──────────────────────────────────────────────
+  // CANVAS (Step 1)
+  // ──────────────────────────────────────────────
   useEffect(() => {
     if (step !== 1) return;
 
@@ -209,6 +246,9 @@ export default function FormPage({ loaderData }) {
     setStep(2);
   };
 
+  // ──────────────────────────────────────────────
+  // TRAVELER CAROUSEL (Step 2)
+  // ──────────────────────────────────────────────
   const handlePrevCard = () => {
     setActiveCardIndex((prev) => (prev - 1 + displayTravelers.length) % displayTravelers.length);
   };
@@ -222,6 +262,9 @@ export default function FormPage({ loaderData }) {
     setStep(3);
   };
 
+  // ──────────────────────────────────────────────
+  // CATEGORY & VIBES (Steps 3–4)
+  // ──────────────────────────────────────────────
   const handleSelectCategory = (category) => {
     setChosenCategory(category);
     setSelectedVibes([]);
@@ -238,6 +281,9 @@ export default function FormPage({ loaderData }) {
     setStep(7);
   };
 
+  // ──────────────────────────────────────────────
+  // RESET
+  // ──────────────────────────────────────────────
   const handleReset = () => {
     setNameImage("");
     setTravelerType("");
@@ -248,6 +294,8 @@ export default function FormPage({ loaderData }) {
     setTakePictures("yes");
     setActiveCardIndex(2);
     setHasDrawn(false);
+    setSessionUserId(null);
+    setSessionSaving(false);
     setSwipeLocations([]);
     setDeck([]);
     setDeckIndex(0);
@@ -278,9 +326,8 @@ export default function FormPage({ loaderData }) {
   };
 
   // ──────────────────────────────────────────────
-  // SWIPE EXPERIENCE LOGIC
+  // SWIPE EXPERIENCE LOGIC (Step 7)
   // ──────────────────────────────────────────────
-
   const buildDeck = useCallback((locations) => {
     const arr = [...locations];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -345,6 +392,7 @@ export default function FormPage({ loaderData }) {
     return () => { cancelled = true; };
   }, [step, chosenCategory, budget, distance, buildDeck, getVibeIds]);
 
+  // Camera init for swipe
   useEffect(() => {
     if (step !== 7 || swipeLoading) return;
 
@@ -608,7 +656,6 @@ export default function FormPage({ loaderData }) {
         return;
       }
 
-      // Reuse or create gesture recognizer
       let recognizer = gestureRecognizerRef.current;
       if (!recognizer) {
         try {
@@ -641,7 +688,6 @@ export default function FormPage({ loaderData }) {
           const cam = new window.Camera(video, {
             onFrame: async () => {
               if (stopped) return;
-
               if (!summaryGestureRecRef.current) return;
 
               const timestamp = performance.now();
@@ -652,11 +698,9 @@ export default function FormPage({ loaderData }) {
 
               ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-              // Draw subtle hand skeleton in bottom-right corner
               if (result && result.landmarks && result.landmarks.length > 0) {
                 const landmarks = result.landmarks[0];
                 if (window.drawConnectors && window.drawLandmarks) {
-                  // Scale landmarks to a small preview area (bottom-right corner)
                   const previewLandmarks = landmarks.map(lm => ({
                     x: 0.75 + lm.x * 0.25,
                     y: 0.7 + lm.y * 0.3,
@@ -671,7 +715,6 @@ export default function FormPage({ loaderData }) {
                 }
               }
 
-              // Classify gesture
               let gesture = null;
               if (result && result.gestures && result.gestures.length > 0) {
                 for (const gestureList of result.gestures) {
@@ -690,9 +733,7 @@ export default function FormPage({ loaderData }) {
                 setSummaryGestureDetected(!!gesture);
                 setSummaryGestureProgress(0);
                 setSummaryGestureType(gesture);
-                if (!gesture) {
-                  setSummaryGestureStatus("👍 Thumbs up → QR code · 👎 Thumbs down → swipe again");
-                }
+                if (!gesture) setSummaryGestureStatus("👍 Thumbs up → QR code · 👎 Thumbs down → swipe again");
               } else if (!summaryHasTriggeredRef.current) {
                 const elapsed = (performance.now() - summaryGestureStartRef.current) / 1000;
                 const pct = Math.min(elapsed / GESTURE_HOLD_SECONDS, 1);
@@ -700,13 +741,9 @@ export default function FormPage({ loaderData }) {
                 setSummaryGestureDetected(true);
                 setSummaryGestureType(gesture);
 
-                if (gesture === "thumbsUp") {
-                  setSummaryGestureStatus(`👍 Hold to confirm… (${elapsed.toFixed(1)}s)`);
-                } else if (gesture === "thumbsDown") {
-                  setSummaryGestureStatus(`👎 Hold to swipe again… (${elapsed.toFixed(1)}s)`);
-                }
+                if (gesture === "thumbsUp") setSummaryGestureStatus(`👍 Hold to confirm… (${elapsed.toFixed(1)}s)`);
+                else if (gesture === "thumbsDown") setSummaryGestureStatus(`👎 Hold to swipe again… (${elapsed.toFixed(1)}s)`);
 
-                // Draw progress ring
                 const cx = canvas.width / 2;
                 const cy = canvas.height / 2;
                 const radius = 50;
@@ -717,7 +754,6 @@ export default function FormPage({ loaderData }) {
                 ctx.lineCap = "round";
                 ctx.stroke();
 
-                // Inner fill as background circle
                 ctx.beginPath();
                 ctx.arc(cx, cy, radius - 2, 0, 2 * Math.PI);
                 ctx.strokeStyle = gesture === "thumbsUp" ? "rgba(46,204,113,0.15)" : "rgba(231,76,60,0.15)";
@@ -731,17 +767,16 @@ export default function FormPage({ loaderData }) {
 
                   if (gesture === "thumbsUp") {
                     setSummaryGestureStatus("✓ Going to QR code!");
-                    setSummarySummaryFlash(true);
+                    setSummaryFlash(true);
                     setTimeout(() => {
-                      setSummarySummaryFlash(false);
+                      setSummaryFlash(false);
                       setStep(9);
                     }, 400);
                   } else if (gesture === "thumbsDown") {
                     setSummaryGestureStatus("✓ Back to swiping!");
-                    setSummarySummaryFlash(true);
+                    setSummaryFlash(true);
                     setTimeout(() => {
-                      setSummarySummaryFlash(false);
-                      // Reset swipe state but keep camera & preferences
+                      setSummaryFlash(false);
                       setSwipeDone(false);
                       setDeckIndex(0);
                       deckIndexRef.current = 0;
@@ -784,9 +819,9 @@ export default function FormPage({ loaderData }) {
     };
   }, [step]);
 
-  // Helper to avoid ESLint issue with state setter in camera loop closure
-  const setSummarySummaryFlash = (val) => setSummaryFlash(val);
-
+  // ──────────────────────────────────────────────
+  // GESTURE + VOTE HANDLERS
+  // ──────────────────────────────────────────────
   const handleGestureAction = useCallback((gesture) => {
     if (tutorialActiveRef.current) {
       handleTutorialGesture(gesture);
@@ -846,7 +881,7 @@ export default function FormPage({ loaderData }) {
     const dataUrl = captureCanvas.toDataURL("image/jpeg", 0.85);
     const loc = deckRef.current[deckIndexRef.current];
     if (loc) {
-      const newPhoto = { dataUrl, locationName: loc.name, locationImage: loc.image };
+      const newPhoto = { dataUrl, locationName: loc.name, locationImage: loc.image, locationId: loc.keyID };
       reactionPhotosRef.current = [...reactionPhotosRef.current, newPhoto];
       setReactionPhotos(reactionPhotosRef.current);
     }
@@ -926,6 +961,7 @@ export default function FormPage({ loaderData }) {
     setStep(8);
   }, []);
 
+  // Drag handlers
   useEffect(() => {
     if (step !== 7) return;
 
@@ -984,6 +1020,9 @@ export default function FormPage({ loaderData }) {
   const progressPct = deck.length > 0 ? (deckIndex / deck.length) * 100 : 0;
   const categoryLabel = chosenCategory?.name?.trim() || "All Spots";
 
+  // ──────────────────────────────────────────────
+  // RENDER
+  // ──────────────────────────────────────────────
   return (
     <div className={`form-page ${step === 7 ? "form-page--swipe" : ""} ${step === 8 ? "form-page--summary" : ""}`} id="form-screen">
       {step !== 7 && step !== 8 && (
@@ -995,7 +1034,7 @@ export default function FormPage({ loaderData }) {
 
       <div className={`form-card ${step === 7 ? "form-card--fullscreen" : ""} ${step === 8 ? "form-card--fullscreen" : ""}`} id="form-content-card">
 
-        {/* === STEP 0 === */}
+        {/* === STEP 0: INTRO === */}
         {step === 0 && (
           <div className="step-intro" id="step-0">
             <div className="intro-portal-icon">
@@ -1011,7 +1050,7 @@ export default function FormPage({ loaderData }) {
           </div>
         )}
 
-        {/* === STEP 1 === */}
+        {/* === STEP 1: DRAW NAME === */}
         {step === 1 && (
           <div className="step-container" id="step-1">
             <div className="form-header">
@@ -1035,7 +1074,7 @@ export default function FormPage({ loaderData }) {
           </div>
         )}
 
-        {/* === STEP 2 === */}
+        {/* === STEP 2: TRAVELER CAROUSEL === */}
         {step === 2 && (
           <div className="step-container" id="step-2">
             <div className="form-header">
@@ -1068,7 +1107,7 @@ export default function FormPage({ loaderData }) {
           </div>
         )}
 
-        {/* === STEP 3 === */}
+        {/* === STEP 3: CATEGORY === */}
         {step === 3 && (
           <div className="step-container" id="step-3">
             <div className="form-header">
@@ -1089,7 +1128,7 @@ export default function FormPage({ loaderData }) {
           </div>
         )}
 
-        {/* === STEP 4 === */}
+        {/* === STEP 4: VIBES === */}
         {step === 4 && (
           <div className="step-container" id="step-4">
             <div className="form-header">
@@ -1118,7 +1157,7 @@ export default function FormPage({ loaderData }) {
           </div>
         )}
 
-        {/* === STEP 5 === */}
+        {/* === STEP 5: BUDGET & DISTANCE === */}
         {step === 5 && (
           <div className="step-container" id="step-5">
             <div className="form-header">
@@ -1157,7 +1196,7 @@ export default function FormPage({ loaderData }) {
           </div>
         )}
 
-        {/* === STEP 6 === */}
+        {/* === STEP 6: TAKE PICTURES === */}
         {step === 6 && (
           <div className="step-container" id="step-6">
             <div className="form-header">
@@ -1265,15 +1304,12 @@ export default function FormPage({ loaderData }) {
                     </div>
                     <div className="category-badge" id="cat-badge">{categoryLabel}</div>
                   </div>
-
                   <div className="progress-bar" style={{ marginBottom: ".5rem" }}>
                     <div className="progress-fill" style={{ width: `${progressPct}%` }} />
                   </div>
-
                   <div className={`gesture-status ${gestureDetected ? "detected" : ""}`} id="gesture-status">
                     {gestureStatusText}
                   </div>
-
                   <div className="card-area" id="card-area">
                     {currentCard && (
                       <div className={`location-card ${cardSwipeClass}`} id="location-card" ref={cardRef}>
@@ -1294,12 +1330,10 @@ export default function FormPage({ loaderData }) {
                       </div>
                     )}
                   </div>
-
                   <div className="gesture-indicator">
                     <div className="gesture-btn dislike" id="btn-dislike" onClick={() => handleVote(false)} title="Dislike">👎</div>
                     <div className="gesture-btn like" id="btn-like" onClick={() => handleVote(true)} title="Like">👍</div>
                   </div>
-
                   {noCameraNotice && (
                     <div className="no-camera-notice" style={{ display: "block" }} id="no-camera-notice">
                       No camera — use buttons to vote
@@ -1327,24 +1361,15 @@ export default function FormPage({ loaderData }) {
           </div>
         )}
 
-        {/* === STEP 8: GESTURE-POWERED SUMMARY PAGE === */}
+        {/* === STEP 8: GESTURE-POWERED SUMMARY === */}
         {step === 8 && (
           <div className="swipe-screen summary-gesture-screen" id="step-8">
-            {/* Hidden camera for gesture recognition */}
             <video ref={summaryVideoRef} style={{ display: "none" }} autoPlay playsInline muted />
-
-            {/* Canvas overlay for gesture feedback */}
             <canvas ref={summaryCanvasRef} className="summary-gesture-canvas"
-              style={{
-                position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-                pointerEvents: "none", zIndex: 5
-              }}
+              style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 5 }}
             />
-
-            {/* Flash overlay */}
             <div className={`flash-overlay ${summaryFlash ? "flash" : ""}`} />
 
-            {/* Main content */}
             <div className="summary-gesture-content">
               <div className="summary-gesture-header">
                 <h1 className="form-heading" style={{ color: "#fff", textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
@@ -1355,7 +1380,6 @@ export default function FormPage({ loaderData }) {
                 </p>
               </div>
 
-              {/* Photos grid */}
               <div className="photos-grid summary-photos-grid" id="photos-grid-container">
                 {reactionPhotos.length > 0 ? (
                   reactionPhotos.map((photo, i) => (
@@ -1386,7 +1410,6 @@ export default function FormPage({ loaderData }) {
                 )}
               </div>
 
-              {/* Gesture choice cards */}
               <div className="summary-gesture-choices">
                 <div
                   className={`summary-choice-card summary-choice-card--like ${summaryGestureType === "thumbsUp" ? "active" : ""}`}
@@ -1436,7 +1459,6 @@ export default function FormPage({ loaderData }) {
                 </div>
               </div>
 
-              {/* Gesture status bar */}
               <div className={`summary-gesture-status ${summaryGestureDetected ? "detected" : ""}`} id="summary-gesture-status">
                 {summaryGestureStatus}
               </div>
@@ -1445,54 +1467,57 @@ export default function FormPage({ loaderData }) {
         )}
 
         {/* === STEP 9: QR CODE === */}
-        {step === 9 && (() => {
-          // Fallback user identifier if no genuine session exists. 
-          // Uses length of handwritten image string or defaults to a quick timestamp string.
-          const finalUserId = nameImage ? `user_${nameImage.length}` : `portal_${Date.now()}`;
-          const webappUrl = `http://localhost:5173/intro?user=${finalUserId}`;
-          //Just remember to revert it to the dynamic window.location.origin logic when you're ready to deploy it to a live production server!
-          // const webappUrl = `${window.location.origin}/intro?user=${finalUserId}`;
-          return (
-            <div className="step-container" id="step-9">
-              <div className="form-header">
-                <h1 className="form-heading">Your Antwerp journey awaits! 🎉</h1>
-                <p className="form-subheading">
-                  Scan the QR code below to get your personalised Antwerp itinerary with all your liked spots.
-                </p>
-              </div>
-
-              <div className="qr-container">
-                <div className="qr-code-wrapper">
-                  <img
-                    className="qr-code-image"
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(webappUrl)}`}
-                    alt="QR code for your itinerary"
-                  />
-                </div>
-                <div className="qr-liked-spots">
-                  <p className="qr-spots-label">Your {likesCount} liked spot{likesCount !== 1 ? "s" : ""}:</p>
-                  <div className="summary-vibes-tags">
-                    {likedLocations.map((loc) => (
-                      <span key={loc.keyID || loc.name} className="summary-vibe-tag">
-                        📍 {loc.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="qr-traveler-badge">
-                  <span>🧭 {travelerType}</span>
-                </div>
-              </div>
-
-              <div className="summary-actions" style={{ marginTop: "2rem" }}>
-                <button onClick={handleReset} className="btn-form btn-form--secondary" id="restart-button">
-                  ↩ Start Over
-                </button>
-              </div>
+        {step === 9 && (
+          <div className="step-container" id="step-9">
+            <div className="form-header">
+              <h1 className="form-heading">Your Antwerp journey awaits! 🎉</h1>
+              <p className="form-subheading">
+                Scan the QR code below to get your personalised Antwerp itinerary with all your liked spots.
+              </p>
             </div>
-          );
-        })()}
+
+            <div className="qr-container">
+              {sessionSaving || !sessionUserId ? (
+                <div className="swipe-loading">
+                  <div className="loader" />
+                  <p>Generating your itinerary…</p>
+                </div>
+              ) : (
+                <>
+                  <div className="qr-code-wrapper">
+                    <img
+                      className="qr-code-image"
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${window.location.origin}/intro?user=${sessionUserId}`)}`}
+                      alt="QR code for your itinerary"
+                    />
+                  </div>
+
+                  <div className="qr-liked-spots">
+                    <p className="qr-spots-label">Your {likesCount} liked spot{likesCount !== 1 ? "s" : ""}:</p>
+                    <div className="summary-vibes-tags">
+                      {likedLocations.map((loc) => (
+                        <span key={loc.keyID || loc.name} className="summary-vibe-tag">
+                          📍 {loc.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="qr-traveler-badge">
+                    <span>🧭 {travelerType}</span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="summary-actions" style={{ marginTop: "2rem" }}>
+              <button onClick={handleReset} className="btn-form btn-form--secondary" id="restart-button">
+                ↩ Start Over
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
