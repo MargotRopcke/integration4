@@ -24,13 +24,7 @@ export default function FormPage({ loaderData }) {
   const { primaryCategories = [], vibeCategories = [], travelerTypes = [] } = loaderData || {};
   const [step, setStep] = useState(0);
 
-  const displayTravelers = travelerTypes && travelerTypes.length > 0 ? travelerTypes : [
-    { id: 1, name: "Party Animal", description: "Always looking for the best bars, clubs, and nightlife spots." },
-    { id: 2, name: "New Experience Nerd", description: "Curious explorer seeking hidden gems, quirky cafés, and unique views." },
-    { id: 3, name: "Adrenaline Junkie", description: "Thrill-seeker seeking action, dynamic tours, and high energy adventures." },
-    { id: 4, name: "Luxury Connoisseur", description: "Savouring the finer things: high-end shopping, upscale dining, and premium service." },
-    { id: 5, name: "Culture Vulture", description: "Soaking up art, history, fashion houses, and local heritage." }
-  ];
+  const displayTravelers = travelerTypes;
 
   // Form selections state
   const [nameImage, setNameImage] = useState("");
@@ -47,7 +41,7 @@ export default function FormPage({ loaderData }) {
   const [hasDrawn, setHasDrawn] = useState(false);
 
   // Traveler Slider State
-  const [activeCardIndex, setActiveCardIndex] = useState(2);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   // Session state (for QR code)
   const [sessionUserId, setSessionUserId] = useState(null);
@@ -251,15 +245,21 @@ export default function FormPage({ loaderData }) {
   // TRAVELER CAROUSEL (Step 2)
   // ──────────────────────────────────────────────
   const handlePrevCard = () => {
+    if (displayTravelers.length === 0) return;
     setActiveCardIndex((prev) => (prev - 1 + displayTravelers.length) % displayTravelers.length);
   };
 
   const handleNextCard = () => {
+    if (displayTravelers.length === 0) return;
     setActiveCardIndex((prev) => (prev + 1) % displayTravelers.length);
   };
 
   const handleSelectCard = () => {
-    setTravelerType(displayTravelers[activeCardIndex].name);
+    if (displayTravelers.length === 0) return;
+    const chosen = displayTravelers[activeCardIndex];
+    if (chosen) {
+      setTravelerType(chosen.name);
+    }
     setStep(3);
   };
 
@@ -293,7 +293,7 @@ export default function FormPage({ loaderData }) {
     setBudget("€ (≤30)");
     setDistance("walking (0-2km)");
     setTakePictures("yes");
-    setActiveCardIndex(2);
+    setActiveCardIndex(0);
     setHasDrawn(false);
     setSessionUserId(null);
     setSessionSaving(false);
@@ -1134,27 +1134,36 @@ export default function FormPage({ loaderData }) {
               <p className="form-subheading">Tell me what kind of traveller you are:</p>
             </div>
             <div className="carousel-wrapper">
-              <button onClick={handlePrevCard} className="carousel-btn" id="carousel-left">‹</button>
+              <button onClick={handlePrevCard} className="carousel-btn" id="carousel-left" disabled={displayTravelers.length <= 1}>‹</button>
               <div className="carousel-viewport">
-                {displayTravelers.map((type, index) => {
-                  let positionClass = "";
-                  const prevIndex = (activeCardIndex - 1 + displayTravelers.length) % displayTravelers.length;
-                  const nextIndex = (activeCardIndex + 1) % displayTravelers.length;
-                  if (index === activeCardIndex) positionClass = "card--active";
-                  else if (index === prevIndex) positionClass = "card--prev";
-                  else if (index === nextIndex) positionClass = "card--next";
-                  return (
-                    <div key={type.id} className={`carousel-card ${positionClass}`}>
-                      <h3 className="card-title">{type.name}</h3>
-                      <p className="card-desc">{type.description}</p>
-                    </div>
-                  );
-                })}
+                {displayTravelers.length === 0 ? (
+                  <div className="swipe-loading" style={{ height: "auto", margin: "2rem 0" }}>
+                    <div className="loader" style={{ margin: "0 auto 1rem" }} />
+                    <p style={{ color: "#aaa" }}>Loading traveler types…</p>
+                  </div>
+                ) : (
+                  displayTravelers.map((type, index) => {
+                    let positionClass = "";
+                    const prevIndex = (activeCardIndex - 1 + displayTravelers.length) % displayTravelers.length;
+                    const nextIndex = (activeCardIndex + 1) % displayTravelers.length;
+                    if (index === activeCardIndex) positionClass = "card--active";
+                    else if (index === prevIndex) positionClass = "card--prev";
+                    else if (index === nextIndex) positionClass = "card--next";
+                    return (
+                      <div key={type.id || index} className={`carousel-card ${positionClass}`}>
+                        <h3 className="card-title">{type.name}</h3>
+                        <p className="card-desc">{type.description}</p>
+                      </div>
+                    );
+                  })
+                )}
               </div>
-              <button onClick={handleNextCard} className="carousel-btn" id="carousel-right">›</button>
+              <button onClick={handleNextCard} className="carousel-btn" id="carousel-right" disabled={displayTravelers.length <= 1}>›</button>
             </div>
             <div className="carousel-select-area">
-              <button onClick={handleSelectCard} className="btn-form" id="select-card">Select traveler type</button>
+              <button onClick={handleSelectCard} className="btn-form" id="select-card" disabled={displayTravelers.length === 0}>
+                Select traveler type
+              </button>
             </div>
           </div>
         )}
