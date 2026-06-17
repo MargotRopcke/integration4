@@ -63,6 +63,7 @@ export default function FormPage({ loaderData }) {
   const [likedLocations, setLikedLocations] = useState([]);
   const [likesCount, setLikesCount] = useState(0);
   const [cameraReady, setCameraReady] = useState(false);
+  const cameraReadyRef = useRef(false);
   const [reactionPhotos, setReactionPhotos] = useState([]);
   const [countdownActive, setCountdownActive] = useState(false);
   const [swipeDone, setSwipeDone] = useState(false);
@@ -90,6 +91,13 @@ export default function FormPage({ loaderData }) {
   const [summaryGestureProgress, setSummaryGestureProgress] = useState(0);
   const [summaryGestureType, setSummaryGestureType] = useState(null);
   const [summaryFlash, setSummaryFlash] = useState(false);
+
+  // ──────────────────────────────────────────────
+  // PRINT STATE (Step "printing")
+  // ──────────────────────────────────────────────
+  const [printStatus, setPrintStatus] = useState("idle"); // "idle" | "printing" | "done" | "error"
+  const [printCollageUrl, setPrintCollageUrl] = useState(null);
+  const [printErrorMsg, setPrintErrorMsg] = useState("");
 
   // Summary camera refs
   const summaryVideoRef = useRef(null);
@@ -134,7 +142,7 @@ export default function FormPage({ loaderData }) {
   // SAVE SESSION WHEN ENTERING STEP 9
   // ──────────────────────────────────────────────
   useEffect(() => {
-    if (step !== 9) return;
+    if (step !== 9 && step !== "printing") return;
 
     // Don't re-save if we already have a session ID
     if (sessionUserId) return;
@@ -303,6 +311,7 @@ export default function FormPage({ loaderData }) {
     setLikedLocations([]);
     setLikesCount(0);
     setCameraReady(false);
+    cameraReadyRef.current = false;
     setReactionPhotos([]);
     setCountdownActive(false);
     setSwipeDone(false);
@@ -314,6 +323,9 @@ export default function FormPage({ loaderData }) {
     setSummaryGestureDetected(false);
     setSummaryGestureProgress(0);
     setSummaryGestureType(null);
+    setPrintStatus("idle");
+    setPrintCollageUrl(null);
+    setPrintErrorMsg("");
 
     if (cameraInstanceRef.current) {
       try { cameraInstanceRef.current.stop(); } catch (e) { }
@@ -444,6 +456,7 @@ export default function FormPage({ loaderData }) {
         if (stopped) { stream.getTracks().forEach((t) => t.stop()); return; }
         video.srcObject = stream;
         setCameraReady(true);
+        cameraReadyRef.current = true;
         setGestureStatusText("🤖 Initialising AI models…");
       } catch (e) {
         setNoCameraNotice(true);
@@ -767,11 +780,12 @@ export default function FormPage({ loaderData }) {
                   summaryGestureStartRef.current = null;
 
                   if (gesture === "thumbsUp") {
-                    setSummaryGestureStatus("✓ Going to QR code!");
+                    setSummaryGestureStatus("✓ Preparing your collage…");
                     setSummaryFlash(true);
                     setTimeout(() => {
                       setSummaryFlash(false);
-                      setStep(9);
+                      setPrintStatus("idle");
+                      setStep("printing");
                     }, 400);
                   } else if (gesture === "thumbsDown") {
                     setSummaryGestureStatus("✓ Back to swiping!");
@@ -822,6 +836,119 @@ export default function FormPage({ loaderData }) {
 
   // Helper to avoid ESLint issue with state setter in camera loop closure
   const setSummarySummaryFlash = (val) => setSummaryFlash(val);
+
+  // ──────────────────────────────────────────────
+  // PRINT HELPERS
+  // ──────────────────────────────────────────────
+  const buildCollageDataUrl = useCallback((photos) => {
+    const cols = 3;
+    const cellW = 640;
+    const cellH = 480;
+    const padding = 16;
+    const rows = Math.ceil(photos.length / cols);
+    const canvasW = cols * cellW + (cols + 1) * padding;
+    const canvasH = rows * cellH + (rows + 1) * padding;
+
+    const c = document.createElement("canvas");
+    c.width = canvasW;
+    c.height = canvasH;
+    const ctx = c.getContext("2d");
+
+    // Background
+    ctx.fillStyle = "#0a0a0f";
+    ctx.fillRect(0, 0, canvasW, canvasH);
+
+    const drawPhotoAt = (img, x, y) => {
+      // Rounded clip
+      const r = 12;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + cellW - r, y);
+      ctx.quadraticCurveTo(x + cellW, y, x + cellW, y + r);
+      ctx.lineTo(x + cellW, y + cellH - r);
+      ctx.quadraticCurveTo(x + cellW, y + cellH, x + cellW - r, y + cellH);
+      ctx.lineTo(x + r, y + cellH);
+      ctx.quadraticCurveTo(x, y + cellH, x, y + cellH - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(img, x, y, cellW, cellH);
+      ctx.restore();
+
+      // Label bar
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(x, y + cellH - 36, cellW, 36);
+    };
+
+    const promises = photos.map((photo, i) => new Promise((resolve) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = padding + col * (cellW + padding);
+      const y = padding + row * (cellH + padding);
+
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        drawPhotoAt(img, x, y);
+        // Location label
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 18px system-ui, sans-serif";
+        ctx.fillText(`📍 ${photo.locationName}`, x + 12, y + cellH - 11);
+        resolve();
+      };
+      img.onerror = resolve;
+      img.src = photo.dataUrl;
+    }));
+
+    return Promise.all(promises).then(() => c.toDataURL("image/jpeg", 0.92));
+  }, []);
+
+  const triggerPrint = useCallback(async (collageDataUrl) => {
+    const res = await fetch("http://127.0.0.1:3456/print-collage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: collageDataUrl }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || "Print failed");
+  }, []);
+
+  const handleStartPrinting = useCallback(async () => {
+    setPrintStatus("printing");
+    setPrintErrorMsg("");
+    try {
+      const photos = reactionPhotosRef.current;
+
+      // Build collage source: reaction photos if available, otherwise location images
+      const collageItems = photos.length > 0
+        ? photos
+        : likedLocationsRef.current.map((loc) => ({
+          dataUrl: loc.image,  // Supabase image URL
+          locationName: loc.name,
+        }));
+
+      const collageUrl = collageItems.length > 0
+        ? await buildCollageDataUrl(collageItems)
+        : null;
+
+      setPrintCollageUrl(collageUrl);
+      if (collageUrl) await triggerPrint(collageUrl);
+      setPrintStatus("done");
+      setTimeout(() => setStep(9), 2000);
+    } catch (err) {
+      console.error("Print error:", err);
+      setPrintErrorMsg(err.message || "Could not reach print server.");
+      setPrintStatus("error");
+    }
+  }, [buildCollageDataUrl, triggerPrint]);
+
+  // Auto-trigger print when we enter the printing step
+  useEffect(() => {
+    if (step !== "printing") return;
+    handleStartPrinting();
+  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleGoBack = useCallback(() => {
     const currentIdx = deckIndexRef.current;
@@ -907,7 +1034,7 @@ export default function FormPage({ loaderData }) {
 
   const capturePhoto = useCallback(() => {
     const video = videoRef.current;
-    if (!video || !cameraReady) return;
+    if (!video || !cameraReadyRef.current) return;
 
     setFlashActive(true);
     setTimeout(() => setFlashActive(false), 200);
@@ -937,7 +1064,7 @@ export default function FormPage({ loaderData }) {
       reactionPhotosRef.current = [...reactionPhotosRef.current, newPhoto];
       setReactionPhotos(reactionPhotosRef.current);
     }
-  }, [cameraReady]);
+  }, []);
 
   const triggerCountdownAndVote = useCallback((liked) => {
     if (countdownActiveRef.current) return;
@@ -959,7 +1086,7 @@ export default function FormPage({ loaderData }) {
     const nextCountdownStep = () => {
       if (stepIdx >= steps.length) {
         setCountdownVisible(false);
-        if (takePictures === "yes" && cameraReady) capturePhoto();
+        if (takePictures === "yes" && cameraReadyRef.current) capturePhoto();
         countdownActiveRef.current = false;
         setCountdownActive(false);
         commitVote(true);
@@ -971,7 +1098,7 @@ export default function FormPage({ loaderData }) {
       setTimeout(nextCountdownStep, stepIdx === 4 ? 900 : 800);
     };
     nextCountdownStep();
-  }, [takePictures, cameraReady, capturePhoto]);
+  }, [takePictures, capturePhoto]);
 
   const commitVote = useCallback((liked) => {
     const loc = deckRef.current[deckIndexRef.current];
@@ -1498,12 +1625,12 @@ export default function FormPage({ loaderData }) {
               <div className="summary-gesture-choices">
                 <div
                   className={`summary-choice-card summary-choice-card--like ${summaryGestureType === "thumbsUp" ? "active" : ""}`}
-                  onClick={() => setStep(9)}
+                  onClick={() => { setPrintStatus("idle"); setStep("printing"); }}
                   id="summary-choice-like"
                 >
                   <div className="summary-choice-icon">👍</div>
-                  <div className="summary-choice-label">Get QR code</div>
-                  <div className="summary-choice-hint">Hold thumbs up</div>
+                  <div className="summary-choice-label">Print &amp; get QR</div>
+                  <div className="summary-choice-hint">Hold thumbs up to print</div>
                   {summaryGestureType === "thumbsUp" && (
                     <div className="summary-progress-bar">
                       <div className="summary-progress-fill summary-progress-fill--like"
@@ -1548,6 +1675,74 @@ export default function FormPage({ loaderData }) {
                 {summaryGestureStatus}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* === STEP "printing": COLLAGE PRINTING SCREEN === */}
+        {step === "printing" && (
+          <div className="step-container" id="step-printing" style={{
+            display: "flex", flexDirection: "column", alignItems: "center",
+            justifyContent: "center", minHeight: "100vh", padding: "2rem",
+            background: "#0a0a0f", color: "#e8e8ed",
+          }}>
+            {/* Collage preview */}
+            {printCollageUrl && (
+              <div style={{
+                width: "100%", maxWidth: 560, borderRadius: 16,
+                overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)",
+                marginBottom: "2rem", boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+              }}>
+                <img src={printCollageUrl} alt="Your reaction photo collage"
+                  style={{ width: "100%", display: "block" }} />
+              </div>
+            )}
+
+            {printStatus === "printing" && (
+              <>
+                <div className="loader" style={{ marginBottom: "1.25rem" }} />
+                <h2 style={{ fontSize: "1.4rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+                  Printing your collage…
+                </h2>
+                <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem" }}>
+                  Sending to the HP Envy 5530 — please wait.
+                </p>
+              </>
+            )}
+
+            {printStatus === "done" && (
+              <>
+                <div style={{ fontSize: "3rem", marginBottom: "0.75rem" }}>🖨️ ✓</div>
+                <h2 style={{ fontSize: "1.4rem", fontWeight: 600, marginBottom: "0.5rem", color: "#2ecc71" }}>
+                  Print job sent!
+                </h2>
+                <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem" }}>
+                  Taking you to your QR code…
+                </p>
+              </>
+            )}
+
+            {printStatus === "error" && (
+              <>
+                <div style={{ fontSize: "3rem", marginBottom: "0.75rem" }}>⚠️</div>
+                <h2 style={{ fontSize: "1.4rem", fontWeight: 600, marginBottom: "0.5rem", color: "#e74c3c" }}>
+                  Couldn't reach the printer
+                </h2>
+                <p style={{
+                  color: "rgba(255,255,255,0.55)", fontSize: "0.9rem",
+                  maxWidth: 400, textAlign: "center", marginBottom: "0.5rem",
+                }}>
+                  {printErrorMsg || "Make sure print-server.js is running (node print-server.js)."}
+                </p>
+                <div style={{ display: "flex", gap: "1rem", marginTop: "1.25rem", flexWrap: "wrap", justifyContent: "center" }}>
+                  <button className="btn-form" onClick={handleStartPrinting}>
+                    ↺ Try Again
+                  </button>
+                  <button className="btn-form btn-form--secondary" onClick={() => setStep(9)}>
+                    Skip printing →
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
