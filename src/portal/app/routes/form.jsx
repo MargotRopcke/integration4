@@ -171,6 +171,19 @@ export default function FormPage({ loaderData }) {
   }, [step]);
 
   // ──────────────────────────────────────────────
+  // AUTO-REFRESH AFTER 1 MINUTE ON STEP 9
+  // ──────────────────────────────────────────────
+  useEffect(() => {
+    if (step !== 9) return;
+
+    const timer = setTimeout(() => {
+      window.location.reload();
+    }, 60000); // 60 seconds (1 minute)
+
+    return () => clearTimeout(timer);
+  }, [step]);
+
+  // ──────────────────────────────────────────────
   // CANVAS (Step 1)
   // ──────────────────────────────────────────────
   useEffect(() => {
