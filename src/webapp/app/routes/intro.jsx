@@ -1,87 +1,100 @@
-import { Link } from "react-router";
+import { useLoaderData, Link } from "react-router";
+import { getSessionLocations } from '../data';
 import "./intro.css";
 
-export default function Intro() {
-  return (
-    
-    <div className="intro" id="intro-screen">
+// intro.jsx
+export async function clientLoader({ request }) {
+  const userId = new URL(request.url).searchParams.get('user');
+  console.log('userId from URL:', userId, typeof userId);
 
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabase = createClient(
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+  );
+
+  // Raw query to see exactly what's in the table
+  const { data, error } = await supabase
+    .from("sessions_photos")
+    .select("*")
+    .limit(5);
+  console.log('ALL recent sessions_photos:', data, error);
+
+  // ...rest
+  if (!userId || isNaN(Number(userId)))
+    return { session: null, locations: [], sessionPhotos: [], userId: null };
+
+  try {
+    return await getSessionLocations(userId);
+  } catch (e) {
+    console.error("Failed to load session locations:", e);
+    return { session: null, locations: [], sessionPhotos: [], userId };
+  }
+
+  console.log('ALL recent sessions_photos:', data, error);
+  console.log('user_ids in db:', data?.map(r => ({ user_id: r.user_id, type: typeof r.user_id })));
+  console.log('querying with userId:', userId, Number(userId));
+  console.log('ALL recent sessions_photos:', data, error);
+  console.log('row details:', JSON.stringify(data?.map(r => ({ id: r.id, user_id: r.user_id, location_id: r.location_id })), null, 2));
+  console.log('looking for userId:', userId, '→ as number:', Number(userId));
+}
+
+export default function Intro() {
+  const { session, locations, sessionPhotos, userId } = useLoaderData();
+  console.log('sessionPhotos:', sessionPhotos);
+  console.log('first photo value:', sessionPhotos?.[0]?.photo?.slice(0, 50));
+  // Prefer the user's own reaction selfies for the polaroids;
+  // fall back to location images if no photos were captured.
+  const polaroidSources =
+    sessionPhotos && sessionPhotos.length > 0
+      ? sessionPhotos.slice(0, 6).map((p) => ({ src: p.photo, alt: "Your reaction" }))
+      : (locations || []).slice(0, 6).map((l) => ({ src: l.image, alt: l.name }));
+
+  return (
+    <div className="intro" id="intro-screen">
       <div className="mobile-container">
-        {/* Header Sectie */}
+
         <header className="header-section">
           <h1 className="welcome-text">
-            HI <span className="name-handwritten"><img src="" alt="" />Femke</span>
+            HI{" "}
+            <span className="name-handwritten">
+              {session?.photo_name
+                ? <img src={session.photo_name} alt="your name" style={{ width: '50%', height: '50%', objectFit: 'cover' }} />
+                : "Traveler"}
+            </span>
           </h1>
-          <p className="subtitle">db type traveller</p>
+          <p className="subtitle">{session?.traveler_type?.name || "Explorer"}</p>
         </header>
-        {/* Collage Sectie */}
+
         <main className="collage-container">
-          {/* Groene 'Welcome to Antwerp' banner die erdoorheen loopt */}
           <div className="ticker-tape">
             <span>Welcome to Antwerp • Welcome to Antwerp • Welcome to Antwerp</span>
           </div>
 
-          {/* Polaroid 1: Links (Wit/Geelachtig) */}
-          <div className="polaroid polaroid-left">
-            <div className="polaroid-img-wrapper">
-              <img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=400" alt="Terras" />
+          {["polaroid-left", "polaroid-center", "polaroid-right",
+            "polaroid-bg-dark", "polaroid-right", "polaroid-bg-dark"
+          ].map((cls, i) => (
+            <div key={i} className={`polaroid ${cls}`}>
+              <div className="polaroid-img-wrapper">
+                {polaroidSources[i] && (
+                  <img
+                    src={polaroidSources[i].src}
+                    alt={polaroidSources[i].alt}
+                  />
+                )}
+              </div>
             </div>
-          </div>
+          ))}
 
-          {/* Polaroid 2: Midden (Roze, ligt bovenop) */}
-          <div className="polaroid polaroid-center">
-            <div className="polaroid-img-wrapper">
-              <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400" alt="Interieur" />
-            </div>
-          </div>
-
-          {/* Polaroid 3: Rechts (Groen, Chef/Keuken) */}
-          <div className="polaroid polaroid-right">
-            <div className="polaroid-img-wrapper">
-              <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400" alt="Chef" />
-            </div>
-          </div>
-
-          {/* Polaroid 4: Achtergrond/Onder (Blauw/Donker) */}
-          <div className="polaroid polaroid-bg-dark">
-            <div className="polaroid-img-wrapper">
-              <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" alt="Bar" />
-            </div>
-          </div>
-          {/* Polaroid 5: Rechts (Groen, Chef/Keuken) */}
-          <div className="polaroid polaroid-right">
-            <div className="polaroid-img-wrapper">
-              <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400" alt="Chef" />
-            </div>
-          </div>
-
-          {/* Polaroid 6: Achtergrond/Onder (Blauw/Donker) */}
-          <div className="polaroid polaroid-bg-dark">
-            <div className="polaroid-img-wrapper">
-              <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" alt="Bar" />
-            </div>
-          </div>
-
-
-          {/* Type Icon/Illustratie linksonder */}
           <div className="type-icon">
+            {session?.primary_category?.name?.toLowerCase() === 'style' ? '👗' : '🍽'}
           </div>
-        </main>
-   
-        
-        <Link to="/map" className="intro__button" id="enter-button">
-          Let's discover your taste
-        </Link>
-      </div>
 
+          <Link to={`/map?user=${userId || ''}`} className="intro__button" id="enter-button">
+            Let's discover your taste
+          </Link>
+        </main>
+      </div>
     </div>
   );
- 
-}
-
-export function meta() {
-  return [
-    { title: "The Portal — Discover Antwerp" },
-    { name: "description", content: "Discover 6 hidden locations across Antwerp through The Portal." },
-  ];
 }

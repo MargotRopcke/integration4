@@ -7,8 +7,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-import "./style/fonts.css";
-import "./style/root.css";
+import "../../../css/fonts.css";
+import "../../../css/root.css";
 import "./app.css";
 
 export function Layout({ children }) {
@@ -18,13 +18,8 @@ export function Layout({ children }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="description" content="The Portal — Discover 6 hidden locations in Antwerp" />
-
         <Meta />
         <Links />
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossOrigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossOrigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossOrigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossOrigin="anonymous"></script>
       </head>
       <body>
         {children}
@@ -106,6 +101,3 @@ export function HydrateFallback() {
 export function meta() {
   return [{ title: "The Portal — Discover Antwerp" }];
 }
-
-
-
