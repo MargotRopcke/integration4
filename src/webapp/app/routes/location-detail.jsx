@@ -6,10 +6,12 @@ export const clientLoader = async ({ request, params }) => {
   const { locationId } = params;
   const userId = new URL(request.url).searchParams.get("user");
 
-  const [location, reactionPhoto] = await Promise.all([
-    getLocation(locationId),
-    userId ? getReactionPhoto(userId, locationId) : Promise.resolve(null),
-  ]);
+  const location = await getLocation(locationId);
+  let reactionPhoto = null;
+
+  if (location && userId) {
+    reactionPhoto = await getReactionPhoto(userId, location.keyID);
+  }
 
   return { location, reactionPhoto };
 };
