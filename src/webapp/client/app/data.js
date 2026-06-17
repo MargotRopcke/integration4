@@ -244,7 +244,9 @@ export async function saveSession({ userId, photoName, primaryCategoryId, travel
  * Called by the webapp map route after scanning the QR code.
  */
 export async function getSessionLocations(userId) {
-  // 1. Fetch the session details, explicit including the raw primary_category_id column
+  const numericUserId = Number(userId); // ← add this
+  
+  // 1. Fetch the session details
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
     .select(`
@@ -254,44 +256,70 @@ export async function getSessionLocations(userId) {
       primary_category:primary_categories ( id, name ),
       traveler_type:traveler_types ( id, name )
     `)
-    .eq("user_id", userId)
+    .eq("user_id", numericUserId)
     .single();
 
   if (sessionError) throw sessionError;
 
-  // 2. Prepare the locations query safely
-  let locationsQuery = supabase
-    .from("locations")
-    .select(`
-      keyID, name, address, latitude, longitude,
-      quote, price, image,
-      location_vibes ( vibe_categories ( id, name ) )
-    `)
-    .not("image", "is", null);
+  // 2. Fetch session photos — each photo is tied to a liked location via location_id (keyID uuid)
+  const { data: sessionPhotos, error: photosError } = await supabase
+    .from("sessions_photos")
+    .select("photo, location_id")
+    .eq("user_id", numericUserId)
+    .order("id", { ascending: true });
 
-  // 3. Prevent the 400 Bad Request error by ensuring the ID is valid before adding the filter
-  if (session && session.primary_category_id !== undefined && session.primary_category_id !== null) {
-    locationsQuery = locationsQuery.eq("primary_category_id", session.primary_category_id);
+  if (photosError) throw photosError;
+
+  // 3. Derive the unique liked location IDs from the session photos
+  const likedLocationIds = [
+    ...new Set((sessionPhotos || []).map((p) => p.location_id).filter(Boolean)),
+  ];
+
+  // 4. Fetch only the liked locations (or fall back to category-filtered locations if no photos)
+  let locations = [];
+  if (likedLocationIds.length > 0) {
+    const { data, error: locError } = await supabase
+      .from("locations")
+      .select(`
+        keyID, id, name, address, latitude, longitude,
+        quote, price, image,
+        location_vibes ( vibe_categories ( id, name ) )
+      `)
+      .in("keyID", likedLocationIds)
+      .not("image", "is", null);
+
+    if (locError) throw locError;
+
+    // Preserve the order in which the user liked the locations
+    const orderMap = new Map(likedLocationIds.map((id, i) => [id, i]));
+    locations = (data || []).sort(
+      (a, b) => (orderMap.get(a.keyID) ?? 99) - (orderMap.get(b.keyID) ?? 99)
+    );
+  } else {
+    // Fallback: no photos saved — return all locations for the session's primary category
+    let query = supabase
+      .from("locations")
+      .select(`
+        keyID, id, name, address, latitude, longitude,
+        quote, price, image,
+        location_vibes ( vibe_categories ( id, name ) )
+      `)
+      .not("image", "is", null);
+
+    if (session?.primary_category_id != null) {
+      query = query.eq("primary_category_id", session.primary_category_id);
+    }
+
+    const { data, error: locError } = await query;
+    if (locError) throw locError;
+    locations = data || [];
   }
-
-  // 4. Fetch your location data and session photos side-by-side
-  const [
-    { data: locations, error: locError },
-    { data: sessionPhotos },
-  ] = await Promise.all([
-    locationsQuery,
-    supabase
-      .from("sessions_photos")
-      .select("photo, location_id")
-      .eq("user_id", userId)
-      .order("id", { ascending: true }),
-  ]);
-
-  if (locError) throw locError;
 
   return {
     session,
-    locations: locations || [],
+    locations,
     sessionPhotos: sessionPhotos || [],
+    userId,
   };
 }
+

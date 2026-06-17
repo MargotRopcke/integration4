@@ -7,7 +7,7 @@ export default [
     route('qr', 'routes/portal/qr.jsx'),
   ]),
   // ── Webapp (QR destination) ──
-  route("web", "routes/intro.jsx"),
+  route("intro", "routes/intro.jsx"),
   route("map", "routes/map.jsx", [
     layout("layouts/detail-panel.jsx", [
       route(":locationId", "routes/location-detail.jsx"),
