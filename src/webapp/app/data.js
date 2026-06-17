@@ -331,11 +331,22 @@ export async function getReactionPhoto(userId, locationId) {
     const numericUserId = Number(userId);
     if (isNaN(numericUserId) || !locationId) return null;
 
+    // 1. Resolve the location's UUID (keyID) from the integer ID (locationId)
+    const { data: locData, error: locError } = await supabase
+      .from("locations")
+      .select("keyID")
+      .eq("id", Number(locationId))
+      .single();
+
+    if (locError || !locData) return null;
+    const uuid = locData.keyID;
+
+    // 2. Query sessions_photos using the UUID
     const { data, error } = await supabase
       .from("sessions_photos")
       .select("photo")
       .eq("user_id", numericUserId)
-      .eq("location_id", locationId)
+      .eq("location_id", uuid)
       .maybeSingle();
 
     if (error) throw error;
