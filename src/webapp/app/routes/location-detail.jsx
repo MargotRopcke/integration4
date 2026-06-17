@@ -115,6 +115,21 @@ export default function LocationDetail({ loaderData }) {
             </div>
           )}
 
+          {/* Specialization Category Image */}
+          {location.specialization_categories?.image && (
+            <div className="location-detail__section" id="location-specialization">
+              <h3 className="location-detail__section-title">Specialization</h3>
+              <div className="location-detail__specialization-image-wrapper">
+                <img
+                  src={location.specialization_categories.image}
+                  alt={location.specialization_categories.name || "Specialization"}
+                  className="location-detail__specialization-image"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Quote */}
           {location.quote && (
             <div className="location-detail__section">
