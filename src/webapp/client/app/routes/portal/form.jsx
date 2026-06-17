@@ -40,6 +40,7 @@ export default function FormPage({ loaderData }) {
   const [budget, setBudget] = useState("€ (≤30)");
   const [distance, setDistance] = useState("walking (0-2km)");
   const [takePictures, setTakePictures] = useState("yes");
+  const [showNoPhotosPopup, setShowNoPhotosPopup] = useState(false);
 
   // Canvas State & References
   const canvasRef = useRef(null);
@@ -819,9 +820,60 @@ export default function FormPage({ loaderData }) {
     };
   }, [step]);
 
-  // ──────────────────────────────────────────────
-  // GESTURE + VOTE HANDLERS
-  // ──────────────────────────────────────────────
+  // Helper to avoid ESLint issue with state setter in camera loop closure
+  const setSummarySummaryFlash = (val) => setSummaryFlash(val);
+
+  const handleGoBack = useCallback(() => {
+    const currentIdx = deckIndexRef.current;
+    if (currentIdx <= 0) {
+      // Already at the first card, nothing to go back to
+      setGestureStatusText("⛔ Already at the first spot!");
+      return;
+    }
+
+    // If swipe was done, undo it
+    if (swipeDone) {
+      setSwipeDone(false);
+    }
+
+    const prevIndex = currentIdx - 1;
+    const prevLocation = deckRef.current[prevIndex];
+
+    // Check if the previous location was liked
+    if (prevLocation) {
+      const wasLiked = likedLocationsRef.current.some(
+        (loc) => (loc.keyID && loc.keyID === prevLocation.keyID) || (loc.id && loc.id === prevLocation.id)
+      );
+
+      if (wasLiked) {
+        // Remove from liked locations
+        likedLocationsRef.current = likedLocationsRef.current.filter(
+          (loc) => !((loc.keyID && loc.keyID === prevLocation.keyID) || (loc.id && loc.id === prevLocation.id))
+        );
+        setLikedLocations([...likedLocationsRef.current]);
+
+        // Decrement likes count
+        likesCountRef.current = Math.max(0, likesCountRef.current - 1);
+        setLikesCount(likesCountRef.current);
+
+        // Remove associated reaction photo
+        reactionPhotosRef.current = reactionPhotosRef.current.filter(
+          (photo) => photo.locationName !== prevLocation.name
+        );
+        setReactionPhotos([...reactionPhotosRef.current]);
+      }
+    }
+
+    // Go back one card
+    deckIndexRef.current = prevIndex;
+    setDeckIndex(prevIndex);
+    setCardSwipeClass("");
+    setOverlayLikeOpacity(0);
+    setOverlayNopeOpacity(0);
+    cardLoadedTimeRef.current = performance.now();
+    setGestureStatusText("↩ Went back one spot");
+  }, [swipeDone]);
+
   const handleGestureAction = useCallback((gesture) => {
     if (tutorialActiveRef.current) {
       handleTutorialGesture(gesture);
@@ -829,8 +881,8 @@ export default function FormPage({ loaderData }) {
     }
     if (gesture === "thumbsUp") handleVote(true);
     else if (gesture === "thumbsDown") handleVote(false);
-    else if (gesture === "stopHand") handleReset();
-  }, []);
+    else if (gesture === "stopHand") handleGoBack();
+  }, [handleGoBack]);
 
   const nextTutorialStep = useCallback(() => {
     const nextStep = tutorialStepRef.current + 1;
@@ -1211,20 +1263,52 @@ export default function FormPage({ loaderData }) {
               </p>
             </div>
             <div className="camera-choice-grid">
-              <div onClick={() => setTakePictures("yes")}
+              <div onClick={() => { setTakePictures("yes"); handleFinish(); }}
                 className={`camera-choice-card ${takePictures === "yes" ? "active" : ""}`} id="camera-choice-yes">
                 <div className="camera-choice-icon">📸</div>
                 <div className="camera-choice-title">Yes</div>
               </div>
-              <div onClick={() => setTakePictures("no")}
+              <div onClick={() => setShowNoPhotosPopup(true)}
                 className={`camera-choice-card ${takePictures === "no" ? "active" : ""}`} id="camera-choice-no">
                 <div className="camera-choice-icon">🚫</div>
                 <div className="camera-choice-title">No</div>
               </div>
             </div>
-            <div className="vibes-actions">
-              <button onClick={handleFinish} className="btn-form" id="camera-done">Done</button>
-            </div>
+
+            {/* No Photos Confirmation Popup */}
+            {showNoPhotosPopup && (
+              <div className="popup-overlay" id="no-photos-popup">
+                <div className="popup-card">
+                  <h2 className="popup-title">Are you sure?</h2>
+                  <p className="popup-desc">
+                    Taking photos during the experience leads to better outcomes and creates a more engaging overall experience.
+                  </p>
+                  <div className="popup-actions">
+                    <button
+                      className="btn-form"
+                      onClick={() => {
+                        setTakePictures("no");
+                        setShowNoPhotosPopup(false);
+                        handleFinish();
+                      }}
+                      id="popup-confirm-no-photos"
+                    >
+                      Yes, continue
+                    </button>
+                    <button
+                      className="btn-form btn-form--secondary"
+                      onClick={() => {
+                        setTakePictures("yes");
+                        setShowNoPhotosPopup(false);
+                      }}
+                      id="popup-cancel-no-photos"
+                    >
+                      No, I'm not sure
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1332,6 +1416,7 @@ export default function FormPage({ loaderData }) {
                   </div>
                   <div className="gesture-indicator">
                     <div className="gesture-btn dislike" id="btn-dislike" onClick={() => handleVote(false)} title="Dislike">👎</div>
+                    <div className="gesture-btn undo" id="btn-undo" onClick={handleGoBack} title="Go back" style={{ opacity: deckIndex > 0 ? 1 : 0.3, pointerEvents: deckIndex > 0 ? 'auto' : 'none' }}>↩</div>
                     <div className="gesture-btn like" id="btn-like" onClick={() => handleVote(true)} title="Like">👍</div>
                   </div>
                   {noCameraNotice && (

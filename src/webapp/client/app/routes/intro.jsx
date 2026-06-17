@@ -2,13 +2,25 @@ import { useLoaderData, Link } from "react-router";
 import { getSessionLocations } from '../data';
 import "./intro.css";
 
+// routes/map.jsx
+// import { useSearchParams } from 'react-router';
+import { getSessionLocations } from '../data';
 
 // intro.jsx
 export async function clientLoader({ request }) {
   const userId = new URL(request.url).searchParams.get('user');
-  if (!userId) return { session: null, locations: [], userId: null };
-  const data = await getSessionLocations(userId);
-  return { ...data, userId }; // ← pass userId through explicitly
+
+  // werkt alleen met een user id die dan via de qr zou gegeven moeten worden
+  return getSessionLocations(userId);
+
+  // --> als we niet door heel de form willen gaan moet deze code geactiveerd worden
+  //   if (!userId) return { locations: [] };
+  // try {
+  //   return await getSessionLocations(userId);
+  // } catch (e) {
+  //   console.error("Failed to load session locations:", e);
+  //   return { locations: [] };
+  // }
 }
 
 export default function Intro() {
