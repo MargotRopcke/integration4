@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { getPrimaryCategories, getVibeCategories, getFilteredLocations, getTravelerTypes, saveSession, saveSessionPhotos } from "../../data";
+import { getPrimaryCategories, getVibeCategories, getFilteredLocations, getTravelerTypes, saveSession, saveSessionPhotos } from "../data";
 import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs";
 import "./form.css";
 

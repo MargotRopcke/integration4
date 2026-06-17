@@ -97,7 +97,7 @@
 /*  AntwerpenSmallCaps-Regular */
 @font-face {
     font-family: 'AntwerpenSmallCaps';
-    src: url('fonts/antwerpen/Antwerpen-SmallCaps/AntwerpenSmallCaps-Regular.eot');
+    src: url('AntwerpenSmallCaps-Regular.eot');
     /* IE9 Compat Modes */
     src: url('fonts/antwerpen/Antwerpen-SmallCaps/AntwerpenSmallCaps-Regular.eot?#iefix') format('embedded-opentype'),
         /* IE6-IE8 */
@@ -133,7 +133,7 @@
 /* Webfont: AntwerpenTall-Tall */
 @font-face {
     font-family: 'AntwerpenTallTall';
-    src: url('fonts/antwerpen/Antwerpen-Tall/AntwerpenTall-Tall.eot');
+    src: url('fonts/antwerpen/Antwerpen-Tall/AntwerpenTall-Tall.css');
     /* IE9 Compat Modes */
     src: url('fonts/antwerpen/Antwerpen-Tall/AntwerpenTall-Tall.eot?#iefix') format('embedded-opentype'),
         /* IE6-IE8 */

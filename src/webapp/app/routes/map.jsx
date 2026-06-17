@@ -2,36 +2,31 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Link, Outlet, useNavigate, useParams } from "react-router";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { getLocations, getSessionLocations } from "../data";
+import { getLocations } from "../data";
 import "./map.css";
 
 // Antwerp center coordinates
 const ANTWERP_CENTER = [4.4025, 51.2194];
 const ANTWERP_ZOOM = 13;
 
+// OpenStreetMap raster tiles basemap style (matching demo-mila maplibre)
+// Replace your old MAP_STYLE with this clean, stylized vector style
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-export const clientLoader = async ({ request }) => {
+
+
+export const clientLoader = async () => {
   try {
-    const userId = new URL(request.url).searchParams.get("user");
-
-    if (userId) {
-      // QR code flow — load the user's personalised locations
-      const { session, locations } = await getSessionLocations(userId);
-      return { locations, session, userId };
-    }
-
-    // Direct visit — load all locations
     const locations = await getLocations();
-    return { locations, session: null, userId: null };
+    return { locations };
   } catch (error) {
     console.error("Failed to load locations:", error);
-    return { locations: [], session: null, userId: null };
+    return { locations: [] };
   }
 };
 
 export default function MapPage({ loaderData }) {
-  const { locations, session, userId } = loaderData;
+  const { locations } = loaderData;
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
@@ -52,6 +47,7 @@ export default function MapPage({ loaderData }) {
         },
         (error) => {
           console.warn("Geolocation error:", error.message);
+          // Default to Antwerp center if geolocation fails
           setUserPosition({
             lat: ANTWERP_CENTER[1],
             lng: ANTWERP_CENTER[0],
@@ -97,14 +93,15 @@ export default function MapPage({ loaderData }) {
   const createMarkerElement = useCallback((location, isActive) => {
     const el = document.createElement("div");
     el.className = `map-marker${isActive ? " map-marker--active" : ""}`;
-    el.innerHTML = `<div class="map-marker__icon"></div>`;
+    el.innerHTML = `
+      <div class="map-marker__icon"></div>
+      
+    `;
     el.addEventListener("click", () => {
-      // Keep user param in the URL when navigating to a location detail
-      const userParam = userId ? `?user=${userId}` : "";
-      navigate(`/map/${location.id}${userParam}`);
+      navigate(`/map/${location.id}`);
     });
     return el;
-  }, [navigate, userId]);
+  }, [navigate]);
 
   // Add location markers to the map
   useEffect(() => {
@@ -128,18 +125,7 @@ export default function MapPage({ loaderData }) {
 
       markersRef.current.push(marker);
     });
-
-    // If session locations, fit the map to show all of them
-    if (session && locations.length > 1) {
-      const bounds = new maplibregl.LngLatBounds();
-      locations.forEach((loc) => {
-        if (loc.latitude && loc.longitude) {
-          bounds.extend([parseFloat(loc.longitude), parseFloat(loc.latitude)]);
-        }
-      });
-      mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 15 });
-    }
-  }, [mapLoaded, locations, params.locationId, createMarkerElement, session]);
+  }, [mapLoaded, locations, params.locationId, createMarkerElement]);
 
   // Add user position marker
   useEffect(() => {
@@ -161,26 +147,11 @@ export default function MapPage({ loaderData }) {
 
   return (
     <div className="map-page" id="map-screen">
-      {/* Back button — goes back to intro with user param if available */}
-      <Link
-        to={userId ? `/intro?user=${userId}` : "/"}
-        className="map-page__back"
-        id="back-button"
-      >
+      {/* Back to intro */}
+      <Link to="/" className="map-page__back" id="back-button">
         <span className="map-page__back-arrow">←</span>
         Back
       </Link>
-
-      {/* Session badge — shown when viewing personalised locations */}
-      {session && (
-        <div className="map-page__session-badge">
-          <span>
-            {session.primary_category?.name?.toLowerCase() === "style" ? "👗" : "🍽"}
-          </span>
-          <span>{session.traveler_type?.name}</span>
-          <span>· {locations.length} spots</span>
-        </div>
-      )}
 
       {/* Map */}
       <div ref={mapContainerRef} className="map-page__map" />
@@ -193,8 +164,8 @@ export default function MapPage({ loaderData }) {
         </div>
       )}
 
-      {/* Detail panel outlet */}
-      <Outlet context={{ userPosition, userId }} />
+      {/* Detail panel outlet (rendered when a location is selected) */}
+      <Outlet context={{ userPosition }} />
     </div>
   );
 }
@@ -202,6 +173,6 @@ export default function MapPage({ loaderData }) {
 export function meta() {
   return [
     { title: "Map — The Portal" },
-    { name: "description", content: "Explore your personalised Antwerp locations." },
+    { name: "description", content: "Explore 6 hidden locations on the Antwerp map." },
   ];
 }
