@@ -1767,7 +1767,7 @@ export default function FormPage({ loaderData }) {
                   <div className="qr-code-wrapper">
                     <img
                       className="qr-code-image"
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${window.location.origin}/intro?user=${sessionUserId}`)}`}
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`https://margotropcke.github.io/integration4/?user=${sessionUserId}`)}`}
                       alt="QR code for your itinerary"
                     />
                   </div>

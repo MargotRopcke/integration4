@@ -1,15 +1,21 @@
 import { useOutletContext } from "react-router";
-import { getLocation, calculateDistance, formatDistance } from "../data";
+import { getLocation, getReactionPhoto, calculateDistance, formatDistance } from "../data";
 import "./location-detail.css";
 
-export const clientLoader = async ({ params }) => {
+export const clientLoader = async ({ request, params }) => {
   const { locationId } = params;
-  const location = await getLocation(locationId);
-  return { location };
+  const userId = new URL(request.url).searchParams.get("user");
+
+  const [location, reactionPhoto] = await Promise.all([
+    getLocation(locationId),
+    userId ? getReactionPhoto(userId, locationId) : Promise.resolve(null),
+  ]);
+
+  return { location, reactionPhoto };
 };
 
 export default function LocationDetail({ loaderData }) {
-  const { location } = loaderData;
+  const { location, reactionPhoto } = loaderData;
   // Get merged context from detail-panel layout (expanded + userPosition from map)
   const context = useOutletContext() || {};
   const { expanded = false, userPosition } = context;
@@ -41,15 +47,17 @@ export default function LocationDetail({ loaderData }) {
       ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location.address)}`
       : null;
 
+  const imageSource = reactionPhoto || location.image;
+
   return (
     <div className="location-detail" id="location-detail">
       {/* === COLLAPSED VIEW: always visible === */}
       <div className="location-detail__summary">
         {/* Photo */}
-        {location.image && (
+        {imageSource && (
           <div className="location-detail__image-wrapper">
             <img
-              src={location.image}
+              src={imageSource}
               alt={location.name}
               className="location-detail__image"
               loading="lazy"
