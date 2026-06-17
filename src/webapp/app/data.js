@@ -323,3 +323,27 @@ export async function getSessionLocations(userId) {
   };
 }
 
+/**
+ * Fetch a user's reaction photo for a specific location.
+ */
+export async function getReactionPhoto(userId, locationId) {
+  try {
+    const numericUserId = Number(userId);
+    if (isNaN(numericUserId) || !locationId) return null;
+
+    const { data, error } = await supabase
+      .from("sessions_photos")
+      .select("photo")
+      .eq("user_id", numericUserId)
+      .eq("location_id", locationId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data ? data.photo : null;
+  } catch (error) {
+    console.error("Error fetching reaction photo:", error);
+    return null;
+  }
+}
+
+
