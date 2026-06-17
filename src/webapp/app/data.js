@@ -38,7 +38,7 @@ export async function getLocation(id) {
   try {
     const { data, error } = await supabase
       .from("locations")
-      .select("*")
+      .select("*, specialization_categories(image)")
       .eq("id", id)
       .single();
 

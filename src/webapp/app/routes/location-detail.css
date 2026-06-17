@@ -214,3 +214,17 @@
   font-size: 0.85rem;
   font-style: italic;
 }
+
+/* Specialization image styles */
+.location-detail__specialization-image-wrapper {
+  max-width: 120px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-top: var(--space-xs);
+}
+
+.location-detail__specialization-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
