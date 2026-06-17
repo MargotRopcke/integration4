@@ -2,10 +2,6 @@ import { useLoaderData, Link } from "react-router";
 import { getSessionLocations } from '../data';
 import "./intro.css";
 
-// routes/map.jsx
-// import { useSearchParams } from 'react-router';
-import { getSessionLocations } from '../data';
-
 // intro.jsx
 export async function clientLoader({ request }) {
   const userId = new URL(request.url).searchParams.get('user');
