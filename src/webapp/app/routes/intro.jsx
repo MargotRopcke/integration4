@@ -1,11 +1,23 @@
 import { useLoaderData, Link } from "react-router";
 import { getSessionLocations } from '../data';
+import { NoUserFallback } from "../components/NoUserFallback";
 import "./intro.css";
 
 // intro.jsx
 export async function clientLoader({ request }) {
-  const userId = new URL(request.url).searchParams.get('user');
+  let userId = new URL(request.url).searchParams.get('user');
   console.log('userId from URL:', userId, typeof userId);
+
+  if (userId) {
+    localStorage.setItem('portal_user_id', userId);
+  } else {
+    userId = localStorage.getItem('portal_user_id');
+    console.log('userId from localStorage:', userId);
+  }
+
+  if (!userId || isNaN(Number(userId))) {
+    return { noUser: true, session: null, locations: [], sessionPhotos: [], userId: null };
+  }
 
   const { createClient } = await import("@supabase/supabase-js");
   const supabase = createClient(
@@ -20,27 +32,21 @@ export async function clientLoader({ request }) {
     .limit(5);
   console.log('ALL recent sessions_photos:', data, error);
 
-  // ...rest
-  if (!userId || isNaN(Number(userId)))
-    return { session: null, locations: [], sessionPhotos: [], userId: null };
-
   try {
-    return await getSessionLocations(userId);
+    return { ...(await getSessionLocations(userId)), noUser: false };
   } catch (e) {
     console.error("Failed to load session locations:", e);
-    return { session: null, locations: [], sessionPhotos: [], userId };
+    return { session: null, locations: [], sessionPhotos: [], userId, noUser: false };
   }
-
-  console.log('ALL recent sessions_photos:', data, error);
-  console.log('user_ids in db:', data?.map(r => ({ user_id: r.user_id, type: typeof r.user_id })));
-  console.log('querying with userId:', userId, Number(userId));
-  console.log('ALL recent sessions_photos:', data, error);
-  console.log('row details:', JSON.stringify(data?.map(r => ({ id: r.id, user_id: r.user_id, location_id: r.location_id })), null, 2));
-  console.log('looking for userId:', userId, '→ as number:', Number(userId));
 }
 
 export default function Intro() {
-  const { session, locations, sessionPhotos, userId } = useLoaderData();
+  const { session, locations, sessionPhotos, userId, noUser } = useLoaderData();
+  
+  if (noUser) {
+    return <NoUserFallback />;
+  }
+
   console.log('sessionPhotos:', sessionPhotos);
   console.log('first photo value:', sessionPhotos?.[0]?.photo?.slice(0, 50));
   // Prefer the user's own reaction selfies for the polaroids;

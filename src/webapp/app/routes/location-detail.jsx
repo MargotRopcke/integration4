@@ -4,7 +4,13 @@ import "./location-detail.css";
 
 export const clientLoader = async ({ request, params }) => {
   const { locationId } = params;
-  const userId = new URL(request.url).searchParams.get("user");
+  let userId = new URL(request.url).searchParams.get("user");
+
+  if (userId) {
+    localStorage.setItem('portal_user_id', userId);
+  } else {
+    userId = localStorage.getItem('portal_user_id');
+  }
 
   const [location, reactionPhoto] = await Promise.all([
     getLocation(locationId),

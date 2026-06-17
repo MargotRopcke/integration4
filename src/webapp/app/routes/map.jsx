@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate, useParams } from "react-router";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { getLocations, getSessionLocations } from "../data";
+import { NoUserFallback } from "../components/NoUserFallback";
 import "./map.css";
 
 // Antwerp center coordinates
@@ -13,25 +14,34 @@ const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json
 
 export const clientLoader = async ({ request }) => {
   try {
-    const userId = new URL(request.url).searchParams.get("user");
+    let userId = new URL(request.url).searchParams.get("user");
 
     if (userId) {
-      // QR code flow — load the user's personalised locations
-      const { session, locations } = await getSessionLocations(userId);
-      return { locations, session, userId };
+      localStorage.setItem('portal_user_id', userId);
+    } else {
+      userId = localStorage.getItem('portal_user_id');
     }
 
-    // Direct visit — load all locations
-    const locations = await getLocations();
-    return { locations, session: null, userId: null };
+    if (!userId || isNaN(Number(userId))) {
+      return { locations: [], session: null, userId: null, noUser: true };
+    }
+
+    // QR code flow — load the user's personalised locations
+    const { session, locations } = await getSessionLocations(userId);
+    return { locations, session, userId, noUser: false };
   } catch (error) {
     console.error("Failed to load locations:", error);
-    return { locations: [], session: null, userId: null };
+    return { locations: [], session: null, userId: null, noUser: true };
   }
 };
 
 export default function MapPage({ loaderData }) {
-  const { locations, session, userId } = loaderData;
+  const { locations, session, userId, noUser } = loaderData;
+  
+  if (noUser) {
+    return <NoUserFallback />;
+  }
+
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
