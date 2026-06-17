@@ -1,0 +1,149 @@
+/* ==========================================================================
+    SUN ANTWERPEN (STANDARD)
+   ========================================================================== */
+
+/* Light (300) */
+@font-face {
+    font-family: 'SunAntwerpen';
+    src: url('fonts/sunAntwerpen/SunAntwerpen_300/SunAntwerpen_300.eot');
+    src: url('fonts/sunAntwerpen/SunAntwerpen_300/SunAntwerpen_300.eot?#iefix') format('embedded-opentype'),
+        url('fonts/sunAntwerpen/SunAntwerpen_300/SunAntwerpen_300.woff') format('woff'),
+        url('fonts/sunAntwerpen/SunAntwerpen_300/SunAntwerpen_300.svg#SunAntwerpen_300') format('svg');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* Light Italic (300 Italic) */
+@font-face {
+    font-family: 'SunAntwerpen';
+    src: url('fonts/sunAntwerpen/SunAntwerpen_300_italic/SunAntwerpen_300_italic.eot');
+    src: url('fonts/sunAntwerpen/SunAntwerpen_300_italic/SunAntwerpen_300_italic.eot?#iefix') format('embedded-opentype'),
+        url('fonts/sunAntwerpen/SunAntwerpen_300_italic/SunAntwerpen_300_italic.woff') format('woff'),
+        url('fonts/sunAntwerpen/SunAntwerpen_300_italic/SunAntwerpen_300_italic.svg#SunAntwerpen_300_italic') format('svg');
+    font-weight: 300;
+    font-style: italic;
+}
+
+/* Medium / Regular (500) */
+@font-face {
+    font-family: 'SunAntwerpen';
+    src: url('fonts/sunAntwerpen/SunAntwerpen_500/SunAntwerpen_500.eot');
+    src: url('fonts/sunAntwerpen/SunAntwerpen_500/SunAntwerpen_500.eot?#iefix') format('embedded-opentype'),
+        url('fonts/sunAntwerpen/SunAntwerpen_500/SunAntwerpen_500.woff') format('woff'),
+        url('fonts/sunAntwerpen/SunAntwerpen_500/SunAntwerpen_500.svg#SunAntwerpen_500') format('svg');
+    font-weight: 500;
+    font-style: normal;
+}
+
+/* Medium / Regular Italic (500 Italic) */
+@font-face {
+    font-family: 'SunAntwerpen';
+    src: url('fonts/sunAntwerpen/SunAntwerpen_500_italic/SunAntwerpen_500_italic.eot');
+    src: url('fonts/sunAntwerpen/SunAntwerpen_500_italic/SunAntwerpen_500_italic.eot?#iefix') format('embedded-opentype'),
+        url('fonts/sunAntwerpen/SunAntwerpen_500_italic/SunAntwerpen_500_italic.woff') format('woff'),
+        url('fonts/sunAntwerpen/SunAntwerpen_500_italic/SunAntwerpen_500_italic.svg#SunAntwerpen_500_italic') format('svg');
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* Bold (700) */
+@font-face {
+    font-family: 'SunAntwerpen';
+    src: url('fonts/sunAntwerpen/SunAntwerpen_700/SunAntwerpen_700.eot');
+    src: url('fonts/sunAntwerpen/SunAntwerpen_700/SunAntwerpen_700.eot?#iefix') format('embedded-opentype'),
+        url('fonts/sunAntwerpen/SunAntwerpen_700/SunAntwerpen_700.woff') format('woff'),
+        url('fonts/sunAntwerpen/SunAntwerpen_700/SunAntwerpen_700.svg#SunAntwerpen_700') format('svg');
+    font-weight: 700;
+    font-style: normal;
+}
+
+/* Bold Italic (700 Italic) */
+@font-face {
+    font-family: 'SunAntwerpen';
+    src: url('fonts/sunAntwerpen/SunAntwerpen_700_italic/SunAntwerpen_700_italic.eot');
+    src: url('fonts/sunAntwerpen/SunAntwerpen_700_italic/SunAntwerpen_700_italic.eot?#iefix') format('embedded-opentype'),
+        url('fonts/sunAntwerpen/SunAntwerpen_700_italic/SunAntwerpen_700_italic.woff') format('woff'),
+        url('fonts/sunAntwerpen/SunAntwerpen_700_italic/SunAntwerpen_700_italic.svg#SunAntwerpen_700_italic') format('svg');
+    font-weight: 700;
+    font-style: italic;
+}
+
+/* Extra Bold (800) */
+@font-face {
+    font-family: 'SunAntwerpen';
+    src: url('fonts/sunAntwerpen/SunAntwerpen_800/SunAntwerpen_800.eot');
+    src: url('fonts/sunAntwerpen/SunAntwerpen_800/SunAntwerpen_800.eot?#iefix') format('embedded-opentype'),
+        url('fonts/sunAntwerpen/SunAntwerpen_800/SunAntwerpen_800.woff') format('woff'),
+        url('fonts/sunAntwerpen/SunAntwerpen_800/SunAntwerpen_800.svg#SunAntwerpen_800') format('svg');
+    font-weight: 800;
+    font-style: normal;
+}
+
+/* Extra Bold Italic (800 Italic) */
+@font-face {
+    font-family: 'SunAntwerpen';
+    src: url('fonts/sunAntwerpen/SunAntwerpen_800_italic/SunAntwerpen_800_italic.eot');
+    src: url('fonts/sunAntwerpen/SunAntwerpen_800_italic/SunAntwerpen_800_italic.eot?#iefix') format('embedded-opentype'),
+        url('fonts/sunAntwerpen/SunAntwerpen_800_italic/SunAntwerpen_800_italic.woff') format('woff'),
+        url('fonts/sunAntwerpen/SunAntwerpen_800_italic/SunAntwerpen_800_italic.svg#SunAntwerpen_800_italic') format('svg');
+    font-weight: 800;
+    font-style: italic;
+}
+
+/* ==========================================================================
+    ANTWERPEN 
+   ========================================================================== */
+
+/*  AntwerpenSmallCaps-Regular */
+@font-face {
+    font-family: 'AntwerpenSmallCaps';
+    src: url('AntwerpenSmallCaps-Regular.eot');
+    /* IE9 Compat Modes */
+    src: url('fonts/antwerpen/Antwerpen-SmallCaps/AntwerpenSmallCaps-Regular.eot?#iefix') format('embedded-opentype'),
+        /* IE6-IE8 */
+        url('fonts/antwerpen/Antwerpen-SmallCaps/AntwerpenSmallCaps-Regular.woff') format('woff'),
+        /* Modern Browsers */
+        url('fonts/antwerpen/Antwerpen-SmallCaps/AntwerpenSmallCaps-Regular.ttf') format('truetype'),
+        /* Safari, Android, iOS */
+        url('fonts/antwerpen/Antwerpen-SmallCaps/AntwerpenSmallCaps-Regular.svg#AntwerpenSmallCaps-Regular') format('svg');
+    /* Legacy iOS */
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
+/* Webfont: Antwerpen-Regular */
+@font-face {
+    font-family: 'Antwerpen';
+    src: url('fonts/antwerpen/Antwerpen-Regular/Antwerpen-Regular.eot');
+    /* IE9 Compat Modes */
+    src: url('fonts/antwerpen/Antwerpen-Regular/Antwerpen-Regular.eot?#iefix') format('embedded-opentype'),
+        /* IE6-IE8 */
+        url('fonts/antwerpen/Antwerpen-Regular/Antwerpen-Regular.woff') format('woff'),
+        /* Modern Browsers */
+        url('fonts/antwerpen/Antwerpen-Regular/Antwerpen-Regular.ttf') format('truetype'),
+        /* Safari, Android, iOS */
+        url('fonts/antwerpen/Antwerpen-Regular/Antwerpen-Regular.svg#Antwerpen-Regular') format('svg');
+    /* Legacy iOS */
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
+/* Webfont: AntwerpenTall-Tall */
+@font-face {
+    font-family: 'AntwerpenTallTall';
+    src: url('fonts/antwerpen/Antwerpen-Tall/AntwerpenTall-Tall.css');
+    /* IE9 Compat Modes */
+    src: url('fonts/antwerpen/Antwerpen-Tall/AntwerpenTall-Tall.eot?#iefix') format('embedded-opentype'),
+        /* IE6-IE8 */
+        url('fonts/antwerpen/Antwerpen-Tall/AntwerpenTall-Tall.woff') format('woff'),
+        /* Modern Browsers */
+        url('fonts/antwerpen/Antwerpen-Tall/AntwerpenTall-Tall.ttf') format('truetype'),
+        /* Safari, Android, iOS */
+        url('fonts/antwerpen/Antwerpen-Tall/AntwerpenTall-Tall.svg#AntwerpenTall-Tall') format('svg');
+    /* Legacy iOS */
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
