@@ -209,7 +209,10 @@ export default function FormPage({ loaderData }) {
             activeIndex={activeCardIdx}
             onPrev={() => setActiveCardIdx((p) => (p - 1 + travelers.length) % travelers.length)}
             onNext={() => setActiveCardIdx((p) => (p + 1) % travelers.length)}
-            onSelect={() => { setTravelerType(travelers[activeCardIdx].name); setStep(3); }}
+            onSelect={() => {
+              setTravelerType(travelers[activeCardIdx].name); setStep(3);
+            }}
+            onBack={() => setStep(1)}
           />
         )}
 
@@ -217,6 +220,7 @@ export default function FormPage({ loaderData }) {
           <StepCategory
             categories={primaryCategories}
             onSelect={(cat) => { setChosenCategory(cat); setSelectedVibes([]); setStep(4); }}
+            onBack={() => setStep(2)}
           />
         )}
 
@@ -231,6 +235,7 @@ export default function FormPage({ loaderData }) {
               )
             }
             onDone={() => setStep(5)}
+            onBack={() => setStep(3)}
           />
         )}
 
@@ -241,6 +246,7 @@ export default function FormPage({ loaderData }) {
             onBudget={setBudget}
             onDistance={setDistance}
             onNext={() => setStep(6)}
+            onBack={() => setStep(4)}
           />
         )}
 
@@ -248,6 +254,7 @@ export default function FormPage({ loaderData }) {
           <StepPhotos
             takePictures={takePictures}
             onChoose={(choice) => { setTakePictures(choice); setStep(7); }}
+            onBack={() => setStep(5)}
           />
         )}
 

@@ -1,8 +1,11 @@
-export function StepVibes({ vibes, chosenCategory, selectedVibes, onToggle, onDone }) {
+import { BackButton } from "../components/BackButton";
+import { StepProgress } from "../components/StepProgress";
+export function StepVibes({ vibes, chosenCategory, selectedVibes, onToggle, onDone, onBack }) {
   const filtered = vibes.filter((v) => v.primary_category_id === chosenCategory?.id);
 
   return (
     <div className="step-container" id="step-4">
+      <BackButton onClick={onBack} />
       <div className="form-header">
         <h1 className="form-heading">Choose the vibe(s) that fit your taste:</h1>
         <p className="form-subheading">Your taste shapes a more personal journey.</p>
@@ -27,6 +30,7 @@ export function StepVibes({ vibes, chosenCategory, selectedVibes, onToggle, onDo
       <div className="vibes-actions">
         <button onClick={onDone} className="btn-form" id="done-button">Done</button>
       </div>
+      <StepProgress current={4} total={6} />
     </div>
   );
 }

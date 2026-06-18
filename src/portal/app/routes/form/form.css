@@ -106,17 +106,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--form-accent);
-  color: var(--color-creamy-vanilla);
+  background: var(--color-creamy-vanilla);
+  color: var(--color-blood-orange);
   border: none;
   padding: 0.9rem 2.2rem;
-  border-radius: 50px;
-  font-family: var(--font-primary);
-  font-size: var(--size-base);
+  border-radius: var(--border-radius);
+  font-family: var(--font-secondary);
+  font-size: var(--size-xl);
   font-weight: var(--weight-bold);
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
+  border: 5px solid var(--style-blood-orange, #E03C31);
   box-shadow: 0 4px 15px rgba(225, 59, 44, 0.25);
 }
 
@@ -313,12 +313,12 @@
 }
 
 .carousel-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--form-glass);
+  width: auto;
+  height: auto;
+  border-radius: var(--border-radius);
+  background: var(--color-blood-orange);
   border: 1px solid var(--form-glass-border);
-  color: var(--form-text);
+  color: var(--color-creamy-vanilla);
   font-size: var(--size-lg);
   display: flex;
   align-items: center;
@@ -339,6 +339,7 @@
   display: flex;
   justify-content: center;
   margin-top: var(--space-md);
+  gap: var(--space-md);
 }
 
 /* ── STEP 3: VIBES ── */
@@ -563,8 +564,9 @@
 }
 
 .category-choice-card {
-  background: var(--form-surface);
-  border: 1px solid var(--form-glass-border);
+  background: var(--color-creamy-vanilla);
+  border: var(--size-lg) solid var(--color-blood-orange);
+
   border-radius: calc(var(--border-radius) * 2);
   padding: 2.2rem var(--space-lg);
   display: flex;
@@ -589,10 +591,10 @@
 
 
 .category-choice-title {
-  font-family: var(--font-Antwerpen-SmallCaps);
+  font-family: var(--font-secondary);
   font-size: var(--size-xl);
   font-weight: var(--weight-bold);
-  color: var(--form-text);
+  color: var(--color-blood-orange);
 }
 
 /* ── STEP 5: BUDGET & DISTANCE ── */
@@ -612,10 +614,11 @@
 }
 
 .group-title {
+  font-family: var(--font-secondary);
   font-size: var(--size-md);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-light);
   color: var(--form-text);
-  letter-spacing: 0.02em;
+
 }
 
 .options-row {
@@ -633,7 +636,7 @@
 }
 
 .option-btn {
-  background: var(--form-surface);
+  background: var(--color-blood-orange);
   border: 1px solid var(--form-glass-border);
   border-radius: var(--border-radius);
   padding: var(--space-md) var(--space-md);
@@ -641,7 +644,7 @@
   font-family: var(--font-primary);
   font-size: var(--size-base);
   font-weight: var(--weight-regular);
-  color: var(--form-text-muted);
+  color: var(--color-creamy-vanilla);
   cursor: pointer;
   transition: all 0.25s ease;
   user-select: none;
@@ -650,10 +653,10 @@
 
 
 .option-btn.active {
-  background: rgba(225, 59, 44, 0.12);
-  border-color: var(--form-accent);
+  background: var(--color-creamy-vanilla);
+  border: var(--space-xs) solid var(--color-blood-orange);
   color: var(--form-text);
-  box-shadow: 0 0 15px rgba(225, 59, 44, 0.15);
+
 }
 
 /* ── STEP 6: CAMERA CHOICES ── */
@@ -1854,4 +1857,296 @@
 /* Background-image card support */
 .card-image[style*="background-image"] {
   font-size: 0;
+}
+
+/* ── STEP PROGRESS DOTS ── */
+.step-progress {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: var(--space-xl);
+}
+
+.step-progress__dot {
+  width: 2rem;
+  height: 0.35rem;
+  border-radius: 99px;
+  background: rgba(20, 69, 82, 0.2);
+  transition: background 0.3s ease;
+}
+
+.step-progress__dot--active {
+  background: var(--color-blood-orange);
+}
+
+/* ── STEP 1: DRAW NAME ── */
+.step-draw {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.step-draw__header {
+  text-align: left;
+  margin-bottom: var(--space-xl);
+}
+
+.step-draw__header .form-heading {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  color: var(--color-text-blue);
+}
+
+.step-draw__header .form-subheading {
+  margin: 0;
+  color: var(--color-text-blue);
+  font-size: var(--size-base);
+}
+
+/* Canvas box — the big red card */
+.canvas-container {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  background: var(--color-blood-orange);
+  border-radius: calc(var(--border-radius) * 2);
+  overflow: hidden;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-title-row {
+  padding: 1.25rem 1.5rem 0.5rem;
+  text-align: center;
+}
+
+.canvas-title {
+  font-family: var(--font-Antwerpen);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  color: var(--color-creamy-vanilla);
+  font-weight: var(--weight-regular);
+}
+
+.canvas-draw-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.canvas-element {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  display: block;
+}
+
+.canvas-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(253, 254, 239, 0.45);
+  font-family: var(--font-secondary);
+  font-size: var(--size-lg);
+  font-weight: var(--weight-light);
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+.canvas-hint.hidden {
+  opacity: 0;
+}
+
+/* Action buttons row inside the red box */
+.canvas-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.canvas-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  line-height: 0;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.canvas-action-btn:active {
+  transform: scale(0.92);
+}
+
+/* Privacy note below the canvas box */
+.canvas-privacy-note {
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-blue);
+  text-align: center;
+  margin-top: var(--space-md);
+}
+
+/* Back button — top-left of any step */
+.btn-back-top {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 0;
+  z-index: 10;
+  transition: opacity 0.2s;
+}
+
+.btn-back-top:active {
+  opacity: 0.6;
+}
+
+/* ── STEP 2: TRAVELER CAROUSEL ── */
+.step-traveler {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 4rem;
+}
+
+.traveler-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.traveler-header .form-subheading {
+  order: -1;
+  font-size: var(--size-base);
+  color: var(--color-text-blue);
+  opacity: 0.75;
+  margin-bottom: 0.5rem;
+}
+
+.traveler-header .form-heading {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  color: var(--color-text-blue);
+  margin-bottom: 0;
+}
+
+/* Card stage — fixed height, cards stack in the center */
+.traveler-stage {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.traveler-card {
+  position: absolute;
+  width: 240px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  border: var(--space-md) solid var(--card-color, #E03C31);
+  background: #fff;
+  transform-origin: bottom center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s ease,
+    z-index 0s;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.traveler-card__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #ddd;
+}
+
+.traveler-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.traveler-card__photo-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.traveler-card__label {
+  padding: 0.75rem 1rem;
+}
+
+.traveler-card__name {
+  font-family: var(--font-Antwerpen);
+  font-size: 1.3rem;
+  color: #fff;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.02em;
+}
+
+/* Description below the card stack */
+.traveler-active-desc {
+  font-family: var(--font-secondary);
+  font-size: var(--size-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-blue);
+  text-align: center;
+  max-width: 300px;
+  line-height: var(--lh-loose);
+  margin-bottom: var(--space-xl);
+  min-height: 3rem;
+}
+
+/* Navigation row */
+.carousel-select-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+/* Solid square arrow buttons */
+.carousel-btn--square {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: var(--color-blood-orange);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.carousel-btn--square:active {
+  transform: scale(0.93);
+  opacity: 0.85;
+}
+
+/* Select button — outlined style */
+.btn-form--traveler-select {
+  background: transparent;
+  color: var(--color-blood-orange);
+  border: 3px solid var(--color-blood-orange);
+  box-shadow: none;
+  font-size: var(--size-lg);
+  padding: 0.8rem 2.5rem;
+  border-radius: var(--border-radius);
 }

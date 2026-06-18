@@ -1,8 +1,11 @@
+import { BackButton } from "../components/BackButton";
+import { StepProgress } from "../components/StepProgress";
 const CATEGORY_IMG = { style: "👗", flavour: "🍽" };
 
-export function StepCategory({ categories, onSelect }) {
+export function StepCategory({ categories, onSelect, onBack }) {
   return (
     <div className="step-container" id="step-3">
+      <BackButton onClick={onBack} />
       <div className="form-header">
         <h1 className="form-heading">What would you like to “taste” of Antwerp?</h1>
         <p className="form-subheading">Every portal needs an entry point. </p>
@@ -24,6 +27,7 @@ export function StepCategory({ categories, onSelect }) {
           );
         })}
       </div>
+      <StepProgress current={3} total={6} />
     </div>
   );
 }

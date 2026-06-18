@@ -124,7 +124,7 @@ export async function getTravelerTypes() {
   try {
     const { data, error } = await supabase
       .from("traveler_types")
-      .select("*")
+      .select("id, name, description, image")
       .order("id", { ascending: true });
 
     if (error) throw error;
@@ -322,4 +322,3 @@ export async function getSessionLocations(userId) {
     userId,
   };
 }
-
