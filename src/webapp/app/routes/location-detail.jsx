@@ -54,7 +54,7 @@ export default function LocationDetail({ loaderData }) {
       : null;
 
   let imageSource = location.image;
-  if (reactionPhoto) {
+  if (reactionPhoto && reactionPhoto.trim() !== "") {
     imageSource = reactionPhoto;
   }
   return (
