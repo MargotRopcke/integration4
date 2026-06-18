@@ -4,12 +4,12 @@ export function StepVibes({ vibes, chosenCategory, selectedVibes, onToggle, onDo
   return (
     <div className="step-container" id="step-4">
       <div className="form-header">
-        <h1 className="form-heading">Your taste shapes a more personal journey.</h1>
-        <p className="form-subheading">Choose the vibe(s) that fit your taste:</p>
+        <h1 className="form-heading">Choose the vibe(s) that fit your taste:</h1>
+        <p className="form-subheading">Your taste shapes a more personal journey.</p>
       </div>
       <div className="vibes-grid">
         {filtered.map((vibe) => {
-          const name       = vibe.name.trim();
+          const name = vibe.name.trim();
           const isSelected = selectedVibes.includes(name);
           return (
             <div

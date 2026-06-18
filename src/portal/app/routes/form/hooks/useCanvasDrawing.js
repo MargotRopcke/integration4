@@ -19,7 +19,7 @@ export function useCanvasDrawing(active) {
     ctx.lineCap   = "round";
     ctx.lineJoin  = "round";
     ctx.lineWidth = 10;
-    ctx.strokeStyle = "#1477CC";
+    ctx.strokeStyle = "#fafcf0";
 
     const getPos = (e) => {
       const rect    = canvas.getBoundingClientRect();
@@ -45,7 +45,7 @@ export function useCanvasDrawing(active) {
         ctx.stroke();
       } else {
         ctx.arc(pos.x, pos.y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = "#1477CC";
+        ctx.fillStyle = "#fafcf0";
         ctx.fill();
       }
       lastPos = pos;

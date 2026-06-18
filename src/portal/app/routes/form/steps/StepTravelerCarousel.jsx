@@ -2,8 +2,8 @@ export function StepTravelerCarousel({ travelers, activeIndex, onPrev, onNext, o
   return (
     <div className="step-container" id="step-2">
       <div className="form-header">
-        <h1 className="form-heading">The portal only works when it knows where to take you.</h1>
-        <p className="form-subheading">Tell me what kind of traveller you are:</p>
+        <h1 className="form-heading">Tell me what kind of traveller you are:</h1>
+        <p className="form-subheading">The portal only works when it knows where to take you.</p>
       </div>
       <div className="carousel-wrapper">
         <button onClick={onPrev} className="carousel-btn" id="carousel-left">‹</button>
