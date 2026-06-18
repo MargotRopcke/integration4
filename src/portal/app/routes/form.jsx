@@ -131,6 +131,8 @@ export default function FormPage({ loaderData }) {
   const reactionPhotosRef = useRef([]);
   const showBgReplacementRef = useRef(true);
   const currentBgIndexRef = useRef(0);
+  const takePicturesRef = useRef("yes");
+  takePicturesRef.current = takePictures;
 
   // Drag state refs
   const isDraggingRef = useRef(false);
@@ -1079,40 +1081,6 @@ export default function FormPage({ loaderData }) {
     }
   }, []);
 
-  const triggerCountdownAndVote = useCallback((liked) => {
-    if (countdownActiveRef.current) return;
-
-    if (!liked) {
-      commitVote(false);
-      return;
-    }
-
-    if (likesCountRef.current >= MAX_LIKES) return;
-
-    countdownActiveRef.current = true;
-    setCountdownActive(true);
-    setCountdownVisible(true);
-
-    const steps = ["3", "2", "1", "📸 Say Cheese!"];
-    let stepIdx = 0;
-
-    const nextCountdownStep = () => {
-      if (stepIdx >= steps.length) {
-        setCountdownVisible(false);
-        if (takePictures === "yes" && cameraReadyRef.current) capturePhoto();
-        countdownActiveRef.current = false;
-        setCountdownActive(false);
-        commitVote(true);
-        return;
-      }
-      setCountdownCheese(stepIdx === 3);
-      setCountdownText(steps[stepIdx]);
-      stepIdx++;
-      setTimeout(nextCountdownStep, stepIdx === 4 ? 900 : 800);
-    };
-    nextCountdownStep();
-  }, [takePictures, capturePhoto]);
-
   const commitVote = useCallback((liked) => {
     const loc = deckRef.current[deckIndexRef.current];
     if (!loc) return;
@@ -1141,6 +1109,51 @@ export default function FormPage({ loaderData }) {
       }
     }, 360);
   }, []);
+
+  const triggerCountdownAndVote = useCallback((liked) => {
+    if (countdownActiveRef.current) return;
+
+    if (!liked) {
+      commitVote(false);
+      return;
+    }
+
+    if (likesCountRef.current >= MAX_LIKES) return;
+
+    if (takePicturesRef.current === "no") {
+      const loc = deckRef.current[deckIndexRef.current];
+      if (loc) {
+        const newPhoto = { dataUrl: "", locationName: loc.name, locationImage: loc.image, locationId: loc.keyID };
+        reactionPhotosRef.current = [...reactionPhotosRef.current, newPhoto];
+        setReactionPhotos(reactionPhotosRef.current);
+      }
+      commitVote(true);
+      return;
+    }
+
+    countdownActiveRef.current = true;
+    setCountdownActive(true);
+    setCountdownVisible(true);
+
+    const steps = ["3", "2", "1", "📸 Say Cheese!"];
+    let stepIdx = 0;
+
+    const nextCountdownStep = () => {
+      if (stepIdx >= steps.length) {
+        setCountdownVisible(false);
+        if (takePicturesRef.current === "yes" && cameraReadyRef.current) capturePhoto();
+        countdownActiveRef.current = false;
+        setCountdownActive(false);
+        commitVote(true);
+        return;
+      }
+      setCountdownCheese(stepIdx === 3);
+      setCountdownText(steps[stepIdx]);
+      stepIdx++;
+      setTimeout(nextCountdownStep, stepIdx === 4 ? 900 : 800);
+    };
+    nextCountdownStep();
+  }, [capturePhoto, commitVote]);
 
   const handleVote = useCallback((liked) => {
     if (deckIndexRef.current >= deckRef.current.length) return;
