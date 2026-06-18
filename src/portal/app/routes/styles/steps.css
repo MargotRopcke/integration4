@@ -1,0 +1,809 @@
+/* ==========================================================================
+   STEPS.CSS — styles for form steps 0–6, printing, QR
+   Imported via form.css @import
+   ========================================================================== */
+
+/* ── STEP 0: INTRO ───────────────────────────────────────────────────────── */
+.step-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-xxl) var(--space-md);
+  background: var(--color-blood-orange);
+}
+
+.intro-portal-icon {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin-bottom: var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── STEP 1: DRAW NAME ───────────────────────────────────────────────────── */
+.step-draw {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.step-draw__header {
+  text-align: left;
+  margin-bottom: var(--space-xl);
+}
+
+.step-draw__header .form-heading {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  color: var(--color-text-blue);
+}
+
+.step-draw__header .form-subheading {
+  margin: 0;
+  color: var(--color-text-blue);
+  font-size: var(--size-base);
+}
+
+.canvas-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: var(--space-lg) 0;
+}
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  background: var(--color-blood-orange);
+  border-radius: calc(var(--border-radius) * 2);
+  overflow: hidden;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-title-row {
+  padding: 1.25rem 1.5rem 0.5rem;
+  text-align: center;
+}
+
+.canvas-title {
+  font-family: var(--font-primary);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  color: var(--color-creamy-vanilla);
+  font-weight: var(--weight-regular);
+}
+
+.canvas-draw-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.canvas-element {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  display: block;
+}
+
+.canvas-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(253, 254, 239, 0.45);
+  font-family: var(--font-secondary);
+  font-size: var(--size-lg);
+  font-weight: var(--weight-light);
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+.canvas-hint.hidden {
+  opacity: 0;
+}
+
+.canvas-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.canvas-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  line-height: 0;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.canvas-action-btn:active {
+  transform: scale(0.92);
+}
+
+.canvas-privacy-note {
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-blue);
+  text-align: center;
+  margin-top: var(--space-md);
+}
+
+/* ── STEP 2: TRAVELER CAROUSEL ───────────────────────────────────────────── */
+.step-traveler {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 4rem;
+}
+
+.traveler-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.traveler-header .form-subheading {
+  order: -1;
+  font-size: var(--size-base);
+  color: var(--color-text-blue);
+  opacity: 0.75;
+  margin-bottom: 0.5rem;
+}
+
+.traveler-header .form-heading {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  color: var(--color-text-blue);
+  margin-bottom: 0;
+}
+
+.traveler-stage {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.traveler-card {
+  position: absolute;
+  width: 240px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  border: var(--space-md) solid var(--card-color, #E03C31);
+  background: #fff;
+  transform-origin: bottom center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.traveler-card__photo {
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: #ddd;
+}
+
+.traveler-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.traveler-card__photo-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.traveler-card__label {
+  padding: 0.75rem 1rem;
+}
+
+.traveler-card__name {
+  font-family: var(--font-primary);
+  font-size: 1.3rem;
+  color: #fff;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.02em;
+}
+
+.traveler-active-desc {
+  font-family: var(--font-secondary);
+  font-size: var(--size-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-blue);
+  text-align: center;
+  max-width: 300px;
+  line-height: var(--lh-loose);
+  margin-bottom: var(--space-xl);
+  min-height: 3rem;
+}
+
+.carousel-select-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.carousel-btn--square {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: var(--color-blood-orange);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.carousel-btn--square:active {
+  transform: scale(0.93);
+  opacity: 0.85;
+}
+
+.btn-form--traveler-select {
+  background: transparent;
+  color: var(--color-blood-orange);
+  border: 3px solid var(--color-blood-orange);
+  box-shadow: none;
+  font-size: var(--size-lg);
+  padding: 0.8rem 2.5rem;
+  border-radius: var(--border-radius);
+}
+
+/* ── STEP 3: CATEGORY ────────────────────────────────────────────────────── */
+.category-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+  margin: var(--space-xl) 0;
+}
+
+@media (max-width: 500px) {
+  .category-choice-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
+.category-choice-card {
+  background: var(--color-creamy-vanilla);
+  border: var(--size-lg) solid var(--color-blood-orange);
+  border-radius: calc(var(--border-radius) * 2);
+  padding: 2.2rem var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.category-choice-card:active {
+  transform: translateY(-1px);
+}
+
+.category-choice-icon {
+  font-size: 3.2rem;
+  margin-bottom: var(--space-md);
+  transition: transform 0.3s ease;
+}
+
+.category-choice-title {
+  font-family: var(--font-secondary);
+  font-size: var(--size-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-blood-orange);
+}
+
+/* ── STEP 3: CATEGORY CARDS ──────────────────────────────────────────────── */
+.category-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+  margin: var(--space-xl) 0;
+  padding: 0 var(--space-sm);
+}
+
+.category-card {
+  position: relative;
+  background: var(--color-blood-orange);
+  border-radius: calc(var(--border-radius));
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 20px rgba(225, 59, 44, 0.25);
+  overflow: visible;
+  /* lets deco image overflow the card */
+}
+
+.category-card:active {
+  transform: scale(0.97);
+}
+
+/* ── DECORATIVE IMAGE ── */
+.category-card__deco {
+  position: absolute;
+  width: 90px;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Position deco differently per card type */
+.category-card--style .category-card__deco {
+  bottom: -20px;
+  left: -20px;
+}
+
+.category-card--flavour .category-card__deco {
+  top: -20px;
+  right: -10px;
+}
+
+/* ── WHITE INNER BOX ── */
+.category-card__inner {
+  background: #fff;
+  border-radius: var(--border-radius);
+  padding: var(--space-xl) var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+}
+
+.category-card__name {
+  font-family: var(--font-primary);
+  font-size: clamp(var(--size-xl), 5vw, var(--size-xxl));
+  font-weight: var(--weight-regular);
+  color: var(--color-blood-orange);
+  text-align: center;
+}
+
+/* ── DESCRIPTION ── */
+.category-card__desc {
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-creamy-vanilla);
+  text-align: center;
+  line-height: var(--lh-loose);
+  margin-top: var(--space-md);
+  padding: 0 var(--space-sm);
+}
+
+
+/* ── STEP 4: VIBES ───────────────────────────────────────────────────────── */
+
+/* Header area — heading + decorative image side by side */
+.vibes-header {
+  position: relative;
+  margin-bottom: var(--space-lg);
+}
+
+.vibes-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.vibes-heading {
+  font-size: clamp(var(--size-xl), 5vw, var(--size-xxl));
+  text-align: left;
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.vibes-subheading {
+  text-align: left;
+  margin: 0.4rem 0 0;
+  font-size: var(--size-base);
+}
+
+/* Decorative bag image — top right of heading */
+.vibes-deco {
+  width: 110px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-top: -10px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── GRID WRAPPER ── */
+.vibes-grid-wrap {
+  position: relative;
+  margin: var(--space-lg) 0;
+}
+
+/* Crosshair grid lines — 4 columns × 4 rows drawn with CSS */
+.vibes-gridlines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right,
+      var(--color-text-blue) 0px,
+      var(--color-text-blue) 1px,
+      transparent 1px,
+      transparent 25%),
+    repeating-linear-gradient(to bottom,
+      var(--color-text-blue) 0px,
+      var(--color-text-blue) 1px,
+      transparent 1px,
+      transparent 33.333%);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* ── PILL GRID ── */
+.vibes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg) var(--space-lg);
+  padding: var(--space-lg) 0;
+  position: relative;
+  z-index: 1;
+}
+
+.vibe-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-primary);
+  font-size: clamp(var(--size-lg), 3.5vw, var(--size-xl));
+  font-weight: var(--weight-regular);
+  line-height: 1.2;
+  text-align: center;
+  min-height: 72px;
+  transition: transform 0.15s ease, outline 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.vibe-pill:active {
+  transform: scale(0.95);
+}
+
+/* ── DONE BUTTON ── */
+.vibes-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-xl);
+}
+
+.btn-form--vibes-done {
+  background: transparent;
+  color: var(--color-blood-orange);
+  border: 3px solid var(--color-blood-orange);
+  box-shadow: none;
+  font-size: var(--size-xl);
+  padding: 0.8rem 3rem;
+  border-radius: var(--border-radius);
+}
+
+.vibe-pill.selected,
+.vibe-pill[data-selected="true"] {
+  background-color: var(--color-creamy-vanilla) !important;
+  color: var(--color-blood-orange) !important;
+  border: 3px solid var(--color-blood-orange);
+  outline: none;
+  transform: none;
+  box-shadow: 0 3px 10px rgba(225, 59, 44, 0.2);
+}
+
+/*
+ ── STEP 4: VIBES ─────────────────────────────────────────────────────────
+.vibes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+  margin: var(--space-xl) 0;
+}
+
+@media (max-width: 500px) {
+  .vibes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vibe-option {
+  background: var(--form-surface);
+  border-radius: calc(var(--border-radius) * 1.75);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.vibe-option.selected {
+  background: rgba(225, 59, 44, 0.12);
+  border-color: var(--form-accent);
+  box-shadow: 0 0 15px rgba(225, 59, 44, 0.15);
+}
+
+.vibe-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--form-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.vibe-option.selected .vibe-circle {
+  border-color: var(--form-accent);
+  background: var(--form-accent);
+}
+
+.vibe-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-creamy-vanilla);
+  transform: scale(0);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.vibe-option.selected .vibe-dot {
+  transform: scale(1);
+}
+
+.vibe-text {
+  font-size: var(--size-base);
+  font-weight: var(--weight-regular);
+  color: var(--form-text-muted);
+  transition: color 0.2s ease;
+}
+
+.vibe-option.selected .vibe-text {
+  color: var(--form-text);
+}
+
+.vibes-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-lg);
+}
+
+*/
+
+/* ── STEP 5: BUDGET & DISTANCE ───────────────────────────────────────────── */
+.budget-distance-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  margin: var(--space-xl) 0;
+  width: 100%;
+}
+
+.question-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.group-title {
+  font-family: var(--font-secondary);
+  font-size: var(--size-md);
+  font-weight: var(--weight-light);
+  color: var(--form-text);
+}
+
+.options-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  width: 100%;
+}
+
+@media (max-width: 500px) {
+  .options-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+}
+
+.option-btn {
+  background: var(--color-blood-orange);
+  border-radius: var(--border-radius);
+  padding: var(--space-md);
+  text-align: center;
+  font-family: var(--font-primary);
+  font-size: var(--size-base);
+  font-weight: var(--weight-regular);
+  color: var(--color-creamy-vanilla);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+.option-btn.active {
+  background: var(--color-creamy-vanilla);
+  border: var(--space-xs) solid var(--color-blood-orange);
+  color: var(--form-text);
+}
+
+/* ── STEP 6: PHOTO CHOICE ────────────────────────────────────────────────── */
+.camera-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-xl);
+  margin: var(--space-xxl) 0;
+}
+
+@media (max-width: 500px) {
+  .camera-choice-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+}
+
+.camera-choice-card {
+  background: var(--form-surface);
+  border-radius: calc(var(--border-radius) * 2);
+  padding: 2.5rem var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.camera-choice-card.active {
+  background: rgba(225, 59, 44, 0.12);
+  box-shadow: 0 0 25px rgba(225, 59, 44, 0.25);
+  transform: scale(1.03);
+}
+
+.camera-choice-icon {
+  font-size: 3.8rem;
+  margin-bottom: var(--space-lg);
+  transition: transform 0.3s ease;
+}
+
+.camera-choice-title {
+  font-family: var(--font-Antwerpen-SmallCaps);
+  font-size: var(--size-xl);
+  font-weight: var(--weight-bold);
+  color: var(--form-text);
+}
+
+/* ── STEP QR ─────────────────────────────────────────────────────────────── */
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xl);
+  width: 100%;
+  margin: var(--space-lg) 0;
+}
+
+.qr-code-wrapper {
+  background: #fff;
+  padding: var(--space-lg);
+  border-radius: calc(var(--border-radius) * 2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.qr-code-image {
+  width: 240px;
+  height: 240px;
+  display: block;
+}
+
+.qr-spots-label {
+  font-size: var(--size-sm);
+  font-weight: var(--weight-bold);
+  color: var(--form-text);
+  margin-bottom: var(--space-sm);
+  text-align: center;
+}
+
+.qr-traveler-badge {
+  font-family: var(--font-secondary);
+  font-size: var(--size-md);
+  font-weight: var(--weight-bold);
+  color: var(--color-blood-orange);
+}
+
+/* ── PRINTING / QR LAYOUT ────────────────────────────────────────────────── */
+.step-printing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-xxl) var(--space-xl);
+  background: var(--sw-bg);
+  color: var(--sw-text);
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+.printing-collage-preview {
+  width: 100%;
+  max-width: 560px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+.printing-collage-preview img {
+  width: 100%;
+  display: block;
+}
+
+.printing-icon {
+  font-size: 3rem;
+}
+
+.printing-heading {
+  font-size: var(--size-lg);
+  font-weight: var(--weight-bold);
+}
+
+.printing-heading--success {
+  color: var(--color-pear-sorbet);
+}
+
+.printing-heading--error {
+  color: var(--color-blood-orange);
+}
+
+.printing-subtext {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: var(--size-sm);
+  max-width: 400px;
+}
+
+.printing-actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--space-md);
+}

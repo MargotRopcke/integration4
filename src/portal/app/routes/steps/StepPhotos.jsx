@@ -1,12 +1,10 @@
+import { FormStepLayout } from "../layouts/FormStepLayout";
 import { useState } from "react";
-import { BackButton } from "../components/BackButton";
-import { StepProgress } from "../components/StepProgress";
 export function StepPhotos({ takePictures, onChoose, onBack }) {
   const [showPopup, setShowPopup] = useState(false);
 
   return (
-    <div className="step-container" id="step-6">
-      <BackButton onClick={onBack} />
+    <FormStepLayout id="step-6" current={6} onBack={onBack}>
       <div className="form-header">
         <h1 className="form-heading">Take pictures during experience?</h1>
         <p className="form-subheading" style={{ margin: "1.5rem auto", maxWidth: "600px" }}>
@@ -66,7 +64,6 @@ export function StepPhotos({ takePictures, onChoose, onBack }) {
           </div>
         </div>
       )}
-      <StepProgress current={6} total={6} />
-    </div>
+    </FormStepLayout>
   );
 }

@@ -1,13 +1,11 @@
-import { BackButton } from "../components/BackButton";
-import { StepProgress } from "../components/StepProgress";
+import { FormStepLayout } from "../layouts/FormStepLayout";
 const BUDGET_OPTIONS = ["€ (≤30)", "€€ (≤60)", "€€€ (≥60)"];
 const DISTANCE_OPTIONS = ["walking (0-2km)", "bike (2-5km)", "tram (if possible)"];
 
 
 export function StepBudgetDistance({ budget, distance, onBudget, onDistance, onNext, onBack }) {
   return (
-    <div className="step-container" id="step-5">
-      <BackButton onClick={onBack} />
+    <FormStepLayout id="step-5" current={5} onBack={onBack}>
       <div className="form-header">
         <h1 className="form-heading">Shape the path to where you want to be.</h1>
       </div>
@@ -43,10 +41,7 @@ export function StepBudgetDistance({ budget, distance, onBudget, onDistance, onN
           </div>
         </div>
       </div>
-      <div className="vibes-actions" style={{ marginTop: "2rem" }}>
-        <button onClick={onNext} className="btn-form" id="budget-distance-next">Next</button>
-      </div>
-      <StepProgress current={5} total={6} />
-    </div>
+
+    </FormStepLayout>
   );
 }

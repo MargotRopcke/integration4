@@ -1,3 +1,5 @@
+import { FullscreenLayout } from "../layouts/FullscreenLayout";
+
 export function StepSummary({
   likesCount, likedLocations, reactionPhotos,
   // camera refs
@@ -8,7 +10,7 @@ export function StepSummary({
   onPrint, onSwipeAgain,
 }) {
   return (
-    <div className="swipe-screen summary-gesture-screen" id="step-8">
+    <FullscreenLayout id="step-8" className="summary-gesture-screen">
       <video ref={videoRef} style={{ display: "none" }} autoPlay playsInline muted />
       <canvas
         ref={canvasRef}
@@ -98,6 +100,6 @@ export function StepSummary({
           {gestureStatus}
         </div>
       </div>
-    </div>
+    </FullscreenLayout>
   );
 }

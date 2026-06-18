@@ -1,3 +1,5 @@
+import { PrintingLayout } from "../layouts/PrintingLayout";
+
 export function StepQR({ sessionUserId, sessionSaving, likesCount, likedLocations, travelerType, onReset }) {
   const qrUrl = sessionUserId
     ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
@@ -6,7 +8,7 @@ export function StepQR({ sessionUserId, sessionSaving, likesCount, likedLocation
     : null;
 
   return (
-    <div className="step-container" id="step-9">
+    <PrintingLayout id="step-9">
       <div className="form-header">
         <h1 className="form-heading">Your Antwerp journey awaits! 🎉</h1>
         <p className="form-subheading">
@@ -23,11 +25,7 @@ export function StepQR({ sessionUserId, sessionSaving, likesCount, likedLocation
         ) : (
           <>
             <div className="qr-code-wrapper">
-              <img
-                className="qr-code-image"
-                src={qrUrl}
-                alt="QR code for your itinerary"
-              />
+              <img className="qr-code-image" src={qrUrl} alt="QR code for your itinerary" />
             </div>
             <div className="qr-liked-spots">
               <p className="qr-spots-label">
@@ -35,9 +33,7 @@ export function StepQR({ sessionUserId, sessionSaving, likesCount, likedLocation
               </p>
               <div className="summary-vibes-tags">
                 {likedLocations.map((loc) => (
-                  <span key={loc.keyID || loc.name} className="summary-vibe-tag">
-                    📍 {loc.name}
-                  </span>
+                  <span key={loc.keyID || loc.name} className="summary-vibe-tag">📍 {loc.name}</span>
                 ))}
               </div>
             </div>
@@ -48,11 +44,11 @@ export function StepQR({ sessionUserId, sessionSaving, likesCount, likedLocation
         )}
       </div>
 
-      <div className="summary-actions" style={{ marginTop: "2rem" }}>
+      <div className="summary-actions">
         <button onClick={onReset} className="btn-form btn-form--secondary" id="restart-button">
           ↩ Start Over
         </button>
       </div>
-    </div>
+    </PrintingLayout>
   );
 }

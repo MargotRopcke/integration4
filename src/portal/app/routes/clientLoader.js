@@ -1,4 +1,4 @@
-import { getPrimaryCategories, getVibeCategories, getTravelerTypes } from "../../data";
+import { getPrimaryCategories, getVibeCategories, getTravelerTypes } from "../data";
 
 export async function clientLoader() {
   try {

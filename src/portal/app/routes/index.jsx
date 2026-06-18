@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { saveSession, saveSessionPhotos } from "../../data";
+import { saveSession, saveSessionPhotos } from "../data";
 import { FALLBACK_TRAVELERS } from "./constants";
 
 // Hooks
@@ -21,8 +21,7 @@ import { StepSwipe } from "./steps/StepSwipe";
 import { StepSummary } from "./steps/StepSummary";
 import { StepPrinting } from "./steps/StepPrinting";
 import { StepQR } from "./steps/StepQR";
-
-import "./form.css";
+import "./styles/form.css";
 
 export { clientLoader } from "./clientLoader";
 
