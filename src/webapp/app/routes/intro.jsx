@@ -42,7 +42,7 @@ export async function clientLoader({ request }) {
 
 export default function Intro() {
   const { session, locations, sessionPhotos, userId, noUser } = useLoaderData();
-  
+
   if (noUser) {
     return <NoUserFallback />;
   }
@@ -54,13 +54,13 @@ export default function Intro() {
   const polaroidSources =
     sessionPhotos && sessionPhotos.length > 0
       ? sessionPhotos.slice(0, 6).map((p) => {
-          const matchingLoc = (locations || []).find((l) => l.keyID === p.location_id);
-          const hasPhoto = p.photo && p.photo.trim() !== "";
-          return {
-            src: hasPhoto ? p.photo : (matchingLoc?.image || ""),
-            alt: matchingLoc?.name || "Your reaction"
-          };
-        })
+        const matchingLoc = (locations || []).find((l) => l.keyID === p.location_id);
+        const hasPhoto = p.photo && p.photo.trim() !== "";
+        return {
+          src: hasPhoto ? p.photo : (matchingLoc?.image || ""),
+          alt: matchingLoc?.name || "Your reaction"
+        };
+      })
       : (locations || []).slice(0, 6).map((l) => ({ src: l.image, alt: l.name }));
 
   return (
@@ -68,14 +68,16 @@ export default function Intro() {
       <div className="mobile-container">
 
         <header className="header-section">
-          <h1 className="welcome-text">
-            HI{" "}
+          <div className="header-text-wrapper">
+            <h1 className="welcome-text">
+              HI{" "}
+            </h1>
             <span className="name-handwritten">
               {session?.photo_name
                 ? <img src={session.photo_name} alt="your name" style={{ width: '50%', height: '50%', objectFit: 'cover' }} />
                 : "Traveler"}
             </span>
-          </h1>
+          </div>
           <p className="subtitle">{session?.traveler_type?.name || "Explorer"}</p>
         </header>
 
@@ -84,10 +86,8 @@ export default function Intro() {
             <span>Welcome to Antwerp • Welcome to Antwerp • Welcome to Antwerp</span>
           </div>
 
-          {["polaroid-left", "polaroid-center", "polaroid-right",
-            "polaroid-bg-dark", "polaroid-right", "polaroid-bg-dark"
-          ].map((cls, i) => (
-            <div key={i} className={`polaroid ${cls}`}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className={`polaroid polaroid-${i}`}>
               <div className="polaroid-img-wrapper">
                 {polaroidSources[i] && (
                   <img
