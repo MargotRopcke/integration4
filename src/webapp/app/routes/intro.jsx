@@ -53,7 +53,14 @@ export default function Intro() {
   // fall back to location images if no photos were captured.
   const polaroidSources =
     sessionPhotos && sessionPhotos.length > 0
-      ? sessionPhotos.slice(0, 6).map((p) => ({ src: p.photo, alt: "Your reaction" }))
+      ? sessionPhotos.slice(0, 6).map((p) => {
+          const matchingLoc = (locations || []).find((l) => l.keyID === p.location_id);
+          const hasPhoto = p.photo && p.photo.trim() !== "";
+          return {
+            src: hasPhoto ? p.photo : (matchingLoc?.image || ""),
+            alt: matchingLoc?.name || "Your reaction"
+          };
+        })
       : (locations || []).slice(0, 6).map((l) => ({ src: l.image, alt: l.name }));
 
   return (
