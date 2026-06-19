@@ -51,7 +51,7 @@ export default function Intro() {
   console.log('first photo value:', sessionPhotos?.[0]?.photo?.slice(0, 50));
   // Prefer the user's own reaction selfies for the polaroids;
   // fall back to location images if no photos were captured.
-  const polaroidSources =
+  const polaroidSources = (
     sessionPhotos && sessionPhotos.length > 0
       ? sessionPhotos.slice(0, 6).map((p) => {
         const matchingLoc = (locations || []).find((l) => l.keyID === p.location_id);
@@ -61,7 +61,8 @@ export default function Intro() {
           alt: matchingLoc?.name || "Your reaction"
         };
       })
-      : (locations || []).slice(0, 6).map((l) => ({ src: l.image, alt: l.name }));
+      : (locations || []).slice(0, 6).map((l) => ({ src: l.image, alt: l.name }))
+  ).filter((item) => item.src && item.src.trim() !== "");
 
   return (
     <div className="intro" id="intro-screen">
@@ -70,43 +71,51 @@ export default function Intro() {
         <header className="header-section">
           <div className="header-text-wrapper">
             <h1 className="welcome-text">
-              HI{" "}
+              hi
             </h1>
-            <span className="name-handwritten">
-              {session?.photo_name
-                ? <img src={session.photo_name} alt="your name" style={{ width: '50%', height: '50%', objectFit: 'cover' }} />
-                : "Traveler"}
-            </span>
+            {session?.photo_name
+              ? <img src={session.photo_name} alt="your name" style={{ width: '30%', height: '30%', objectFit: 'cover' }} />
+              : "Traveler"}
           </div>
-          <p className="subtitle">{session?.traveler_type?.name || "Explorer"}</p>
+          <p className="subtitle">The {session?.traveler_type?.name || "Explorer"}</p>
         </header>
 
-        <main className="collage-container">
-          <div className="ticker-tape">
-            <span>Welcome to Antwerp • Welcome to Antwerp • Welcome to Antwerp</span>
+        <div className="banner">
+          <div className="banner-track">
+            <span>Welcome to Antwerp</span>
+            <span>Welcome to Antwerp</span>
+            <span>Welcome to Antwerp</span>
+            <span>Welcome to Antwerp</span>
           </div>
+        </div>
 
-          {Array.from({ length: 6 }).map((_, i) => (
+        <main className="collage-container">
+          {polaroidSources.map((source, i) => (
             <div key={i} className={`polaroid polaroid-${i}`}>
               <div className="polaroid-img-wrapper">
-                {polaroidSources[i] && (
-                  <img
-                    src={polaroidSources[i].src}
-                    alt={polaroidSources[i].alt}
-                  />
-                )}
+                <img
+                  src={source.src}
+                  alt={source.alt}
+                />
               </div>
             </div>
           ))}
 
           <div className="type-icon">
-            {session?.primary_category?.name?.toLowerCase() === 'style' ? '👗' : '🍽'}
+            {session?.primary_category?.image && (
+              <img
+                src={session.primary_category.image}
+                alt={session.primary_category.name || "Category Icon"}
+              />
+            )}
           </div>
+        </main>
 
+        <footer>
           <Link to={`/map?user=${userId || ''}`} className="intro__button" id="enter-button">
             Let's discover your taste
           </Link>
-        </main>
+        </footer>
       </div>
     </div>
   );

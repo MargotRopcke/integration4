@@ -253,7 +253,7 @@ export async function getSessionLocations(userId) {
       user_id,
       photo_name,
       primary_category_id,
-      primary_category:primary_categories ( id, name ),
+      primary_category:primary_categories ( id, name, image ),
       traveler_type:traveler_types ( id, name )
     `)
     .eq("user_id", numericUserId)
