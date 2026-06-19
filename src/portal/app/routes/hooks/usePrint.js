@@ -1,18 +1,18 @@
 import { useState, useCallback } from "react";
 
 /**
- * Builds a photo collage and sends it to the local print server.
+ * Builds a photo collage and sends it to the /print resource route.
  */
 export function usePrint() {
-  const [status,    setStatus]    = useState("idle"); // "idle"|"printing"|"done"|"error"
-  const [collageUrl,setCollageUrl]= useState(null);
-  const [errorMsg,  setErrorMsg]  = useState("");
+  const [status,     setStatus]     = useState("idle"); // "idle"|"printing"|"done"|"error"
+  const [collageUrl, setCollageUrl] = useState(null);
+  const [errorMsg,   setErrorMsg]   = useState("");
 
   const buildCollage = useCallback((photos) => {
-    const cols  = 3, cellW = 640, cellH = 480, pad = 16;
-    const rows  = Math.ceil(photos.length / cols);
-    const cw    = cols * cellW + (cols + 1) * pad;
-    const ch    = rows * cellH + (rows + 1) * pad;
+    const cols = 3, cellW = 640, cellH = 480, pad = 16;
+    const rows = Math.ceil(photos.length / cols);
+    const cw   = cols * cellW + (cols + 1) * pad;
+    const ch   = rows * cellH + (rows + 1) * pad;
 
     const c   = document.createElement("canvas");
     c.width   = cw;
@@ -61,11 +61,26 @@ export function usePrint() {
       img.src = photo.dataUrl;
     }));
 
-    return Promise.all(promises).then(() => c.toDataURL("image/jpeg", 0.92));
+    return Promise.all(promises).then(() => {
+      // Convert to grayscale so it prints black & white on any printer/driver
+      const gray = document.createElement("canvas");
+      gray.width  = cw;
+      gray.height = ch;
+      const gCtx = gray.getContext("2d");
+      gCtx.drawImage(c, 0, 0);
+      const imageData = gCtx.getImageData(0, 0, cw, ch);
+      const d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const luma = d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
+        d[i] = d[i + 1] = d[i + 2] = luma;
+      }
+      gCtx.putImageData(imageData, 0, 0);
+      return gray.toDataURL("image/jpeg", 0.92);
+    });
   }, []);
 
   const triggerPrint = useCallback(async (dataUrl) => {
-    const res  = await fetch("http://127.0.0.1:3456/print-collage", {
+    const res  = await fetch("/print", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ image: dataUrl }),
@@ -77,7 +92,7 @@ export function usePrint() {
   /**
    * @param {object[]} reactionPhotos  - captured during swipe
    * @param {object[]} likedLocations  - fallback if no photos
-   * @param {Function} onDone          - called after successful print (navigate to next step)
+   * @param {Function} onDone          - called after successful print
    */
   const startPrinting = useCallback(async (reactionPhotos, likedLocations, onDone) => {
     setStatus("printing");
@@ -94,7 +109,7 @@ export function usePrint() {
       setTimeout(() => onDone?.(), 2000);
     } catch (err) {
       console.error("Print error:", err);
-      setErrorMsg(err.message || "Could not reach print server.");
+      setErrorMsg(err.message || "Print failed.");
       setStatus("error");
     }
   }, [buildCollage, triggerPrint]);
