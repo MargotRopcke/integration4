@@ -6,9 +6,6 @@ import { getLocations, getSessionLocations } from "../data";
 import { NoUserFallback } from "../components/NoUserFallback";
 import "./map.css";
 
-// Antwerp center coordinates
-const ANTWERP_CENTER = [4.4025, 51.2194];
-const ANTWERP_ZOOM = 13;
 
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
@@ -37,7 +34,7 @@ export const clientLoader = async ({ request }) => {
 
 export default function MapPage({ loaderData }) {
   const { locations, session, userId, noUser } = loaderData;
-  
+
   if (noUser) {
     return <NoUserFallback />;
   }
@@ -77,15 +74,39 @@ export default function MapPage({ loaderData }) {
     }
   }, []);
 
+  // Auto-select the first location if none is selected on load
+  useEffect(() => {
+    if (locations && locations.length > 0 && !params.locationId) {
+      const firstLoc = locations[0];
+      const userParam = userId ? `?user=${userId}` : "";
+      navigate(`/map/${firstLoc.id}${userParam}`, { replace: true });
+    }
+  }, [locations, params.locationId, navigate, userId]);
+
   // Initialize MapLibre map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    let initialBounds = null;
+    if (locations && locations.length > 0) {
+      const bounds = new maplibregl.LngLatBounds();
+      locations.forEach((loc) => {
+        if (loc.latitude && loc.longitude) {
+          bounds.extend([parseFloat(loc.longitude), parseFloat(loc.latitude)]);
+        }
+      });
+      if (!bounds.isEmpty()) {
+        initialBounds = bounds;
+      }
+    }
+
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: MAP_STYLE,
-      center: ANTWERP_CENTER,
-      zoom: ANTWERP_ZOOM,
+      ...(initialBounds
+        ? { bounds: initialBounds, fitBoundsOptions: { padding: 60, maxZoom: 15 } }
+        : { center: ANTWERP_CENTER, zoom: ANTWERP_ZOOM }
+      ),
       attributionControl: false,
     });
 
@@ -101,7 +122,7 @@ export default function MapPage({ loaderData }) {
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [locations]);
 
   // Create marker DOM element
   const createMarkerElement = useCallback((location, isActive) => {
@@ -171,27 +192,6 @@ export default function MapPage({ loaderData }) {
 
   return (
     <div className="map-page" id="map-screen">
-      {/* Back button — goes back to intro with user param if available */}
-      <Link
-        to={userId ? `/intro?user=${userId}` : "/"}
-        className="map-page__back"
-        id="back-button"
-      >
-        <span className="map-page__back-arrow">←</span>
-        Back
-      </Link>
-
-      {/* Session badge — shown when viewing personalised locations */}
-      {session && (
-        <div className="map-page__session-badge">
-          <span>
-            {session.primary_category?.name?.toLowerCase() === "style" ? "👗" : "🍽"}
-          </span>
-          <span>{session.traveler_type?.name}</span>
-          <span>· {locations.length} spots</span>
-        </div>
-      )}
-
       {/* Map */}
       <div ref={mapContainerRef} className="map-page__map" />
 
@@ -204,7 +204,7 @@ export default function MapPage({ loaderData }) {
       )}
 
       {/* Detail panel outlet */}
-      <Outlet context={{ userPosition, userId }} />
+      <Outlet context={{ userPosition, userId, locations }} />
     </div>
   );
 }

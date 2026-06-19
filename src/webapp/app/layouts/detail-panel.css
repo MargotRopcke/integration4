@@ -11,7 +11,7 @@
   background: var(--color-creamy-vanilla);
   color: var(--color-text-blue);
   transition: height var(--transition-slow), max-height var(--transition-slow);
-  overflow: hidden;
+  overflow: visible;
   animation: panel-slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -91,4 +91,30 @@
 .detail-panel__close:hover {
   background: rgba(255, 255, 255, 0.12);
   color: var(--color-text-primary);
+}
+
+/* Pagination Dots */
+.detail-panel__pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  pointer-events: auto;
+}
+
+.detail-panel__pagination-dot {
+  height: 4px;
+  border-radius: 2px;
+  background-color: rgba(22, 67, 79, 0.3);
+  width: 12px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.detail-panel__pagination-dot--active {
+  width: 28px;
+  background-color: var(--color-blood-orange);
 }
