@@ -24,8 +24,8 @@ export const clientLoader = async ({ request }) => {
     }
 
     // QR code flow — load the user's personalised locations
-    const { session, locations } = await getSessionLocations(userId);
-    return { locations, session, userId, noUser: false };
+    const { session, locations, sessionPhotos } = await getSessionLocations(userId);
+    return { locations, session, userId, sessionPhotos, noUser: false };
   } catch (error) {
     console.error("Failed to load locations:", error);
     return { locations: [], session: null, userId: null, noUser: true };
@@ -33,7 +33,7 @@ export const clientLoader = async ({ request }) => {
 };
 
 export default function MapPage({ loaderData }) {
-  const { locations, session, userId, noUser } = loaderData;
+  const { locations, session, userId, noUser, sessionPhotos } = loaderData;
 
   if (noUser) {
     return <NoUserFallback />;
@@ -177,7 +177,23 @@ export default function MapPage({ loaderData }) {
   const createMarkerElement = useCallback((location, isActive) => {
     const el = document.createElement("div");
     el.className = `map-marker${isActive ? " map-marker--active" : ""}`;
-    el.innerHTML = `<div class="map-marker__icon"></div>`;
+
+    // Find the reaction photo or fallback location image
+    const matchingPhotoObj = (sessionPhotos || []).find(p => p.location_id === location.keyID);
+    const hasPhoto = matchingPhotoObj?.photo && matchingPhotoObj.photo.trim() !== "";
+    const photoSrc = hasPhoto ? matchingPhotoObj.photo : (location.image || "");
+
+    let html = `<div class="map-marker__icon"></div>`;
+    if (isActive && photoSrc) {
+      html = `
+        <div class="map-marker__square">
+          <img src="${photoSrc}" alt="${location.name}" />
+        </div>
+        <div class="map-marker__icon"></div>
+      `;
+    }
+    el.innerHTML = html;
+
     el.addEventListener("click", () => {
       // 1. Zoom in immediately on the clicked marker
       if (mapRef.current && location.latitude && location.longitude) {
@@ -196,7 +212,7 @@ export default function MapPage({ loaderData }) {
       navigate(`/map/${location.id}${userParam}`);
     });
     return el;
-  }, [navigate, userId]);
+  }, [navigate, userId, sessionPhotos]);
 
   // Add location markers to the map
   useEffect(() => {
