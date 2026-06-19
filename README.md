@@ -14,7 +14,7 @@ Integration 4: Femke Denoo, Mila Jakiç, Eline Deblancq, Margot Röpcke
 - Honesty
 - Put in effort
 
-## List links to Figma etc.:
+## List links process etc.:
 - Figjam: https://www.figma.com/board/Ln5E4FdmMkBqnhtheX4yGl/INT4-FJ?node-id=41-2&t=bEkD5Hre0IFDZGRn-1
 - Figma: https://www.figma.com/design/mpJdmvMZZ3YsKBAPYG6O1x/INT4?node-id=43-60&t=kTfVcQNCcco6jNe3-1
 
