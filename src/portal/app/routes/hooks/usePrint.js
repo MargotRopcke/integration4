@@ -121,4 +121,4 @@ export function usePrint() {
   }, []);
 
   return { status, collageUrl, errorMsg, startPrinting, reset };
-}
+} 
