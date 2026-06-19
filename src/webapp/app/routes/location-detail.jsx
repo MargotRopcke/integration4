@@ -4,7 +4,13 @@ import "./location-detail.css";
 
 export const clientLoader = async ({ request, params }) => {
   const { locationId } = params;
-  const userId = new URL(request.url).searchParams.get("user");
+  let userId = new URL(request.url).searchParams.get("user");
+
+  if (userId) {
+    localStorage.setItem('portal_user_id', userId);
+  } else {
+    userId = localStorage.getItem('portal_user_id');
+  }
 
   const [location, reactionPhoto] = await Promise.all([
     getLocation(locationId),
@@ -47,8 +53,10 @@ export default function LocationDetail({ loaderData }) {
       ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location.address)}`
       : null;
 
-  const imageSource = reactionPhoto || location.image;
-
+  let imageSource = location.image;
+  if (reactionPhoto && reactionPhoto.trim() !== "") {
+    imageSource = reactionPhoto;
+  }
   return (
     <div className="location-detail" id="location-detail">
       {/* === COLLAPSED VIEW: always visible === */}
@@ -80,7 +88,7 @@ export default function LocationDetail({ loaderData }) {
         {/* Expand hint */}
         {!expanded && (
           <div className="location-detail__hint">
-      
+
             <span className="location-detail__hint-chevron">▲</span>
           </div>
         )}
@@ -110,6 +118,21 @@ export default function LocationDetail({ loaderData }) {
                   <span className="location-detail__maps-arrow">↗</span>
                 </a>
               )}
+            </div>
+          )}
+
+          {/* Specialization Category Image */}
+          {location.specialization_categories?.image && (
+            <div className="location-detail__section" id="location-specialization">
+              <h3 className="location-detail__section-title">Specialization</h3>
+              <div className="location-detail__specialization-image-wrapper">
+                <img
+                  src={location.specialization_categories.image}
+                  alt={location.specialization_categories.name || "Specialization"}
+                  className="location-detail__specialization-image"
+                  loading="lazy"
+                />
+              </div>
             </div>
           )}
 
