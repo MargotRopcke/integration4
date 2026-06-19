@@ -53,10 +53,7 @@ export default function LocationDetail({ loaderData }) {
       ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location.address)}`
       : null;
 
-  let imageSource = location.image;
-  if (reactionPhoto && reactionPhoto.trim() !== "") {
-    imageSource = reactionPhoto;
-  }
+  const imageSource = location.image;
   return (
     <div className="location-detail" id="location-detail">
       {/* === COLLAPSED VIEW: always visible === */}
@@ -85,13 +82,7 @@ export default function LocationDetail({ loaderData }) {
           </div>
         </div>
 
-        {/* Expand hint */}
-        {!expanded && (
-          <div className="location-detail__hint">
 
-            <span className="location-detail__hint-chevron">▲</span>
-          </div>
-        )}
       </div>
 
       {/* === EXPANDED VIEW: only visible when expanded === */}

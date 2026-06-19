@@ -31,27 +31,46 @@ const DetailPanel = () => {
 
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchEndY = useRef(0);
 
   const handleTouchStart = (e) => {
     touchStartX.current = e.targetTouches[0].clientX;
     touchEndX.current = e.targetTouches[0].clientX;
+    touchStartY.current = e.targetTouches[0].clientY;
+    touchEndY.current = e.targetTouches[0].clientY;
   };
 
   const handleTouchMove = (e) => {
     touchEndX.current = e.targetTouches[0].clientX;
+    touchEndY.current = e.targetTouches[0].clientY;
   };
 
   const handleTouchEnd = () => {
     const diffX = touchStartX.current - touchEndX.current;
-    const swipeThreshold = 50; // minimum swipe distance in pixels
+    const diffY = touchStartY.current - touchEndY.current;
+    const swipeThreshold = 40; // responsiveness threshold
 
-    if (Math.abs(diffX) > swipeThreshold) {
-      if (diffX > 0) {
-        // Swiped left -> show next
-        navigateToLocation("next");
-      } else {
-        // Swiped right -> show prev
-        navigateToLocation("prev");
+    // Determine if the gesture was primarily horizontal or vertical
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      // Horizontal swipe
+      if (Math.abs(diffX) > swipeThreshold) {
+        if (diffX > 0) {
+          navigateToLocation("next");
+        } else {
+          navigateToLocation("prev");
+        }
+      }
+    } else {
+      // Vertical swipe
+      if (Math.abs(diffY) > swipeThreshold) {
+        if (diffY > 0) {
+          // Swiped up -> Expand
+          setExpanded(true);
+        } else {
+          // Swiped down -> Collapse
+          setExpanded(false);
+        }
       }
     }
   };
@@ -61,43 +80,46 @@ const DetailPanel = () => {
   };
 
   return (
-    <div
-      className={`detail-panel ${expanded ? "detail-panel--expanded" : "detail-panel--collapsed"}`}
-      data-testid="detail-panel"
-      id="detail-panel"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Visual swiper pagination (drawn above the panel sheet) */}
-      {locations && locations.length > 0 && (
-        <div className="detail-panel__pagination" id="panel-pagination">
-          {locations.map((loc, i) => (
-            <span
-              key={loc.id}
-              className={`detail-panel__pagination-dot${
-                i === currentIndex ? " detail-panel__pagination-dot--active" : ""
-              }`}
-            />
-          ))}
-        </div>
+    <>
+      {expanded && (
+        <div
+          className="detail-panel__overlay"
+          onClick={() => setExpanded(false)}
+        />
       )}
+      <div
+        className={`detail-panel ${expanded ? "detail-panel--expanded" : "detail-panel--collapsed"}`}
+        data-testid="detail-panel"
+        id="detail-panel"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Visual swiper pagination (drawn above the panel sheet) */}
+        {locations && locations.length > 0 && (
+          <div className="detail-panel__pagination" id="panel-pagination">
+            {locations.map((loc, i) => (
+              <span
+                key={loc.id}
+                className={`detail-panel__pagination-dot${
+                  i === currentIndex ? " detail-panel__pagination-dot--active" : ""
+                }`}
+              />
+            ))}
+          </div>
+        )}
 
-      {/* Drag handle to toggle expand/collapse */}
-      <div className="detail-panel__handle" onClick={toggleExpand}>
-        <div className="detail-panel__handle-bar" />
+        {/* Drag handle to toggle expand/collapse */}
+        <div className="detail-panel__handle" onClick={toggleExpand}>
+          <div className="detail-panel__handle-bar" />
+        </div>
+
+        {/* Content area — renders location-detail.jsx */}
+        <div className="detail-panel__wrapper" onClick={!expanded ? toggleExpand : undefined}>
+          <Outlet context={{ ...parentContext, expanded }} />
+        </div>
       </div>
-
-      {/* Close button */}
-      <Link to="/map" className="detail-panel__close" id="close-panel">
-        ×
-      </Link>
-
-      {/* Content area — renders location-detail.jsx */}
-      <div className="detail-panel__wrapper" onClick={!expanded ? toggleExpand : undefined}>
-        <Outlet context={{ ...parentContext, expanded }} />
-      </div>
-    </div>
+    </>
   );
 };
 
