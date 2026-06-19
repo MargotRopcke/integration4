@@ -75,6 +75,16 @@ const DetailPanel = () => {
     }
   };
 
+  const activeLoc = locations?.[currentIndex];
+
+  const panelStyle = !expanded && activeLoc?.image
+    ? {
+        backgroundImage: `url(${activeLoc.image})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : {};
+
   const toggleExpand = () => {
     setExpanded((prev) => !prev);
   };
@@ -89,6 +99,7 @@ const DetailPanel = () => {
       )}
       <div
         className={`detail-panel ${expanded ? "detail-panel--expanded" : "detail-panel--collapsed"}`}
+        style={panelStyle}
         data-testid="detail-panel"
         id="detail-panel"
         onTouchStart={handleTouchStart}
@@ -113,6 +124,13 @@ const DetailPanel = () => {
         <div className="detail-panel__handle" onClick={toggleExpand}>
           <div className="detail-panel__handle-bar" />
         </div>
+
+        {/* 1/3 image banner on top when expanded */}
+        {expanded && activeLoc?.image && (
+          <div className="detail-panel__banner">
+            <img src={activeLoc.image} alt={activeLoc.name} />
+          </div>
+        )}
 
         {/* Content area — renders location-detail.jsx */}
         <div className="detail-panel__wrapper" onClick={!expanded ? toggleExpand : undefined}>
