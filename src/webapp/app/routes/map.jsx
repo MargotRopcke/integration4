@@ -6,7 +6,9 @@ import { getLocations, getSessionLocations } from "../data";
 import { NoUserFallback } from "../components/NoUserFallback";
 import "./map.css";
 
-
+// Fallbacks die in je code stonden, hier voor de zekerheid gedefinieerd
+const ANTWERP_CENTER = [4.4025, 51.2194];
+const ANTWERP_ZOOM = 13;
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
 export const clientLoader = async ({ request }) => {
@@ -23,7 +25,6 @@ export const clientLoader = async ({ request }) => {
       return { locations: [], session: null, userId: null, noUser: true };
     }
 
-    // QR code flow — load the user's personalised locations
     const { session, locations, sessionPhotos } = await getSessionLocations(userId);
     return { locations, session, userId, sessionPhotos, noUser: false };
   } catch (error) {
@@ -89,13 +90,10 @@ export default function MapPage({ loaderData }) {
   // Zoom/pan map based on active location selection
   useEffect(() => {
     if (!mapRef.current || !mapLoaded || !locations || locations.length === 0) return;
-
-    // Wait until params.locationId is resolved (either loaded or redirected)
     if (!params.locationId) return;
 
     const activeLocId = String(params.locationId);
 
-    // 1. Initial fit: fit bounds to show all spots above the collapsed sheet
     if (!isInitialFitDone.current) {
       isInitialFitDone.current = true;
       previousLocationId.current = activeLocId;
@@ -116,7 +114,6 @@ export default function MapPage({ loaderData }) {
       return;
     }
 
-    // 2. Subsequent switches (via swiping): zoom in on the active location if it changed
     if (activeLocId !== previousLocationId.current) {
       previousLocationId.current = activeLocId;
 
@@ -132,7 +129,7 @@ export default function MapPage({ loaderData }) {
     }
   }, [params.locationId, mapLoaded, locations]);
 
-  // Initialize MapLibre map
+  // Initialize MapLibre map & Apply custom vector styling
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
@@ -159,8 +156,55 @@ export default function MapPage({ loaderData }) {
       attributionControl: false,
     });
 
-    map.addControl(new maplibregl.NavigationControl(), "top-right");
+    map.on("styledata", () => {
+      // 1. Water zachtblauw maken
+      if (map.getLayer("water")) {
+        map.setPaintProperty("water", "fill-color", "#74a3cc");
+      }
 
+      // 2. Land/Achtergrond zacht oranje-beige maken
+      if (map.getLayer("background")) {
+        map.setPaintProperty("background", "background-color", "#fff2e0");
+      }
+
+      // 3. DYNAMISCH ALLE WEGEN PAKKEN EN GEEL KLEUREN
+      const allLayers = map.getStyle().layers;
+
+      allLayers.forEach((layer) => {
+        // Check of de laag over wegen gaat en een lijn is
+        if (
+          layer.type === "line" &&
+          (layer.id.includes("road") || layer.id.includes("highway") || layer.id.includes("rail"))
+        ) {
+          try {
+            // Dit geeft de wegen die felle, warme oranje-gele kleur uit Screenshot 2026-06-19 at 11.59.43.jpg
+            map.setPaintProperty(layer.id, "line-color", "#f7c247bf");
+          } catch (e) {
+            // Soms weigert een specifieke laag, dit voorkomt dat de code vastloopt
+            console.warn(`Kon kleur voor laag ${layer.id} niet aanpassen`, e);
+          }
+        }
+      });
+
+      // 4. Onnodige rommel verbergen voor die cleane look
+      // We lopen hier ook doorheen voor het geval de namen net anders zijn
+      allLayers.forEach((layer) => {
+        if (
+          layer.id.includes("building") ||
+          layer.id.includes("poi") ||
+          layer.id.includes("label") ||
+          layer.id.includes("park") ||
+          layer.id.includes("leisure")
+        ) {
+          // Zorg dat we niet per ongeluk de wegen-labels of water verbergen
+          if (!layer.id.includes("water") && !layer.id.includes("road")) {
+            try {
+              map.setLayoutProperty(layer.id, "visibility", "none");
+            } catch (e) { }
+          }
+        }
+      });
+    });
     map.on("load", () => {
       setMapLoaded(true);
     });
@@ -178,7 +222,6 @@ export default function MapPage({ loaderData }) {
     const el = document.createElement("div");
     el.className = `map-marker${isActive ? " map-marker--active" : ""}`;
 
-    // Find the reaction photo or fallback location image
     const matchingPhotoObj = (sessionPhotos || []).find(p => p.location_id === location.keyID);
     const hasPhoto = matchingPhotoObj?.photo && matchingPhotoObj.photo.trim() !== "";
     const photoSrc = hasPhoto ? matchingPhotoObj.photo : (location.image || "");
@@ -194,8 +237,9 @@ export default function MapPage({ loaderData }) {
     }
     el.innerHTML = html;
 
-    el.addEventListener("click", () => {
-      // 1. Zoom in immediately on the clicked marker
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+
       if (mapRef.current && location.latitude && location.longitude) {
         mapRef.current.easeTo({
           center: [parseFloat(location.longitude), parseFloat(location.latitude)],
@@ -204,13 +248,19 @@ export default function MapPage({ loaderData }) {
           duration: 1000
         });
       }
-      // 2. Update previous location Ref so the useEffect knows we already panned here
-      previousLocationId.current = String(location.id);
 
-      // 3. Keep user param in the URL when navigating to a location detail
-      const userParam = userId ? `?user=${userId}` : "";
-      navigate(`/map/${location.id}${userParam}`);
+      if (!isActive) {
+        previousLocationId.current = String(location.id);
+        const userParam = userId ? `?user=${userId}` : "";
+        navigate(`/map/${location.id}${userParam}`);
+      }
     });
+
+    el.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
     return el;
   }, [navigate, userId, sessionPhotos]);
 
@@ -218,7 +268,6 @@ export default function MapPage({ loaderData }) {
   useEffect(() => {
     if (!mapRef.current || !mapLoaded || !locations?.length) return;
 
-    // Clear existing markers
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
@@ -238,7 +287,7 @@ export default function MapPage({ loaderData }) {
     });
   }, [mapLoaded, locations, params.locationId, createMarkerElement]);
 
-  // Add user position marker
+  // Add user position marker (Perfect blauw bolletje zoals in screenshot!)
   useEffect(() => {
     if (!mapRef.current || !mapLoaded || !userPosition) return;
 
@@ -258,10 +307,8 @@ export default function MapPage({ loaderData }) {
 
   return (
     <div className="map-page" id="map-screen">
-      {/* Map */}
       <div ref={mapContainerRef} className="map-page__map" />
 
-      {/* Loading overlay */}
       {!mapLoaded && (
         <div className="map-page__loading">
           <div className="map-page__loading-spinner" />
@@ -269,7 +316,6 @@ export default function MapPage({ loaderData }) {
         </div>
       )}
 
-      {/* Detail panel outlet */}
       <Outlet context={{ userPosition, userId, locations }} />
     </div>
   );
