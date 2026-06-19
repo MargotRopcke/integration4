@@ -40,8 +40,8 @@ export default function FormPage({ loaderData }) {
   const [travelerType, setTravelerType] = useState("");
   const [chosenCategory, setChosenCategory] = useState(null);
   const [selectedVibes, setSelectedVibes] = useState([]);
-  const [budget, setBudget] = useState("€ (≤30)");
-  const [distance, setDistance] = useState("walking (0-2km)");
+  const [budget, setBudget] = useState("");
+  const [distance, setDistance] = useState("");
   const [takePictures, setTakePictures] = useState("yes");
   const [activeCardIdx, setActiveCardIdx] = useState(2);
 
@@ -290,6 +290,7 @@ export default function FormPage({ loaderData }) {
             onReset={handleReset}
             categoryLabel={categoryLabel}
             progressPct={progressPct}
+            likedLocations={deck.likedLocations}
           />
         )}
 

@@ -605,7 +605,7 @@
 
 */
 
-/* ── STEP 5: BUDGET & DISTANCE ───────────────────────────────────────────── */
+/* ── STEP 5: BUDGET & DISTANCE ───────────────────────────────────────────── 
 .budget-distance-container {
   display: flex;
   flex-direction: column;
@@ -663,8 +663,112 @@
   border: var(--space-xs) solid var(--color-blood-orange);
   color: var(--form-text);
 }
+*/
+/* ── STEP 5: BUDGET & DISTANCE ───────────────────────────────────────────── */
 
-/* ── STEP 6: PHOTO CHOICE ────────────────────────────────────────────────── */
+.bd-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.bd-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxl);
+  width: 100%;
+}
+
+/* ── GROUP ── */
+.bd-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.bd-group-title {
+  font-family: var(--font-primary);
+  font-size: var(--size-xl);
+  font-weight: var(--weight-regular);
+  color: var(--color-text-blue);
+  text-align: center;
+}
+
+/* ── OPTIONS ROW ── */
+.bd-options-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+/* ── OPTION WRAP (button + sub label) ── */
+.bd-option-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1;
+  max-width: 120px;
+}
+
+/* ── BUTTON ── */
+.bd-btn {
+  width: 100%;
+  padding: var(--space-md) var(--space-sm);
+  border-radius: var(--border-radius);
+  border: 3px solid var(--color-blood-orange);
+  background: var(--color-blood-orange);
+  color: var(--color-creamy-vanilla);
+  font-family: var(--font-primary);
+  font-size: var(--size-xl);
+  font-weight: var(--weight-regular);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.bd-btn:active {
+  transform: scale(0.95);
+}
+
+/* Inverted when selected */
+.bd-btn--active {
+  background: var(--color-creamy-vanilla);
+  color: var(--color-blood-orange);
+  border-color: var(--color-blood-orange);
+}
+
+/* Distance buttons have icon + text side by side */
+.bd-btn--icon {
+  font-size: var(--size-lg);
+  padding: var(--space-md) var(--space-sm);
+}
+
+.bd-btn__icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.bd-btn__label {
+  font-family: var(--font-primary);
+  font-size: var(--size-base);
+}
+
+/* Sub label below button */
+.bd-sub {
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  color: var(--color-text-blue);
+  opacity: 0.7;
+  text-align: center;
+}
+
+/* ── STEP 6: PHOTO CHOICE ────────────────────────────────────────────────── 
 .camera-choice-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -709,6 +813,143 @@
   font-size: var(--size-xl);
   font-weight: var(--weight-bold);
   color: var(--form-text);
+}
+*/
+/* ── STEP 6: TAKE PICTURES ───────────────────────────────────────────────── */
+
+.photos-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.photos-heading {
+  text-align: center;
+  font-size: clamp(var(--size-xl), 6vw, var(--size-xxxl));
+}
+
+.photos-desc {
+  font-family: var(--font-secondary);
+  font-size: var(--size-base);
+  color: var(--color-text-blue);
+  line-height: var(--lh-loose);
+  margin: 0;
+}
+
+.photos-desc strong {
+  font-weight: var(--weight-bold);
+}
+
+.photos-privacy {
+  font-family: var(--font-secondary);
+  font-size: var(--size-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-blood-orange);
+  line-height: var(--lh-loose);
+}
+
+/* ── GRID + CARDS WRAPPER ── */
+.photos-grid-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 380px;
+  margin-top: var(--space-xl);
+}
+
+/* Crosshair grid lines */
+.photos-gridlines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right,
+      var(--color-text-blue) 0px,
+      var(--color-text-blue) 1px,
+      transparent 1px,
+      transparent 25%),
+    repeating-linear-gradient(to bottom,
+      var(--color-text-blue) 0px,
+      var(--color-text-blue) 1px,
+      transparent 1px,
+      transparent 50%);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Cards row */
+.photos-cards {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-xl) var(--space-sm) var(--space-xxl);
+}
+
+/* ── POLAROID CARD ── */
+.polaroid {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+  flex: 1;
+  max-width: 200px;
+}
+
+.polaroid:active {
+  transform: scale(0.96) !important;
+}
+
+/* YES card tilts left, NO card tilts right */
+.polaroid--yes {
+  transform: rotate(-6deg) translateY(-10px);
+}
+
+.polaroid--no {
+  transform: rotate(5deg) translateY(10px);
+}
+
+/* Inner polaroid frame */
+.polaroid__photo {
+  width: 100%;
+  background: #fff;
+  border: 6px solid var(--color-blood-orange);
+  border-radius: 4px;
+  padding: var(--space-sm) var(--space-sm) 2.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.polaroid__photo img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  border-radius: 2px;
+}
+
+/* NO photo is slightly desaturated */
+.polaroid__photo--no img {
+  filter: saturate(0.6) brightness(0.9);
+}
+
+/* YES / NO label inside the white border bottom */
+.polaroid__label {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-primary);
+  font-size: var(--size-base);
+  font-weight: var(--weight-regular);
+  color: var(--color-blood-orange);
+  letter-spacing: 0.08em;
 }
 
 /* ── STEP QR ─────────────────────────────────────────────────────────────── */

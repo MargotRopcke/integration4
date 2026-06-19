@@ -1,4 +1,5 @@
 import { MAX_LIKES } from "../constants";
+import { TutorialScreen } from "./TutorialScreen";
 
 export function StepSwipe({
   // deck state
@@ -20,6 +21,8 @@ export function StepSwipe({
   onVote, onGoBack, onShowResults, onReset,
   // derived
   categoryLabel, progressPct,
+  // liked locations for polaroid stack
+  likedLocations,
 }) {
   if (loading) {
     return (
@@ -36,9 +39,9 @@ export function StepSwipe({
     return (
       <div className="swipe-screen" id="swipe">
         <div className="swipe-loading">
-          <p style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>😔</p>
+          <p className="swipe-empty-icon">😔</p>
           <p>No locations found matching your preferences.</p>
-          <button className="btn-form" onClick={() => onReset("preferences")} style={{ marginTop: "1.5rem" }}>
+          <button className="btn-form" onClick={() => onReset("preferences")}>
             ← Adjust Preferences
           </button>
         </div>
@@ -48,129 +51,134 @@ export function StepSwipe({
 
   return (
     <div className="swipe-screen" id="swipe">
-      {/* Hidden video feed */}
-      <video ref={videoRef} id="video-bg" className="input_video"
-        style={{ display: "none" }} autoPlay playsInline muted />
 
-      {/* Background: location image + segmented self */}
-      <div className="video-wrapper">
+      {/* ── ALWAYS MOUNTED: video + canvases so camera runs during tutorial too ── */}
+      <video
+        ref={videoRef}
+        id="video-bg"
+        className="input_video"
+        style={{ display: "none" }}
+        autoPlay
+        playsInline
+        muted
+      />
+
+      {/* Background layer — hidden during tutorial, visible during live swipe */}
+      <div className="video-wrapper" style={{ opacity: tutorialActive ? 0 : 1 }}>
         {currentCard && (
-          <img ref={bgImageRef} className="bg-image"
-            src={currentCard.image} alt="background" crossOrigin="anonymous" />
+          <img
+            ref={bgImageRef}
+            className="bg-image"
+            src={currentCard.image}
+            alt="background"
+            crossOrigin="anonymous"
+          />
         )}
         <canvas ref={outputCanvasRef} className="output_canvas" />
       </div>
 
-      {/* Hand landmark overlay */}
-      <canvas ref={canvasOverlayRef} id="canvas-overlay" />
+      {/* Hand landmark canvas — hidden during tutorial */}
+      <canvas
+        ref={canvasOverlayRef}
+        id="canvas-overlay"
+        style={{ opacity: tutorialActive ? 0 : 1 }}
+      />
 
-      {/* Tutorial overlay */}
-      <div className={`tutorial-overlay ${tutorialActive ? "active" : ""}`} id="tutorial-overlay">
-        <div className="tutorial-card">
-          <div className={`tutorial-step ${tutorialStep !== 1 ? "hidden" : ""}`} id="tutorial-step-1">
-            <h2 className="tutorial-title">Step onto the marker.</h2>
-            <p className="tutorial-desc">
-              After the instructions, we'll give you a selection of personalised local spots.
-            </p>
-            <div className="tutorial-visual alignment-marker">
-              <div className="marker-circle">👤</div>
-            </div>
-            <button className="btn-form" onClick={nextTutorialStep}>I'm Ready!</button>
-          </div>
-          <div className={`tutorial-step ${tutorialStep !== 2 ? "hidden" : ""}`} id="tutorial-step-2">
-            <h2 className="tutorial-title">Like the spot?</h2>
-            <p className="tutorial-desc">Show a thumb up motion to try a like.</p>
-            <div className="tutorial-visual gesture-hint">👍</div>
-            <div className="tutorial-loader-container">
-              <div className="tutorial-hold-bar" style={{ width: `${tutorialHoldBars[2]}%` }} />
-            </div>
-          </div>
-          <div className={`tutorial-step ${tutorialStep !== 3 ? "hidden" : ""}`} id="tutorial-step-3">
-            <h2 className="tutorial-title">Don't like the spot?</h2>
-            <p className="tutorial-desc">Show a thumb down motion to try a dislike.</p>
-            <div className="tutorial-visual gesture-hint">👎</div>
-            <div className="tutorial-loader-container">
-              <div className="tutorial-hold-bar" style={{ width: `${tutorialHoldBars[3]}%` }} />
-            </div>
-          </div>
-          <div className={`tutorial-step ${tutorialStep !== 4 ? "hidden" : ""}`} id="tutorial-step-4">
-            <h2 className="tutorial-title">Undo a (dis)like?</h2>
-            <p className="tutorial-desc">Try a return by doing a stop motion.</p>
-            <div className="tutorial-visual gesture-hint">✋</div>
-            <div className="tutorial-loader-container">
-              <div className="tutorial-hold-bar" style={{ width: `${tutorialHoldBars[4]}%` }} />
-            </div>
-          </div>
+      {/* ── TUTORIAL OVERLAY — sits on top, camera runs underneath ── */}
+      {tutorialActive && (
+        <div className="tutorial-overlay-new" id="tutorial-overlay">
+          <TutorialScreen
+            tutorialStep={tutorialStep}
+            tutorialHoldBars={tutorialHoldBars}
+            nextTutorialStep={nextTutorialStep}
+          />
         </div>
-      </div>
+      )}
 
-      {/* Main swipe UI */}
-      <div className="swipe-ui">
-        <div className="top-bar">
-          <div className="logo">Antwerp</div>
-          <div className="likes-counter">
-            <span className="heart" id="heart-icon">♥</span>
-            <span id="likes-count">{likesCount}</span> / {MAX_LIKES}
+      {/* ── LIVE SWIPE UI — hidden during tutorial ── */}
+      {!tutorialActive && (
+        <>
+          {/* Gesture status floating top-center */}
+          <div
+            className={`swipe-gesture-hint ${gestureDetected ? "detected" : ""}`}
+            id="gesture-status"
+          >
+            {gestureStatus}
           </div>
-          <div className="category-badge" id="cat-badge">{categoryLabel}</div>
-        </div>
 
-        <div className="progress-bar" style={{ marginBottom: ".5rem" }}>
-          <div className="progress-fill" style={{ width: `${progressPct}%` }} />
-        </div>
+          {/* Bottom UI row: polaroid stack | gesture btns | location card */}
+          <div className="swipe-bottom">
 
-        <div className={`gesture-status ${gestureDetected ? "detected" : ""}`} id="gesture-status">
-          {gestureStatus}
-        </div>
-
-        <div className="card-area" id="card-area">
-          {currentCard && (
-            <div className={`location-card ${cardSwipeClass}`} id="location-card" ref={cardRef}>
-              <div className="card-inner" id="card-inner">
-                <div
-                  className="card-image"
-                  id="card-image"
-                  style={{
-                    backgroundImage:    `url(${currentCard.image})`,
-                    backgroundSize:     "cover",
-                    backgroundPosition: "center",
-                  }}
-                />
-                <div className="card-body">
-                  <div className="card-type"  id="card-type">{categoryLabel}</div>
-                  <div className="card-name"  id="card-name">{currentCard.name}</div>
-                  <div className="card-meta"  id="card-meta">
-                    📍 {currentCard.address}
-                    {currentCard.quote && ` · "${currentCard.quote}"`}
+            {/* Left: polaroid stack with liked counter */}
+            <div className="swipe-polaroid-stack">
+              <div className="swipe-counter">{likesCount}/{MAX_LIKES}</div>
+              <div className="swipe-stack-cards">
+                {likedLocations.slice(-3).map((loc, i) => (
+                  <div
+                    key={loc.keyID || i}
+                    className="swipe-stack-card"
+                    style={{
+                      transform: `rotate(${(i - 1) * 6}deg) translateY(${(2 - i) * 4}px)`,
+                      zIndex: i,
+                    }}
+                  >
+                    {loc.image && <img src={loc.image} alt={loc.name} />}
                   </div>
-                </div>
+                ))}
+                {likedLocations.length === 0 && (
+                  <div className="swipe-stack-card swipe-stack-card--empty" />
+                )}
               </div>
-              <div className="card-vote-overlay like" style={{ opacity: overlayLike }}>LIKE ✓</div>
-              <div className="card-vote-overlay nope" style={{ opacity: overlayNope }}>NOPE ✗</div>
+            </div>
+
+            {/* Center: like / undo / dislike buttons */}
+            <div className="swipe-gesture-btns">
+              <button
+                className="swipe-gesture-btn swipe-gesture-btn--like"
+                onClick={() => onVote(true)}
+                title="Like"
+              >👍</button>
+              <button
+                className="swipe-gesture-btn swipe-gesture-btn--undo"
+                onClick={onGoBack}
+                title="Undo"
+                style={{
+                  opacity: deckIndex > 0 ? 1 : 0.35,
+                  pointerEvents: deckIndex > 0 ? "auto" : "none",
+                }}
+              >✋</button>
+              <button
+                className="swipe-gesture-btn swipe-gesture-btn--dislike"
+                onClick={() => onVote(false)}
+                title="Dislike"
+              >👎</button>
+            </div>
+
+            {/* Right: location card */}
+            {currentCard && (
+              <div
+                className={`swipe-location-card ${cardSwipeClass}`}
+                id="location-card"
+                ref={cardRef}
+              >
+                <div className="swipe-location-card__map" />
+                <div className="swipe-location-card__info">
+                  <div className="swipe-location-card__name">{currentCard.name}</div>
+                  <div className="swipe-location-card__type">{categoryLabel}</div>
+                </div>
+                <div className="card-vote-overlay like" style={{ opacity: overlayLike }}>LIKE ✓</div>
+                <div className="card-vote-overlay nope" style={{ opacity: overlayNope }}>NOPE ✗</div>
+              </div>
+            )}
+          </div>
+
+          {noCameraNotice && (
+            <div className="no-camera-notice" id="no-camera-notice">
+              No camera — use buttons to vote
             </div>
           )}
-        </div>
-
-        <div className="gesture-indicator">
-          <div className="gesture-btn dislike" id="btn-dislike"
-            onClick={() => onVote(false)} title="Dislike">👎</div>
-          <div
-            className="gesture-btn undo"
-            id="btn-undo"
-            onClick={onGoBack}
-            title="Go back"
-            style={{ opacity: deckIndex > 0 ? 1 : 0.3, pointerEvents: deckIndex > 0 ? "auto" : "none" }}
-          >↩</div>
-          <div className="gesture-btn like" id="btn-like"
-            onClick={() => onVote(true)} title="Like">👍</div>
-        </div>
-
-        {noCameraNotice && (
-          <div className="no-camera-notice" style={{ display: "block" }} id="no-camera-notice">
-            No camera — use buttons to vote
-          </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Done overlay */}
       <div className={`done-overlay ${swipeDone ? "visible" : ""}`} id="done-overlay">
@@ -178,7 +186,7 @@ export function StepSwipe({
         <h2>You've seen it all!</h2>
         <p>You liked <strong>{likesCount}</strong> spots. Ready to see your picks?</p>
         <button className="btn-form" onClick={onShowResults}>See My Picks →</button>
-        <button className="btn-back"  onClick={onReset}>↩ Start Over</button>
+        <button className="btn-back" onClick={onReset}>↩ Start Over</button>
       </div>
 
       {/* Countdown overlay */}
