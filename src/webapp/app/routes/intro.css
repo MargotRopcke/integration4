@@ -71,7 +71,7 @@
   align-items: center;
   gap: 0px;
   margin-top: 5vh;
-  height: 50vh;
+  margin-bottom: 5vh;
 }
 
 .polaroid-img-wrapper img {

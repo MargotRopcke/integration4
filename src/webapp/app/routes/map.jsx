@@ -83,6 +83,55 @@ export default function MapPage({ loaderData }) {
     }
   }, [locations, params.locationId, navigate, userId]);
 
+  const isInitialFitDone = useRef(false);
+  const previousLocationId = useRef(null);
+
+  // Zoom/pan map based on active location selection
+  useEffect(() => {
+    if (!mapRef.current || !mapLoaded || !locations || locations.length === 0) return;
+
+    // Wait until params.locationId is resolved (either loaded or redirected)
+    if (!params.locationId) return;
+
+    const activeLocId = String(params.locationId);
+
+    // 1. Initial fit: fit bounds to show all spots above the collapsed sheet
+    if (!isInitialFitDone.current) {
+      isInitialFitDone.current = true;
+      previousLocationId.current = activeLocId;
+
+      const bounds = new maplibregl.LngLatBounds();
+      locations.forEach((loc) => {
+        if (loc.latitude && loc.longitude) {
+          bounds.extend([parseFloat(loc.longitude), parseFloat(loc.latitude)]);
+        }
+      });
+      if (!bounds.isEmpty()) {
+        mapRef.current.fitBounds(bounds, {
+          padding: { top: 60, bottom: 220, left: 60, right: 60 },
+          maxZoom: 15,
+          animate: false
+        });
+      }
+      return;
+    }
+
+    // 2. Subsequent switches (via swiping): zoom in on the active location if it changed
+    if (activeLocId !== previousLocationId.current) {
+      previousLocationId.current = activeLocId;
+
+      const activeLoc = locations.find((l) => String(l.id) === activeLocId);
+      if (activeLoc && activeLoc.latitude && activeLoc.longitude) {
+        mapRef.current.easeTo({
+          center: [parseFloat(activeLoc.longitude), parseFloat(activeLoc.latitude)],
+          zoom: 15.5,
+          padding: { top: 60, bottom: 220, left: 60, right: 60 },
+          duration: 1000
+        });
+      }
+    }
+  }, [params.locationId, mapLoaded, locations]);
+
   // Initialize MapLibre map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -104,7 +153,7 @@ export default function MapPage({ loaderData }) {
       container: mapContainerRef.current,
       style: MAP_STYLE,
       ...(initialBounds
-        ? { bounds: initialBounds, fitBoundsOptions: { padding: 60, maxZoom: 15 } }
+        ? { bounds: initialBounds, fitBoundsOptions: { padding: { top: 60, bottom: 220, left: 60, right: 60 }, maxZoom: 15 } }
         : { center: ANTWERP_CENTER, zoom: ANTWERP_ZOOM }
       ),
       attributionControl: false,
@@ -130,7 +179,19 @@ export default function MapPage({ loaderData }) {
     el.className = `map-marker${isActive ? " map-marker--active" : ""}`;
     el.innerHTML = `<div class="map-marker__icon"></div>`;
     el.addEventListener("click", () => {
-      // Keep user param in the URL when navigating to a location detail
+      // 1. Zoom in immediately on the clicked marker
+      if (mapRef.current && location.latitude && location.longitude) {
+        mapRef.current.easeTo({
+          center: [parseFloat(location.longitude), parseFloat(location.latitude)],
+          zoom: 15.5,
+          padding: { top: 60, bottom: 220, left: 60, right: 60 },
+          duration: 1000
+        });
+      }
+      // 2. Update previous location Ref so the useEffect knows we already panned here
+      previousLocationId.current = String(location.id);
+
+      // 3. Keep user param in the URL when navigating to a location detail
       const userParam = userId ? `?user=${userId}` : "";
       navigate(`/map/${location.id}${userParam}`);
     });
@@ -159,18 +220,7 @@ export default function MapPage({ loaderData }) {
 
       markersRef.current.push(marker);
     });
-
-    // If session locations, fit the map to show all of them
-    if (session && locations.length > 1) {
-      const bounds = new maplibregl.LngLatBounds();
-      locations.forEach((loc) => {
-        if (loc.latitude && loc.longitude) {
-          bounds.extend([parseFloat(loc.longitude), parseFloat(loc.latitude)]);
-        }
-      });
-      mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 15 });
-    }
-  }, [mapLoaded, locations, params.locationId, createMarkerElement, session]);
+  }, [mapLoaded, locations, params.locationId, createMarkerElement]);
 
   // Add user position marker
   useEffect(() => {
