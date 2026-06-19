@@ -1,0 +1,1173 @@
+/* ==========================================================================
+   SWIPE.CSS — swipe screen (step 7), summary (step 8), gestures, countdown
+   Imported via form.css @import
+   ========================================================================== */
+
+/* ── SWIPE SCREEN SHELL ──────────────────────────────────────────────────── */
+.swipe-screen {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--sw-bg);
+}
+
+.swipe-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: var(--space-md);
+    color: var(--form-text-muted);
+    text-align: center;
+    padding: var(--space-xl);
+}
+
+/* ── VIDEO / SEGMENTATION LAYER ──────────────────────────────────────────── */
+.video-wrapper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.video-wrapper .bg-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0.35;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.video-wrapper .bg-image.fade-out {
+    opacity: 0;
+}
+
+.video-wrapper .output_canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+#canvas-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* ── SWIPE UI LAYER ──────────────────────────────────────────────────────── */
+.swipe-ui {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg);
+    background: linear-gradient(to bottom, rgba(22, 67, 79, 0.9) 0%, transparent 100%);
+}
+
+.top-bar .logo {
+    font-family: var(--font-Antwerpen-Tall);
+    font-size: var(--size-lg);
+    color: var(--color-blood-orange);
+}
+
+.likes-counter {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    background: rgba(250, 252, 240, 0.08);
+    border: 1px solid rgba(250, 252, 240, 0.12);
+    padding: 0.4rem var(--space-md);
+    border-radius: 50px;
+    font-size: var(--size-sm);
+}
+
+.likes-counter .heart {
+    color: var(--sw-like);
+    font-size: var(--size-base);
+}
+
+.category-badge {
+    background: rgba(225, 59, 44, 0.2);
+    color: var(--color-blood-orange);
+    border: 1px solid rgba(225, 59, 44, 0.35);
+    padding: 0.35rem 0.9rem;
+    border-radius: 50px;
+    font-size: var(--size-sm);
+}
+
+.progress-bar {
+    height: 3px;
+    background: rgba(250, 252, 240, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 var(--space-lg);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--color-blood-orange);
+    border-radius: 2px;
+    transition: width 0.3s;
+}
+
+.gesture-status {
+    position: absolute;
+    top: 5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(250, 252, 240, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 0.4rem var(--space-md);
+    border-radius: 50px;
+    font-size: var(--size-xs);
+    color: var(--sw-text2);
+    white-space: nowrap;
+    z-index: 20;
+    transition: all 0.3s;
+}
+
+.gesture-status.detected {
+    background: rgba(5, 130, 168, 0.2);
+    color: var(--color-muted-marine);
+    border: 1px solid var(--color-muted-marine);
+}
+
+/* ── SWIPE CARD ──────────────────────────────────────────────────────────── */
+.card-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 0 var(--space-lg);
+}
+
+.location-card {
+    width: min(400px, 90vw);
+    position: relative;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.location-card.dragging {
+    transition: none;
+}
+
+.card-inner {
+    background: var(--sw-surface);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border: 1px solid rgba(250, 252, 240, 0.08);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.card-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    background: var(--sw-surface2);
+}
+
+.card-body {
+    padding: var(--space-lg);
+}
+
+.card-type {
+    font-size: var(--size-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-blood-orange);
+    margin-bottom: 0.3rem;
+}
+
+.card-name {
+    font-family: var(--font-Antwerpen-Tall);
+    font-size: var(--size-lg);
+    margin-bottom: 0.4rem;
+    color: var(--sw-text);
+}
+
+.card-meta {
+    color: var(--sw-text2);
+    font-size: var(--size-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.card-vote-overlay {
+    position: absolute;
+    top: var(--space-md);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--border-radius);
+    font-size: var(--size-base);
+    font-weight: var(--weight-bold);
+    opacity: 0;
+    transition: opacity 0.15s;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+}
+
+.card-vote-overlay.like {
+    left: var(--space-md);
+    background: rgba(182, 227, 136, 0.25);
+    color: var(--sw-like);
+    border: 2px solid var(--sw-like);
+}
+
+.card-vote-overlay.nope {
+    right: var(--space-md);
+    background: rgba(225, 59, 44, 0.25);
+    color: var(--sw-dislike);
+    border: 2px solid var(--sw-dislike);
+}
+
+@keyframes swipe-out-right {
+    to {
+        transform: translateX(120%) rotate(20deg);
+        opacity: 0;
+    }
+}
+
+@keyframes swipe-out-left {
+    to {
+        transform: translateX(-120%) rotate(-20deg);
+        opacity: 0;
+    }
+}
+
+.swipe-right {
+    animation: swipe-out-right 0.35s forwards;
+}
+
+.swipe-left {
+    animation: swipe-out-left 0.35s forwards;
+}
+
+/* ── GESTURE BUTTONS ─────────────────────────────────────────────────────── */
+.gesture-indicator {
+    position: absolute;
+    bottom: var(--space-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--space-xl);
+    z-index: 20;
+}
+
+.gesture-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid rgba(250, 252, 240, 0.15);
+    background: rgba(250, 252, 240, 0.05);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--sw-text);
+}
+
+.gesture-btn.undo {
+    width: 52px;
+    height: 52px;
+    font-size: 1.4rem;
+}
+
+.gesture-btn.dislike.active-gesture {
+    background: rgba(225, 59, 44, 0.25);
+    border-color: var(--sw-dislike);
+    box-shadow: 0 0 30px rgba(225, 59, 44, 0.4);
+}
+
+.gesture-btn.like.active-gesture {
+    background: rgba(182, 227, 136, 0.25);
+    border-color: var(--sw-like);
+    box-shadow: 0 0 30px rgba(182, 227, 136, 0.4);
+}
+
+.no-camera-notice {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(225, 59, 44, 0.15);
+    border: 1px solid rgba(225, 59, 44, 0.35);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--border-radius);
+    font-size: var(--size-xs);
+    color: var(--color-blood-orange);
+    z-index: 20;
+    white-space: nowrap;
+    display: none;
+}
+
+/* ── DONE OVERLAY ────────────────────────────────────────────────────────── */
+.done-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    background: rgba(22, 67, 79, 0.92);
+    backdrop-filter: blur(8px);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    text-align: center;
+    padding: var(--space-xl);
+}
+
+.done-overlay.visible {
+    display: flex;
+}
+
+.done-emoji {
+    font-size: 4rem;
+}
+
+.done-overlay h2 {
+    font-family: var(--font-Antwerpen-Tall);
+    font-size: var(--size-xxl);
+    color: var(--sw-text);
+}
+
+.done-overlay p {
+    color: var(--sw-text2);
+    max-width: 320px;
+    line-height: var(--lh-loose);
+}
+
+/* ── COUNTDOWN OVERLAY ───────────────────────────────────────────────────── */
+.countdown-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+}
+
+.countdown-overlay.visible {
+    display: flex;
+}
+
+.countdown-number {
+    font-family: var(--font-Antwerpen-Tall);
+    font-size: clamp(6rem, 20vw, 14rem);
+    color: var(--color-creamy-vanilla);
+    text-shadow: 0 0 60px rgba(225, 59, 44, 0.8);
+    animation: countdown-pop 0.6s ease-out forwards;
+    user-select: none;
+}
+
+.countdown-number.cheese {
+    font-size: clamp(3rem, 10vw, 7rem);
+    color: var(--color-sunshine);
+    text-shadow: 0 0 60px rgba(255, 204, 0, 0.9);
+}
+
+@keyframes countdown-pop {
+    0% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    80% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+}
+
+/* ── TUTORIAL OVERLAY ────────────────────────────────────────────────────── */
+.tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(22, 67, 79, 0.8);
+    backdrop-filter: blur(15px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    visibility: hidden;
+}
+
+.tutorial-overlay.active {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+}
+
+.tutorial-card {
+    background: rgba(30, 84, 99, 0.7);
+    border: 1px solid rgba(250, 252, 240, 0.1);
+    border-radius: var(--border-radius);
+    padding: var(--space-xxl) var(--space-xl);
+    width: min(420px, 90vw);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.tutorial-overlay.active .tutorial-card {
+    transform: translateY(0);
+}
+
+.tutorial-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.tutorial-step.hidden {
+    display: none;
+}
+
+.tutorial-title {
+    font-family: var(--font-Antwerpen-Tall);
+    font-size: var(--size-xxl);
+    color: var(--sw-text);
+    margin-bottom: 0.25rem;
+}
+
+.tutorial-desc {
+    color: var(--sw-text2);
+    font-size: var(--size-sm);
+    line-height: var(--lh-loose);
+    margin-bottom: var(--space-md);
+}
+
+.tutorial-visual {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: var(--space-md) 0;
+    user-select: none;
+}
+
+.alignment-marker {
+    background: rgba(5, 130, 168, 0.15);
+    border: 2px solid var(--color-muted-marine);
+    color: var(--color-muted-marine);
+    box-shadow: 0 0 20px rgba(5, 130, 168, 0.3);
+    animation: pulse-marker 2s infinite ease-in-out;
+}
+
+.gesture-hint {
+    background: rgba(250, 252, 240, 0.05);
+    border: 1px solid rgba(250, 252, 240, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: pulse-gesture-visual 2s infinite ease-in-out;
+}
+
+.tutorial-loader-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(250, 252, 240, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: var(--space-md);
+}
+
+.tutorial-hold-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--color-blood-orange) 0%, var(--color-sunshine) 100%);
+    border-radius: 10px;
+    transition: width 0.1s linear;
+}
+
+@keyframes pulse-marker {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0px rgba(5, 130, 168, 0.4);
+    }
+
+    50% {
+        transform: scale(1.06);
+        box-shadow: 0 0 0 15px rgba(5, 130, 168, 0);
+    }
+}
+
+@keyframes pulse-gesture-visual {
+
+    0%,
+    100% {
+        transform: scale(1);
+        border-color: rgba(250, 252, 240, 0.15);
+    }
+
+    50% {
+        transform: scale(1.08);
+        border-color: var(--color-blood-orange);
+    }
+}
+
+/* ── STEP 8: SUMMARY GESTURE SCREEN ─────────────────────────────────────── */
+.summary-gesture-screen {
+    background: var(--sw-bg);
+}
+
+.summary-gesture-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.summary-gesture-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-xxl) var(--space-xl) var(--space-xl);
+    min-height: 100vh;
+    gap: var(--space-xl);
+}
+
+.summary-gesture-header {
+    text-align: center;
+}
+
+/* Photos grid */
+.summary-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-md);
+    width: 100%;
+}
+
+.photo-cell {
+    position: relative;
+    border-radius: calc(var(--border-radius) * 2);
+    overflow: hidden;
+    border: 1px solid rgba(250, 252, 240, 0.1);
+    background: var(--sw-surface2);
+    aspect-ratio: 4/3;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.photo-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scaleX(-1);
+}
+
+.photo-cell-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-sm);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    font-size: var(--size-xs);
+    color: var(--sw-text);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.photo-download {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(250, 252, 240, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--size-sm);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    text-decoration: none;
+    color: var(--sw-text);
+}
+
+.photo-cell:hover .photo-download {
+    opacity: 1;
+}
+
+.no-photos-msg {
+    color: var(--sw-text2);
+    padding: var(--space-xl) 0;
+    font-size: var(--size-sm);
+}
+
+/* Summary choice cards */
+.summary-gesture-choices {
+    display: flex;
+    gap: var(--space-xl);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.summary-choice-card {
+    background: rgba(250, 252, 240, 0.06);
+    border: 2px solid rgba(250, 252, 240, 0.12);
+    border-radius: calc(var(--border-radius) * 2);
+    padding: var(--space-xl) var(--space-xxl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-width: 160px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-choice-card--like.active {
+    background: rgba(182, 227, 136, 0.15);
+    border-color: var(--sw-like);
+}
+
+.summary-choice-card--dislike.active {
+    background: rgba(225, 59, 44, 0.15);
+    border-color: var(--sw-dislike);
+}
+
+.summary-choice-icon {
+    font-size: 2.5rem;
+}
+
+.summary-choice-label {
+    font-family: var(--font-Antwerpen-Tall);
+    font-size: var(--size-lg);
+    color: var(--sw-text);
+}
+
+.summary-choice-hint {
+    font-size: var(--size-xs);
+    color: var(--sw-text2);
+}
+
+.summary-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(250, 252, 240, 0.1);
+}
+
+.summary-progress-fill {
+    height: 100%;
+    transition: width 0.1s linear;
+}
+
+.summary-progress-fill--like {
+    background: var(--sw-like);
+}
+
+.summary-progress-fill--dislike {
+    background: var(--sw-dislike);
+}
+
+.summary-gesture-status {
+    font-size: var(--size-sm);
+    color: var(--sw-text2);
+    text-align: center;
+    padding: 0.5rem var(--space-lg);
+    border-radius: 50px;
+    background: rgba(250, 252, 240, 0.06);
+    transition: all 0.3s ease;
+}
+
+.summary-gesture-status.detected {
+    background: rgba(5, 130, 168, 0.15);
+    color: var(--color-muted-marine);
+}
+
+
+/* ==========================================================================
+   SWIPE TUTORIAL — steps 1–4
+   ========================================================================== */
+
+.tutorial-overlay-new {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+}
+
+/* ── STEP 1: FOOTPRINT MARKER ── */
+.tutorial-screen {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-creamy-vanilla);
+    overflow: hidden;
+}
+
+.tutorial-screen--step1 {
+    padding: var(--space-xl) var(--space-xl) var(--space-xxl);
+    position: relative;
+}
+
+.tutorial-sticker {
+    position: absolute;
+    top: var(--space-xl);
+    right: var(--space-lg);
+    width: 180px;
+    height: auto;
+    pointer-events: none;
+}
+
+.tutorial-text-block {
+    margin-top: 5rem;
+    max-width: 75%;
+}
+
+.tutorial-heading {
+    font-family: var(--font-primary);
+    font-size: clamp(var(--size-xl), 6vw, var(--size-xxxl));
+    font-weight: var(--weight-regular);
+    color: var(--color-blood-orange);
+    line-height: var(--lh-base);
+    margin-bottom: var(--space-md);
+}
+
+.tutorial-body {
+    font-family: var(--font-secondary);
+    font-size: var(--size-base);
+    line-height: var(--lh-loose);
+    color: var(--color-blood-orange);
+}
+
+/* Footprint oval */
+.tutorial-footprint {
+    position: absolute;
+    bottom: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+    height: 130px;
+    background: var(--color-blood-orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.tutorial-footprint:active {
+    transform: translateX(-50%) scale(0.96);
+}
+
+.tutorial-footprint__icon {
+    font-size: 3.5rem;
+    filter: brightness(0) invert(1);
+    letter-spacing: -8px;
+}
+
+/* ── STEPS 2–4: GESTURE SCREENS ── */
+.tutorial-screen--gesture {
+    justify-content: space-between;
+}
+
+.tutorial-icons {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    padding: var(--space-xxl) 0 var(--space-xl);
+}
+
+.tutorial-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tutorial-icon--small {
+    opacity: 0.5;
+}
+
+/* Bottom colored panel */
+.tutorial-panel {
+    flex-shrink: 0;
+    padding: var(--space-xl) var(--space-xl) var(--space-xxl);
+    min-height: 220px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.tutorial-panel .tutorial-heading {
+    font-size: clamp(var(--size-xl), 6vw, var(--size-xxl));
+    margin-bottom: var(--space-sm);
+}
+
+.tutorial-panel .tutorial-body {
+    font-size: var(--size-base);
+    line-height: var(--lh-loose);
+}
+
+.tutorial-panel .tutorial-body strong {
+    font-weight: var(--weight-bold);
+}
+
+/* Hold progress bar */
+.tutorial-hold-track {
+    margin-top: var(--space-md);
+    height: 6px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 99px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.tutorial-hold-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.1s linear;
+    opacity: 0.7;
+}
+
+/* ==========================================================================
+   SWIPE LIVE SCREEN — bottom UI
+   ========================================================================== */
+
+.swipe-gesture-hint {
+    position: absolute;
+    top: var(--space-xl);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5rem;
+    z-index: 20;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+    transition: opacity 0.3s;
+}
+
+/* Bottom row: polaroid stack | gesture btns | location card */
+.swipe-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 var(--space-md) var(--space-xl);
+    gap: var(--space-sm);
+}
+
+/* ── POLAROID STACK ── */
+.swipe-polaroid-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+    width: 130px;
+}
+
+.swipe-counter {
+    background: var(--color-blood-orange);
+    color: var(--color-creamy-vanilla);
+    font-family: var(--font-primary);
+    font-size: var(--size-lg);
+    padding: 0.2rem 0.8rem;
+    border-radius: 99px;
+    position: relative;
+    z-index: 1;
+}
+
+.swipe-stack-cards {
+    position: relative;
+    width: 110px;
+    height: 90px;
+}
+
+.swipe-stack-card {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 85px;
+    height: 80px;
+    transform-origin: bottom center;
+    background: #fff;
+    border: 4px solid var(--color-blood-orange);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    margin-left: -42px;
+}
+
+.swipe-stack-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.swipe-stack-card--empty {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── GESTURE BUTTONS ── */
+.swipe-gesture-btns {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-shrink: 0;
+    padding-bottom: var(--space-sm);
+}
+
+.swipe-gesture-btn {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    font-size: 1.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background 0.15s ease;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.swipe-gesture-btn:active {
+    transform: scale(0.9);
+}
+
+.swipe-gesture-btn--like {
+    background: rgba(182, 227, 136, 0.25);
+}
+
+.swipe-gesture-btn--dislike {
+    background: rgba(225, 59, 44, 0.25);
+}
+
+.swipe-gesture-btn--undo {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
+}
+
+/* ── LOCATION CARD ── */
+.swipe-location-card {
+    flex: 1;
+    max-width: 260px;
+    background: #f5e8c8;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    cursor: grab;
+    transition: transform 0.15s ease;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+}
+
+.swipe-location-card.dragging {
+    cursor: grabbing;
+    transition: none;
+}
+
+/* Map background placeholder */
+.swipe-location-card__map {
+    flex: 1;
+    min-height: 60px;
+    background:
+        radial-gradient(circle at 60% 50%, rgba(225, 59, 44, 0.5) 3px, transparent 3px),
+        repeating-linear-gradient(0deg, rgba(180, 140, 80, 0.15) 0px, rgba(180, 140, 80, 0.15) 1px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(180, 140, 80, 0.15) 0px, rgba(180, 140, 80, 0.15) 1px, transparent 1px, transparent 30px);
+    background-color: #f5e8c8;
+}
+
+.swipe-location-card__info {
+    padding: var(--space-sm) var(--space-md);
+    background: #f5e8c8;
+}
+
+.swipe-location-card__name {
+    font-family: var(--font-primary);
+    font-size: var(--size-lg);
+    color: var(--color-blood-orange);
+    font-weight: var(--weight-regular);
+}
+
+.swipe-location-card__type {
+    font-family: var(--font-secondary);
+    font-size: var(--size-sm);
+    color: var(--color-text-blue);
+    margin-top: 2px;
+}
+
+.swipe-empty-icon {
+    font-size: 1.2rem;
+    margin-bottom: var(--space-sm);
+}
+
+@keyframes swipe-out-right {
+    to {
+        transform: translateX(120%) rotate(20deg);
+        opacity: 0;
+    }
+}
+
+@keyframes swipe-out-left {
+    to {
+        transform: translateX(-120%) rotate(-20deg);
+        opacity: 0;
+    }
+}
+
+.swipe-right {
+    animation: swipe-out-right 0.35s forwards;
+}
+
+.swipe-left {
+    animation: swipe-out-left 0.35s forwards;
+}
+
+/* ── TUTORIAL PROGRESS ICON (top loader icon) ────────────────────────────── */
+
+/*
+  The top icon shows hold progress by clipping a filled version
+  over an outline version. As --progress goes 0→100%, the fill
+  is revealed from bottom to top like a liquid filling a container.
+*/
+.tutorial-icon--progress {
+    position: relative;
+}
+
+.tutorial-progress-icon {
+    position: relative;
+    width: fit-content;
+}
+
+/* Outline base layer — always visible */
+.tutorial-progress-icon svg {
+    display: block;
+}
+
+/* Filled overlay — clipped to reveal from bottom as progress grows */
+.tutorial-progress-icon::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--progress, 0%);
+    background: currentColor;
+    /* mask the fill to the SVG shape using clip-path on the wrapper */
+    transition: height 0.1s linear;
+    pointer-events: none;
+    border-radius: 2px;
+    opacity: 0.35;
+}
+
+/*
+  Since SVG fill is simpler than CSS masking, we handle this
+  differently: the SVG itself receives filled=true once progress > 0,
+  and we animate the opacity of the filled icon from 0→1 as progress grows.
+  The opacity trick gives a clear "charging up" feel.
+*/
+.tutorial-progress-icon svg {
+    opacity: calc(0.3 + (var(--progress, 0) / 100) * 0.7);
+    transition: opacity 0.1s linear;
+}
+
+/* When fully charged (progress = 100), pulse to signal completion */
+.tutorial-progress-icon[style*="--progress: 100%"] svg {
+    animation: icon-pulse 0.4s ease-out;
+}
+
+@keyframes icon-pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ── INSTRUCTION ICON (middle, static) ─────────────────────────────────────  */
+.tutorial-icon--instruction {
+    opacity: 1;
+    /* Subtle float animation to draw attention */
+    animation: icon-float 2.5s ease-in-out infinite;
+}
+
+@keyframes icon-float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}

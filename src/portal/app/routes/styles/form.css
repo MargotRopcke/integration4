@@ -1,0 +1,213 @@
+/* ==========================================================================
+   FORM.CSS — page shell, shared tokens, shared utilities
+   Layout-specific styles live in layouts/*.css
+   Step-specific styles live in styles/steps.css and styles/swipe.css
+   ========================================================================== */
+
+/* ── LOCAL TOKEN ALIASES ─────────────────────────────────────────────────── */
+
+@import "./steps.css";
+@import "./swipe.css";
+
+/* ====...rest of file */
+:root {
+  --form-bg: var(--color-creamy-vanilla);
+  --form-text: var(--color-text-blue);
+  --form-text-muted: rgba(250, 252, 240, 0.55);
+  --form-accent: var(--color-blood-orange);
+  --form-accent-glow: rgba(225, 59, 44, 0.35);
+  --form-surface: #1e5463;
+  --form-radius: var(--border-radius);
+
+  /* Swipe/dark-context aliases */
+  --sw-bg: var(--color-text-blue);
+  --sw-surface: #1e5463;
+  --sw-surface2: #255f70;
+  --sw-text: var(--color-creamy-vanilla);
+  --sw-text2: rgba(250, 252, 240, 0.55);
+  --sw-like: var(--color-pear-sorbet);
+  --sw-dislike: var(--color-blood-orange);
+}
+
+/* ── PAGE SHELL ──────────────────────────────────────────────────────────── */
+.form-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--form-bg);
+  color: var(--form-text);
+  font-family: var(--font-secondary);
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-md);
+  box-sizing: border-box;
+}
+
+.form-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 800px;
+  background: var(--color-creamy-vanilla);
+  padding: var(--space-xxl) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* ── SHARED BUTTONS ──────────────────────────────────────────────────────── */
+.btn-form {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-creamy-vanilla);
+  color: var(--color-blood-orange);
+  border: 5px solid var(--color-blood-orange);
+  padding: 0.9rem 2.2rem;
+  border-radius: var(--border-radius);
+  font-family: var(--font-secondary);
+  font-size: var(--size-xl);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(225, 59, 44, 0.25);
+}
+
+.btn-form:active {
+  transform: translateY(1px);
+}
+
+.btn-form--secondary {
+  background: var(--form-surface);
+  border-color: var(--form-surface);
+  box-shadow: none;
+  color: var(--sw-text);
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--sw-surface2);
+  border: 1px solid rgba(250, 252, 240, 0.12);
+  color: var(--sw-text2);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 50px;
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* ── SHARED POPUP ────────────────────────────────────────────────────────── */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  animation: popup-fade-in 0.25s ease;
+}
+
+@keyframes popup-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.popup-card {
+  background: var(--form-surface);
+  border-radius: calc(var(--border-radius) * 2.5);
+  padding: var(--space-xxl) var(--space-xl);
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  animation: popup-slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes popup-slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.popup-title {
+  font-family: var(--font-Antwerpen-Tall);
+  font-size: var(--size-xl);
+  color: var(--sw-text);
+  margin-bottom: var(--space-sm);
+}
+
+.popup-desc {
+  color: var(--form-text-muted);
+  font-size: var(--size-sm);
+  line-height: var(--lh-loose);
+  margin-bottom: var(--space-xl);
+}
+
+.popup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.popup-actions .btn-form {
+  width: 100%;
+}
+
+/* ── SHARED LOADER ───────────────────────────────────────────────────────── */
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(250, 252, 240, 0.1);
+  border-top-color: var(--color-blood-orange);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── SHARED SUMMARY TAGS ─────────────────────────────────────────────────── */
+.summary-vibes-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.summary-vibe-tag {
+  background: rgba(225, 59, 44, 0.15);
+  border: 1px solid rgba(225, 59, 44, 0.35);
+  color: var(--form-accent);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: 50px;
+  font-size: var(--size-sm);
+}
+
+.summary-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--space-md);
+}
