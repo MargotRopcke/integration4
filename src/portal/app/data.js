@@ -245,7 +245,7 @@ export async function saveSession({ userId, photoName, primaryCategoryId, travel
  */
 export async function getSessionLocations(userId) {
   const numericUserId = Number(userId); // ← add this
-
+  
   // 1. Fetch the session details
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
