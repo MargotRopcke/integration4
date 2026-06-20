@@ -183,22 +183,68 @@
   display: block;
 }
 
+
 .location-detail__quote {
   max-width: 80vw;
-  font-style: italic;
   text-align: center;
   color: var(--color-text-secondary);
   font-size: 1rem;
   line-height: 1.7;
-  padding-left: var(--space-md);
-  border-left: 3px solid var(--color-accent-primary);
-  margin: 0;
+  margin: auto;
 }
 
-.location-detail__vibes {
+.location-detail__expanded-info {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
+}
+
+.location-detail__header-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.location-detail__header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.location-detail__expanded-name {
+  font-family: var(--font-primary);
+  color: var(--color-blood-orange);
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: var(--space-sm);
+}
+
+.location-detail__specialization-badge {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-detail__specialization-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.location-detail__vibe-tag--distance {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.location-detail__vibe-tag--distance svg {
+  height: 1rem;
+  width: auto;
 }
 
 .location-detail__vibe-tag {
