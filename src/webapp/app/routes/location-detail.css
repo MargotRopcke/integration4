@@ -155,7 +155,6 @@
   display: flex;
   justify-content: center;
   margin-top: var(--space-md);
-  width: 100%;
 }
 
 .location-detail__button-link {
@@ -165,11 +164,10 @@
   padding: var(--space-sm) var(--space-md);
   background-color: var(--color-blood-orange);
   border-radius: var(--border-radius);
-  color: var(--color-creamy-vanilla) !important;
+  color: var(--color-creamy-vanilla);
   font-family: var(--font-secondary);
   font-size: 1.25rem;
   font-weight: 350;
-  text-decoration: none;
   transition: background-color var(--transition-fast, 0.2s ease);
 }
 
