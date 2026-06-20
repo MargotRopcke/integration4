@@ -939,9 +939,9 @@ export default function FormPage({ loaderData }) {
       // Build collage source: reaction photos if available, otherwise location images
       const collageItems = photos.length > 0
         ? photos.map((p) => ({
-            ...p,
-            dataUrl: (p.dataUrl && p.dataUrl.trim() !== "") ? p.dataUrl : p.locationImage
-          }))
+          ...p,
+          dataUrl: (p.dataUrl && p.dataUrl.trim() !== "") ? p.dataUrl : p.locationImage
+        }))
         : likedLocationsRef.current.map((loc) => ({
           dataUrl: loc.image,  // Supabase image URL
           locationName: loc.name,
@@ -1629,7 +1629,7 @@ export default function FormPage({ loaderData }) {
                       <div className="photo-cell-label">
                         <span className="photo-cell-emoji">📍</span> {photo.locationName}
                       </div>
-                      <a className="photo-download" 
+                      <a className="photo-download"
                         href={(photo.dataUrl && photo.dataUrl.trim() !== "") ? photo.dataUrl : photo.locationImage}
                         download={(photo.dataUrl && photo.dataUrl.trim() !== "") ? `reaction-${photo.locationName.replace(/\s+/g, "-").toLowerCase()}.jpg` : `location-${photo.locationName.replace(/\s+/g, "-").toLowerCase()}.jpg`}
                         title="Download image">⬇</a>
