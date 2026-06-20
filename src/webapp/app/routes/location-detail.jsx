@@ -22,7 +22,6 @@ export const clientLoader = async ({ request, params }) => {
 
 export default function LocationDetail({ loaderData }) {
   const { location, reactionPhoto } = loaderData;
-  // Get merged context from detail-panel layout (expanded + userPosition from map)
   const context = useOutletContext() || {};
   const { expanded = false, userPosition } = context;
 
@@ -34,7 +33,6 @@ export default function LocationDetail({ loaderData }) {
     );
   }
 
-  // Calculate distance from user to this location
   let distanceText = "—";
   if (userPosition && location.latitude && location.longitude) {
     const dist = calculateDistance(
@@ -46,7 +44,6 @@ export default function LocationDetail({ loaderData }) {
     distanceText = formatDistance(dist);
   }
 
-  // Google Maps navigation link
   const googleMapsUrl = location.latitude && location.longitude
     ? `https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}`
     : location.address
@@ -54,7 +51,6 @@ export default function LocationDetail({ loaderData }) {
       : null; return (
         <div className="location-detail" id="location-detail">
           {!expanded ? (
-            /* === COLLAPSED VIEW (Mini Version) === */
             <div className="location-detail__summary">
               <div className="location-detail__info">
                 <h2 className="location-detail__name">{location.name}</h2>
@@ -70,7 +66,6 @@ export default function LocationDetail({ loaderData }) {
               </div>
             </div>
           ) : (
-            /* === EXPANDED VIEW === */
             <div className="location-detail__expanded">
               <div className="location-detail__header-grid">
                 <div className="location-detail__header">
@@ -86,7 +81,6 @@ export default function LocationDetail({ loaderData }) {
                       )}
                     </div>
 
-                    {/* Distance tag (styled exactly like the vibe tag) */}
                     <div className="location-detail__vibe-tag location-detail__vibe-tag--distance">
                       <span className="location-detail__distance-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="21" viewBox="0 0 16 21" fill="none">
@@ -99,7 +93,6 @@ export default function LocationDetail({ loaderData }) {
                   </div>
                 </div>
 
-                {/* Specialization Category Image */}
                 {location.specialization_categories?.image && (
                   <div className="location-detail__specialization-badge">
                     <img
@@ -110,7 +103,6 @@ export default function LocationDetail({ loaderData }) {
                 )}
               </div>
 
-              {/* Quote */}
               {location.quote && (
                 <div className="location-detail__section">
                   <blockquote className="location-detail__quote">
@@ -119,7 +111,6 @@ export default function LocationDetail({ loaderData }) {
                 </div>
               )}
 
-              {/* Address & Google Maps */}
               {location.address && (
                 <div className="location-detail__button">
                   {googleMapsUrl && (
