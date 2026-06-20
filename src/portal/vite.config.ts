@@ -3,6 +3,16 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [reactRouter()],
+  publicDir: "public",
+});
+
+
+
+/*import { reactRouter } from "@react-router/dev/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [reactRouter()],
   ssr: {
     noExternal: [],
     external: [],
@@ -18,4 +28,4 @@ export default defineConfig({
       external: (id) => id.startsWith("https://"),
     },
   },
-});
+});*/

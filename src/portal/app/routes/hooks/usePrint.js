@@ -1,110 +1,187 @@
 import { useState, useCallback } from "react";
+import { saveCollage } from "../../data";
+import bagSvg  from "../../../assets/stickers/bag-yellow.svg";
+import lipsSvg from "../../../assets/stickers/lips-green.svg";
 
-/**
- * Builds a photo collage and sends it to the /print resource route.
- */
+const CARD_COLORS = ["#e8b4bc", "#5b9bd5", "#e07070", "#7bc67e", "#f0d060", "#4a7a8a"];
+
+const CATEGORY_STICKER = {
+  style:   bagSvg,
+  flavour: lipsSvg,
+};
+
 export function usePrint() {
-  const [status,     setStatus]     = useState("idle"); // "idle"|"printing"|"done"|"error"
+  const [status,     setStatus]     = useState("idle");
   const [collageUrl, setCollageUrl] = useState(null);
   const [errorMsg,   setErrorMsg]   = useState("");
 
-  const buildCollage = useCallback((photos) => {
-    const cols = 3, cellW = 640, cellH = 480, pad = 16;
-    const rows = Math.ceil(photos.length / cols);
-    const cw   = cols * cellW + (cols + 1) * pad;
-    const ch   = rows * cellH + (rows + 1) * pad;
+  const loadImage = (src) => new Promise((resolve) => {
+    if (!src) return resolve(null);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    const timeout = setTimeout(() => resolve(null), 8000);
+    img.onload  = () => { clearTimeout(timeout); resolve(img); };
+    img.onerror = () => { clearTimeout(timeout); resolve(null); };
+    img.src = src;
+  });
+
+  const roundRect = (ctx, x, y, w, h, r) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
+
+  const buildCollage = useCallback(async (photos, sessionUserId, categoryName) => {
+    const W = 2480, H = 3508;
 
     const c   = document.createElement("canvas");
-    c.width   = cw;
-    c.height  = ch;
+    c.width   = W;
+    c.height  = H;
     const ctx = c.getContext("2d");
-    ctx.fillStyle = "#0a0a0f";
-    ctx.fillRect(0, 0, cw, ch);
 
-    const drawCell = (img, x, y) => {
-      const r = 12;
+    ctx.fillStyle = "#f5f0e8";
+    ctx.fillRect(0, 0, W, H);
+
+    const cols    = 3, rows  = 2;
+    const padX    = 96,  padTop  = 96;
+    const gapX    = 48,  gapY   = 32;
+    const labelH  = 104, borderW = 14;
+    const cellW   = Math.floor((W - padX * 2 - gapX * (cols - 1)) / cols);
+    const gridH   = Math.round(H * 0.60);
+    const cellH   = Math.floor((gridH - padTop - gapY * (rows - 1) - labelH * rows) / rows);
+
+    // Pre-load custom fonts before drawing any text
+    await Promise.allSettled([
+      document.fonts.load("normal 200px AntwerpenTallTall"),
+      document.fonts.load("700 48px SunAntwerpen"),
+    ]);
+
+    const qrSrc = sessionUserId
+      ? `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(
+          `https://margotropcke.github.io/integration4/?user=${sessionUserId}`
+        )}`
+      : null;
+
+    const stickerSrc = categoryName
+      ? CATEGORY_STICKER[categoryName.trim().toLowerCase()] ?? null
+      : null;
+
+    const photoImgs = await Promise.all(
+      photos.slice(0, 6).map((p) => loadImage(p.dataUrl))
+    );
+    const qrImg      = await loadImage(qrSrc);
+    const stickerImg = await loadImage(stickerSrc);
+
+    for (let i = 0; i < Math.min(photos.length, 6); i++) {
+      const col   = i % cols;
+      const row   = Math.floor(i / cols);
+      const x     = padX + col * (cellW + gapX);
+      const y     = padTop + row * (cellH + gapY + labelH);
+      const color = CARD_COLORS[i % CARD_COLORS.length];
+      const img   = photoImgs[i];
+
+      ctx.fillStyle = color;
+      roundRect(ctx, x - borderW, y - borderW, cellW + borderW * 2, cellH + borderW * 2, 28);
+      ctx.fill();
+
       ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + cellW - r, y);
-      ctx.quadraticCurveTo(x + cellW, y, x + cellW, y + r);
-      ctx.lineTo(x + cellW, y + cellH - r);
-      ctx.quadraticCurveTo(x + cellW, y + cellH, x + cellW - r, y + cellH);
-      ctx.lineTo(x + r, y + cellH);
-      ctx.quadraticCurveTo(x, y + cellH, x, y + cellH - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
+      roundRect(ctx, x, y, cellW, cellH, 16);
       ctx.clip();
-      ctx.drawImage(img, x, y, cellW, cellH);
-      ctx.restore();
-      // Label bar
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
-      ctx.fillRect(x, y + cellH - 36, cellW, 36);
-    };
-
-    const promises = photos.map((photo, i) => new Promise((resolve) => {
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const x   = pad + col * (cellW + pad);
-      const y   = pad + row * (cellH + pad);
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        drawCell(img, x, y);
-        ctx.fillStyle = "#fff";
-        ctx.font      = "bold 18px system-ui, sans-serif";
-        ctx.fillText(`📍 ${photo.locationName}`, x + 12, y + cellH - 11);
-        resolve();
-      };
-      img.onerror = resolve;
-      img.src = photo.dataUrl;
-    }));
-
-    return Promise.all(promises).then(() => {
-      // Convert to grayscale so it prints black & white on any printer/driver
-      const gray = document.createElement("canvas");
-      gray.width  = cw;
-      gray.height = ch;
-      const gCtx = gray.getContext("2d");
-      gCtx.drawImage(c, 0, 0);
-      const imageData = gCtx.getImageData(0, 0, cw, ch);
-      const d = imageData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const luma = d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
-        d[i] = d[i + 1] = d[i + 2] = luma;
+      if (img) {
+        const scale = Math.max(cellW / img.width, cellH / img.height);
+        const dw = img.width * scale, dh = img.height * scale;
+        ctx.drawImage(img, x + (cellW - dw) / 2, y + (cellH - dh) / 2, dw, dh);
+      } else {
+        ctx.fillStyle = "#ccc";
+        ctx.fillRect(x, y, cellW, cellH);
       }
-      gCtx.putImageData(imageData, 0, 0);
-      return gray.toDataURL("image/jpeg", 0.92);
-    });
+      ctx.restore();
+
+      ctx.fillStyle = color;
+      ctx.font      = "700 48px SunAntwerpen, Georgia, serif";
+      ctx.textAlign = "center";
+      ctx.fillText(photos[i].locationName || "", x + cellW / 2, y + cellH + labelH - 20);
+      ctx.textAlign = "left";
+    }
+
+    const bottomY = padTop + rows * (cellH + gapY + labelH) + 64;
+
+    ctx.fillStyle = "#d63b2f";
+    ctx.font      = "normal 200px AntwerpenTallTall, Georgia, serif";
+    ctx.fillText("THE",    padX, bottomY + 200);
+    ctx.fillText("PORTAL", padX, bottomY + 430);
+
+    if (qrImg) {
+      const qrSize = 480, qrX = W - padX - qrSize, qrY = bottomY + 40;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(qrX - 20, qrY - 20, qrSize + 40, qrSize + 40);
+      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+    }
+
+    if (stickerImg) {
+      const sz = 360, sx = W / 2 - sz / 2, sy = bottomY - 80;
+      ctx.drawImage(stickerImg, sx, sy, sz, sz);
+    }
+
+    // Screen preview — color, downscaled
+    const pw = 620, ph = Math.round(H * pw / W);
+    const preview = document.createElement("canvas");
+    preview.width = pw; preview.height = ph;
+    preview.getContext("2d").drawImage(c, 0, 0, pw, ph);
+    const colorUrl = preview.toDataURL("image/jpeg", 0.9);
+
+    // Print version — full resolution grayscale
+    const gray = document.createElement("canvas");
+    gray.width = W; gray.height = H;
+    const gCtx = gray.getContext("2d");
+    gCtx.drawImage(c, 0, 0);
+    const imgData = gCtx.getImageData(0, 0, W, H);
+    const d = imgData.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const luma = d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
+      d[i] = d[i + 1] = d[i + 2] = luma;
+    }
+    gCtx.putImageData(imgData, 0, 0);
+    const printUrl = gCtx.canvas.toDataURL("image/jpeg", 1.0);
+
+    return { colorUrl, printUrl };
   }, []);
 
-  const triggerPrint = useCallback(async (dataUrl) => {
+  const triggerPrint = useCallback(async (printUrl) => {
     const res  = await fetch("/print", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ image: dataUrl }),
+      body:    JSON.stringify({ image: printUrl }),
     });
     const json = await res.json();
     if (!json.success) throw new Error(json.error || "Print failed");
   }, []);
 
-  /**
-   * @param {object[]} reactionPhotos  - captured during swipe
-   * @param {object[]} likedLocations  - fallback if no photos
-   * @param {Function} onDone          - called after successful print
-   */
-  const startPrinting = useCallback(async (reactionPhotos, likedLocations, onDone) => {
+  const startPrinting = useCallback(async (reactionPhotos, sessionUserId, categoryName, onDone) => {
     setStatus("printing");
     setErrorMsg("");
     try {
-      const items = reactionPhotos.length > 0
-        ? reactionPhotos
-        : likedLocations.map((loc) => ({ dataUrl: loc.image, locationName: loc.name }));
+      if (!reactionPhotos || reactionPhotos.length === 0) {
+        throw new Error("No reaction photos to print.");
+      }
+      const { colorUrl, printUrl } = await buildCollage(reactionPhotos, sessionUserId, categoryName);
+      setCollageUrl(colorUrl);
 
-      const url = items.length > 0 ? await buildCollage(items) : null;
-      setCollageUrl(url);
-      if (url) await triggerPrint(url);
+      const [printResult] = await Promise.allSettled([
+        triggerPrint(printUrl),
+        sessionUserId ? saveCollage(sessionUserId, colorUrl) : Promise.resolve(),
+      ]);
+
+      if (printResult.status === "rejected") throw printResult.reason;
+
       setStatus("done");
       setTimeout(() => onDone?.(), 2000);
     } catch (err) {
@@ -121,4 +198,4 @@ export function usePrint() {
   }, []);
 
   return { status, collageUrl, errorMsg, startPrinting, reset };
-} 
+}

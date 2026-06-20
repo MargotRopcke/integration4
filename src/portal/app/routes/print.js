@@ -13,23 +13,21 @@ import { existsSync } from "fs";
 
 // Windows: update this to match your printer name exactly.
 // Check: Settings → Bluetooth & devices → Printers & scanners
-const PRINTER_NAME = "HP_ENVY_5530_series";
+const PRINTER_NAME = "HP ENVY 5530 series";
 
 // Windows: path to SumatraPDF for silent, no-dialog printing.
 // Download: https://www.sumatrapdfreader.org/download-free-pdf-viewer
 // Falls back to mspaint if not found.
-const SUMATRA_PATH = "C:\\Program Files\\SumatraPDF\\SumatraPDF.exe";
+const SUMATRA_PATH = "C:\\Users\\devin\\AppData\\Local\\SumatraPDF\\SumatraPDF.exe";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function buildPrintCmd(filePath) {
   if (process.platform === "win32") {
     if (existsSync(SUMATRA_PATH)) {
-      // Silent, scales to page, black & white
-      return `"${SUMATRA_PATH}" -print-to "${PRINTER_NAME}" -print-settings "fit,monochrome" "${filePath}"`;
+      return `"${SUMATRA_PATH}" -print-to "${PRINTER_NAME}" -print-settings "fit-page,monochrome" -silent "${filePath}"`;
     }
-    // Fallback: mspaint
-    return `mspaint /pt "${filePath}" "${PRINTER_NAME}"`;
+    return `rundll32 shimgvw.dll,ImageView_PrintTo /pt "${filePath}" "${PRINTER_NAME}"`;
   }
 
   if (process.platform === "darwin") {

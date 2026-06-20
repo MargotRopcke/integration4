@@ -1,43 +1,45 @@
-import { PrintingLayout } from "../layouts/PrintingLayout";
+import { useEffect, useState } from "react";
 
 export function StepPrinting({ status, collageUrl, errorMsg, onRetry, onSkip }) {
+  const [animating, setAnimating] = useState(false);
+
+  useEffect(() => {
+    if (collageUrl) {
+      const t = setTimeout(() => setAnimating(true), 80);
+      return () => clearTimeout(t);
+    }
+  }, [collageUrl]);
+
   return (
-    <PrintingLayout id="step-printing">
+    <div className="step-printing-new" id="step-printing">
+
+      {/* Status text top */}
+      <div className="printing-top">
+        {status === "printing" && <h2 className="printing-title">Printing...</h2>}
+        {status === "done"     && <h2 className="printing-title printing-title--done">Done! ✓</h2>}
+        {status === "error"    && <h2 className="printing-title printing-title--error">Error</h2>}
+      </div>
+
+      {/* Collage sliding up from the bottom */}
       {collageUrl && (
-        <div className="printing-collage-preview">
-          <img src={collageUrl} alt="Your reaction photo collage" />
+        <div className={`printing-collage-slide ${animating ? "printing-collage-slide--in" : ""}`}>
+          <img
+            src={collageUrl}
+            alt="Your collage"
+            className="printing-collage-img"
+            draggable={false}
+          />
         </div>
       )}
 
-      {status === "printing" && (
-        <>
-          <div className="loader" />
-          <h2 className="printing-heading">Printing your collage…</h2>
-          <p className="printing-subtext">Sending to the HP Envy 5530 — please wait.</p>
-        </>
-      )}
-
-      {status === "done" && (
-        <>
-          <div className="printing-icon">🖨️ ✓</div>
-          <h2 className="printing-heading printing-heading--success">Print job sent!</h2>
-          <p className="printing-subtext">Taking you to your QR code…</p>
-        </>
-      )}
-
+      {/* Error actions */}
       {status === "error" && (
-        <>
-          <div className="printing-icon">⚠️</div>
-          <h2 className="printing-heading printing-heading--error">Couldn't reach the printer</h2>
-          <p className="printing-subtext">
-            {errorMsg || "Make sure print-server.js is running (node print-server.js)."}
-          </p>
-          <div className="printing-actions">
-            <button className="btn-form" onClick={onRetry}>↺ Try Again</button>
-            <button className="btn-form btn-form--secondary" onClick={onSkip}>Skip printing →</button>
-          </div>
-        </>
+        <div className="printing-error-actions">
+          <p className="printing-error-msg">{errorMsg || "Couldn't reach the printer."}</p>
+          <button className="btn-form" onClick={onRetry}>↺ Try Again</button>
+          <button className="btn-form btn-form--secondary" onClick={onSkip}>Skip →</button>
+        </div>
       )}
-    </PrintingLayout>
+    </div>
   );
 }
