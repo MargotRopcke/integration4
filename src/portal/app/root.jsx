@@ -1,13 +1,16 @@
-import {
-  isRouteErrorResponse,
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
-import "./app.css";
+import { MEDIAPIPE_SCRIPTS } from "./constants/scripts";
+import "./style/fonts.css";
+import "./style/root.css";
+import "./style/base.css";
+
+export { ErrorBoundary } from "./components/ErrorBoundary";
+export { HydrateFallback } from "./components/HydrateFallback";
+
+export function meta() {
+  return [{ title: "The Portal — Discover Antwerp" }];
+}
 
 export function Layout({ children }) {
   return (
@@ -18,10 +21,9 @@ export function Layout({ children }) {
         <meta name="description" content="The Portal — Discover 6 hidden locations in Antwerp" />
         <Meta />
         <Links />
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossOrigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossOrigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossOrigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossOrigin="anonymous"></script>
+        {MEDIAPIPE_SCRIPTS.map((src) => (
+          <script key={src} src={src} crossOrigin="anonymous" />
+        ))}
       </head>
       <body>
         {children}
@@ -34,72 +36,4 @@ export function Layout({ children }) {
 
 export default function App() {
   return <Outlet />;
-}
-
-export function ErrorBoundary({ error }) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack;
-
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
-
-  return (
-    <main style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100vh",
-      background: "#0a0a0f",
-      color: "#e8e8ed",
-      fontFamily: "'Inter', sans-serif",
-      padding: "2rem",
-      textAlign: "center",
-    }}>
-      <h1 style={{ fontSize: "3rem", marginBottom: "1rem" }}>{message}</h1>
-      <p style={{ color: "#9191a8" }}>{details}</p>
-      {stack && (
-        <pre style={{
-          marginTop: "2rem",
-          padding: "1rem",
-          background: "#12121a",
-          borderRadius: "8px",
-          overflow: "auto",
-          maxWidth: "100%",
-          fontSize: "0.8rem",
-        }}>
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
-  );
-}
-
-export function HydrateFallback() {
-  return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100vh",
-      background: "#0a0a0f",
-      color: "#e8e8ed",
-      fontFamily: "'Inter', sans-serif",
-    }}>
-      <p>Loading...</p>
-    </div>
-  );
-}
-
-export function meta() {
-  return [{ title: "The Portal — Discover Antwerp" }];
 }
