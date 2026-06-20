@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useOutletContext } from "react-router";
 import { getLocation, getReactionPhoto, calculateDistance, formatDistance } from "../data";
 import "./location-detail.css";
@@ -24,6 +26,7 @@ export default function LocationDetail({ loaderData }) {
   const { location, reactionPhoto } = loaderData;
   const context = useOutletContext() || {};
   const { expanded = false, userPosition } = context;
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   if (!location) {
     return (
@@ -116,8 +119,10 @@ export default function LocationDetail({ loaderData }) {
                   {googleMapsUrl && (
                     <a
                       href={googleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowConfirmModal(true);
+                      }}
                       className="location-detail__button-link"
                       id="google-maps-link"
                     >
@@ -131,6 +136,34 @@ export default function LocationDetail({ loaderData }) {
                     </a>
                   )}
                 </div>
+              )}
+
+              {showConfirmModal && createPortal(
+                <div className="gmaps-modal-backdrop" onClick={() => setShowConfirmModal(false)}>
+                  <div className="gmaps-modal" onClick={(e) => e.stopPropagation()}>
+                    <p className="gmaps-modal__text">
+                      You will be redirected to Google Maps to view a list of your liked locations.
+                    </p>
+                    <div className="gmaps-modal__buttons">
+                      <button
+                        className="gmaps-modal__button-confirm"
+                        onClick={() => {
+                          window.open(googleMapsUrl, "_blank", "noopener,noreferrer");
+                          setShowConfirmModal(false);
+                        }}
+                      >
+                        Go to Google Maps
+                      </button>
+                      <button
+                        className="gmaps-modal__button-cancel"
+                        onClick={() => setShowConfirmModal(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>,
+                document.body
               )}
 
               <div className="location-detail__spot-banner">

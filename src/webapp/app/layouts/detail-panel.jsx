@@ -132,4 +132,3 @@ const DetailPanel = () => {
 };
 
 export default DetailPanel;
-

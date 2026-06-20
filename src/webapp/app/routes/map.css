@@ -197,3 +197,25 @@
 .maplibregl-user-location-heading::after {
   display: none !important;
 }
+
+.map-page__gmaps-button {
+  position: absolute;
+  top: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background-color: var(--color-blood-orange);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--border-radius);
+  font-family: var(--font-secondary);
+  font-size: var(--size-md);
+  color: var(--color-creamy-vanilla);
+  font-weight: 350;
+}
+
+.map-page__gmaps-button svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
