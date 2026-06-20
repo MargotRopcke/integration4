@@ -144,7 +144,8 @@ export default function FormPage({ loaderData }) {
       deck.reactionPhotosRef.current,
       sessionUserId,
       chosenCategory?.name ?? "",
-      () => setStep(9)
+      () => setStep(9),
+      deck.likedLocationsRef.current
     );
   }, [step, sessionUserId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -330,7 +331,8 @@ export default function FormPage({ loaderData }) {
                 deck.reactionPhotosRef.current,
                 sessionUserId,
                 chosenCategory?.name ?? "",
-                () => setStep(9)
+                () => setStep(9),
+                deck.likedLocationsRef.current
               )
             }
             onSkip={() => setStep(9)}

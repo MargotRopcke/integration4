@@ -165,14 +165,25 @@ export function usePrint() {
     if (!json.success) throw new Error(json.error || "Print failed");
   }, []);
 
-  const startPrinting = useCallback(async (reactionPhotos, sessionUserId, categoryName, onDone) => {
+  const startPrinting = useCallback(async (reactionPhotos, sessionUserId, categoryName, onDone, likedLocations = []) => {
     setStatus("printing");
     setErrorMsg("");
     try {
-      if (!reactionPhotos || reactionPhotos.length === 0) {
-        throw new Error("No reaction photos to print.");
+      // When user opted out of photos, fall back to location images from Supabase
+      let photos = reactionPhotos;
+      if (!photos || photos.length === 0) {
+        if (likedLocations && likedLocations.length > 0) {
+          photos = likedLocations.map((loc) => ({
+            dataUrl: loc.image,
+            locationName: loc.name,
+            locationImage: loc.image,
+            locationId: loc.keyID,
+          }));
+        } else {
+          throw new Error("No photos to print.");
+        }
       }
-      const { colorUrl, printUrl } = await buildCollage(reactionPhotos, sessionUserId, categoryName);
+      const { colorUrl, printUrl } = await buildCollage(photos, sessionUserId, categoryName);
       setCollageUrl(colorUrl);
 
       const [printResult] = await Promise.allSettled([

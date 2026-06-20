@@ -159,6 +159,12 @@ export function useSwipeDeck({
     if (!liked) { commitVote(false); return; }
     if (likesCountRef.current >= MAX_LIKES) return;
 
+    // When no photos: skip countdown entirely, just vote
+    if (takePictures !== "yes") {
+      commitVote(true);
+      return;
+    }
+
     countdownActiveRef.current = true;
     setCountdownVisible(true);
 
@@ -169,7 +175,7 @@ export function useSwipeDeck({
         setCountdownVisible(false);
 
         // Call capturePhoto via ref — returns dataUrl, store it immediately
-        if (takePictures === "yes" && capturePhotoRef.current) {
+        if (capturePhotoRef.current) {
           const dataUrl = capturePhotoRef.current();
           if (dataUrl) {
             const loc = deckRef.current[deckIndexRef.current];
