@@ -6,10 +6,9 @@ import { getLocations, getSessionLocations } from "../data";
 import { NoUserFallback } from "../components/NoUserFallback";
 import "./map.css";
 
-// Antwerp center coordinates
+// Fallbacks die in je code stonden, hier voor de zekerheid gedefinieerd
 const ANTWERP_CENTER = [4.4025, 51.2194];
 const ANTWERP_ZOOM = 13;
-
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
 export const clientLoader = async ({ request }) => {
@@ -26,9 +25,8 @@ export const clientLoader = async ({ request }) => {
       return { locations: [], session: null, userId: null, noUser: true };
     }
 
-    // QR code flow — load the user's personalised locations
-    const { session, locations } = await getSessionLocations(userId);
-    return { locations, session, userId, noUser: false };
+    const { session, locations, sessionPhotos } = await getSessionLocations(userId);
+    return { locations, session, userId, sessionPhotos, noUser: false };
   } catch (error) {
     console.error("Failed to load locations:", error);
     return { locations: [], session: null, userId: null, noUser: true };
@@ -36,8 +34,8 @@ export const clientLoader = async ({ request }) => {
 };
 
 export default function MapPage({ loaderData }) {
-  const { locations, session, userId, noUser } = loaderData;
-  
+  const { locations, session, userId, noUser, sessionPhotos } = loaderData;
+
   if (noUser) {
     return <NoUserFallback />;
   }
@@ -77,20 +75,136 @@ export default function MapPage({ loaderData }) {
     }
   }, []);
 
-  // Initialize MapLibre map
+  // Auto-select the first location if none is selected on load
+  useEffect(() => {
+    if (locations && locations.length > 0 && !params.locationId) {
+      const firstLoc = locations[0];
+      const userParam = userId ? `?user=${userId}` : "";
+      navigate(`/map/${firstLoc.id}${userParam}`, { replace: true });
+    }
+  }, [locations, params.locationId, navigate, userId]);
+
+  const isInitialFitDone = useRef(false);
+  const previousLocationId = useRef(null);
+
+  // Zoom/pan map based on active location selection
+  useEffect(() => {
+    if (!mapRef.current || !mapLoaded || !locations || locations.length === 0) return;
+    if (!params.locationId) return;
+
+    const activeLocId = String(params.locationId);
+
+    if (!isInitialFitDone.current) {
+      isInitialFitDone.current = true;
+      previousLocationId.current = activeLocId;
+
+      const bounds = new maplibregl.LngLatBounds();
+      locations.forEach((loc) => {
+        if (loc.latitude && loc.longitude) {
+          bounds.extend([parseFloat(loc.longitude), parseFloat(loc.latitude)]);
+        }
+      });
+      if (!bounds.isEmpty()) {
+        mapRef.current.fitBounds(bounds, {
+          padding: { top: 60, bottom: 220, left: 60, right: 60 },
+          maxZoom: 15,
+          animate: false
+        });
+      }
+      return;
+    }
+
+    if (activeLocId !== previousLocationId.current) {
+      previousLocationId.current = activeLocId;
+
+      const activeLoc = locations.find((l) => String(l.id) === activeLocId);
+      if (activeLoc && activeLoc.latitude && activeLoc.longitude) {
+        mapRef.current.easeTo({
+          center: [parseFloat(activeLoc.longitude), parseFloat(activeLoc.latitude)],
+          zoom: 15.5,
+          padding: { top: 60, bottom: 220, left: 60, right: 60 },
+          duration: 1000
+        });
+      }
+    }
+  }, [params.locationId, mapLoaded, locations]);
+
+  // Initialize MapLibre map & Apply custom vector styling
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
+
+    let initialBounds = null;
+    if (locations && locations.length > 0) {
+      const bounds = new maplibregl.LngLatBounds();
+      locations.forEach((loc) => {
+        if (loc.latitude && loc.longitude) {
+          bounds.extend([parseFloat(loc.longitude), parseFloat(loc.latitude)]);
+        }
+      });
+      if (!bounds.isEmpty()) {
+        initialBounds = bounds;
+      }
+    }
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: MAP_STYLE,
-      center: ANTWERP_CENTER,
-      zoom: ANTWERP_ZOOM,
+      ...(initialBounds
+        ? { bounds: initialBounds, fitBoundsOptions: { padding: { top: 60, bottom: 220, left: 60, right: 60 }, maxZoom: 15 } }
+        : { center: ANTWERP_CENTER, zoom: ANTWERP_ZOOM }
+      ),
       attributionControl: false,
     });
 
-    map.addControl(new maplibregl.NavigationControl(), "top-right");
+    map.on("styledata", () => {
+      // 1. Water zachtblauw maken
+      if (map.getLayer("water")) {
+        map.setPaintProperty("water", "fill-color", "#74a3cc");
+      }
 
+      // 2. Land/Achtergrond zacht oranje-beige maken
+      if (map.getLayer("background")) {
+        map.setPaintProperty("background", "background-color", "#fff2e0");
+      }
+
+      // 3. DYNAMISCH ALLE WEGEN PAKKEN EN GEEL KLEUREN
+      const allLayers = map.getStyle().layers;
+
+      allLayers.forEach((layer) => {
+        // Check of de laag over wegen gaat en een lijn is
+        if (
+          layer.type === "line" &&
+          (layer.id.includes("road") || layer.id.includes("highway") || layer.id.includes("rail"))
+        ) {
+          try {
+            // Dit geeft de wegen die felle, warme oranje-gele kleur uit Screenshot 2026-06-19 at 11.59.43.jpg
+            map.setPaintProperty(layer.id, "line-color", "#f7c247bf");
+          } catch (e) {
+            // Soms weigert een specifieke laag, dit voorkomt dat de code vastloopt
+            console.warn(`Kon kleur voor laag ${layer.id} niet aanpassen`, e);
+          }
+        }
+      });
+
+      // 4. Onnodige rommel verbergen voor die cleane look
+      // We lopen hier ook doorheen voor het geval de namen net anders zijn
+      allLayers.forEach((layer) => {
+        if (
+          layer.id.includes("building") ||
+          layer.id.includes("poi") ||
+          layer.id.includes("label") ||
+          layer.id.includes("park") ||
+          layer.id.includes("leisure")
+        ) {
+          // Zorg dat we niet per ongeluk de wegen-labels of water verbergen
+          if (!layer.id.includes("water") && !layer.id.includes("road")) {
+            try {
+              map.setLayoutProperty(layer.id, "visibility", "none");
+            } catch (e) { }
+          }
+        }
+      });
+    });
     map.on("load", () => {
       setMapLoaded(true);
     });
@@ -101,26 +215,59 @@ export default function MapPage({ loaderData }) {
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [locations]);
 
   // Create marker DOM element
   const createMarkerElement = useCallback((location, isActive) => {
     const el = document.createElement("div");
     el.className = `map-marker${isActive ? " map-marker--active" : ""}`;
-    el.innerHTML = `<div class="map-marker__icon"></div>`;
-    el.addEventListener("click", () => {
-      // Keep user param in the URL when navigating to a location detail
-      const userParam = userId ? `?user=${userId}` : "";
-      navigate(`/map/${location.id}${userParam}`);
+
+    const matchingPhotoObj = (sessionPhotos || []).find(p => p.location_id === location.keyID);
+    const hasPhoto = matchingPhotoObj?.photo && matchingPhotoObj.photo.trim() !== "";
+    const photoSrc = hasPhoto ? matchingPhotoObj.photo : (location.image || "");
+
+    let html = `<div class="map-marker__icon"></div>`;
+    if (isActive && photoSrc) {
+      html = `
+        <div class="map-marker__square">
+          <img src="${photoSrc}" alt="${location.name}" />
+        </div>
+        <div class="map-marker__icon"></div>
+      `;
+    }
+    el.innerHTML = html;
+
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      if (mapRef.current && location.latitude && location.longitude) {
+        mapRef.current.easeTo({
+          center: [parseFloat(location.longitude), parseFloat(location.latitude)],
+          zoom: 15.5,
+          padding: { top: 60, bottom: 220, left: 60, right: 60 },
+          duration: 1000
+        });
+      }
+
+      if (!isActive) {
+        previousLocationId.current = String(location.id);
+        const userParam = userId ? `?user=${userId}` : "";
+        navigate(`/map/${location.id}${userParam}`);
+      }
     });
+
+    el.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
     return el;
-  }, [navigate, userId]);
+  }, [navigate, userId, sessionPhotos]);
 
   // Add location markers to the map
   useEffect(() => {
     if (!mapRef.current || !mapLoaded || !locations?.length) return;
 
-    // Clear existing markers
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
@@ -138,20 +285,9 @@ export default function MapPage({ loaderData }) {
 
       markersRef.current.push(marker);
     });
+  }, [mapLoaded, locations, params.locationId, createMarkerElement]);
 
-    // If session locations, fit the map to show all of them
-    if (session && locations.length > 1) {
-      const bounds = new maplibregl.LngLatBounds();
-      locations.forEach((loc) => {
-        if (loc.latitude && loc.longitude) {
-          bounds.extend([parseFloat(loc.longitude), parseFloat(loc.latitude)]);
-        }
-      });
-      mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 15 });
-    }
-  }, [mapLoaded, locations, params.locationId, createMarkerElement, session]);
-
-  // Add user position marker
+  // Add user position marker (Perfect blauw bolletje zoals in screenshot!)
   useEffect(() => {
     if (!mapRef.current || !mapLoaded || !userPosition) return;
 
@@ -171,31 +307,8 @@ export default function MapPage({ loaderData }) {
 
   return (
     <div className="map-page" id="map-screen">
-      {/* Back button — goes back to intro with user param if available */}
-      <Link
-        to={userId ? `/intro?user=${userId}` : "/"}
-        className="map-page__back"
-        id="back-button"
-      >
-        <span className="map-page__back-arrow">←</span>
-        Back
-      </Link>
-
-      {/* Session badge — shown when viewing personalised locations */}
-      {session && (
-        <div className="map-page__session-badge">
-          <span>
-            {session.primary_category?.name?.toLowerCase() === "style" ? "👗" : "🍽"}
-          </span>
-          <span>{session.traveler_type?.name}</span>
-          <span>· {locations.length} spots</span>
-        </div>
-      )}
-
-      {/* Map */}
       <div ref={mapContainerRef} className="map-page__map" />
 
-      {/* Loading overlay */}
       {!mapLoaded && (
         <div className="map-page__loading">
           <div className="map-page__loading-spinner" />
@@ -203,8 +316,7 @@ export default function MapPage({ loaderData }) {
         </div>
       )}
 
-      {/* Detail panel outlet */}
-      <Outlet context={{ userPosition, userId }} />
+      <Outlet context={{ userPosition, userId, locations }} />
     </div>
   );
 }

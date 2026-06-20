@@ -38,7 +38,7 @@ export async function getLocation(id) {
   try {
     const { data, error } = await supabase
       .from("locations")
-      .select("*, specialization_categories(image)")
+      .select("*, specialization_categories(image), location_vibes(vibe_categories(id, name))")
       .eq("id", id)
       .single();
 
@@ -253,7 +253,7 @@ export async function getSessionLocations(userId) {
       user_id,
       photo_name,
       primary_category_id,
-      primary_category:primary_categories ( id, name ),
+      primary_category:primary_categories ( id, name, image ),
       traveler_type:traveler_types ( id, name )
     `)
     .eq("user_id", numericUserId)
