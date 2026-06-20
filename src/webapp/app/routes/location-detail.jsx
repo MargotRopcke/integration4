@@ -73,16 +73,18 @@ export default function LocationDetail({ loaderData }) {
             /* === EXPANDED VIEW === */
             <div className="location-detail__expanded">
               <div className="location-detail__header-grid">
-                <div className="location-detail__header-left">
+                <div className="location-detail__header">
                   <h2 className="location-detail__expanded-name">{location.name}</h2>
                   <div className="location-detail__expanded-info">
-                    {location.location_vibes && location.location_vibes.length > 0 && (
-                      location.location_vibes.map((v, i) => (
-                        <p key={i} className="location-detail__vibe-tag">
-                          {v.vibe_categories?.name}
-                        </p>
-                      ))
-                    )}
+                    <div className="location-detail__expanded-info__vibe-tags">
+                      {location.location_vibes && location.location_vibes.length > 0 && (
+                        location.location_vibes.map((v, i) => (
+                          <p key={i} className="location-detail__vibe-tag">
+                            {v.vibe_categories?.name}
+                          </p>
+                        ))
+                      )}
+                    </div>
 
                     {/* Distance tag (styled exactly like the vibe tag) */}
                     <div className="location-detail__vibe-tag location-detail__vibe-tag--distance">
@@ -94,11 +96,6 @@ export default function LocationDetail({ loaderData }) {
                       </span>
                       <span className="location-detail__distance-text">{distanceText}</span>
                     </div>
-
-                    {/* Busy now tag */}
-                    <p className="location-detail__vibe-tag">
-                      Busy now
-                    </p>
                   </div>
                 </div>
 
@@ -112,9 +109,6 @@ export default function LocationDetail({ loaderData }) {
                   </div>
                 )}
               </div>
-
-              {/* Divider */}
-              <div className="location-detail__divider" />
 
               {/* Quote */}
               {location.quote && (
@@ -148,8 +142,8 @@ export default function LocationDetail({ loaderData }) {
                 </div>
               )}
 
-              <div className="banner">
-                <div className="banner-track">
+              <div className="location-detail__spot-banner">
+                <div className="location-detail__spot-banner-track">
                   <span>The spot</span>
                   <span>The spot</span>
                   <span>The spot</span>
