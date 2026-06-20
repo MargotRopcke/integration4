@@ -1,54 +1,56 @@
-import { PrintingLayout } from "../layouts/PrintingLayout";
+import aLogo from "../../../assets/icons/a-logo.svg";
 
 export function StepQR({ sessionUserId, sessionSaving, likesCount, likedLocations, travelerType, onReset }) {
   const qrUrl = sessionUserId
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=400x400&color=e13b2c&bgcolor=fafcf0&data=${encodeURIComponent(
         `https://margotropcke.github.io/integration4/?user=${sessionUserId}`
       )}`
     : null;
 
   return (
-    <PrintingLayout id="step-9">
-      <div className="form-header">
-        <h1 className="form-heading">Your Antwerp journey awaits! 🎉</h1>
-        <p className="form-subheading">
-          Scan the QR code below to get your personalised Antwerp itinerary with all your liked spots.
-        </p>
+    <div className="step-qr" id="step-9">
+
+      {/* Red top half */}
+      <div className="qr-top">
+        {/* Diagonal "City of Antwerp" banner */}
+        <div className="qr-diagonal-banner" aria-hidden="true">
+          <div className="qr-diagonal-inner">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <span key={i} className="qr-banner-text">City of Antwerp</span>
+            ))}
+          </div>
+        </div>
+
+        <h1 className="qr-heading">
+          Thank you for creating your version of Antwerp with me!
+        </h1>
       </div>
 
-      <div className="qr-container">
+      {/* Cream bottom half */}
+      <div className="qr-bottom">
         {sessionSaving || !sessionUserId ? (
-          <div className="swipe-loading">
+          <div className="qr-loading">
             <div className="loader" />
             <p>Generating your itinerary…</p>
           </div>
         ) : (
           <>
-            <div className="qr-code-wrapper">
-              <img className="qr-code-image" src={qrUrl} alt="QR code for your itinerary" />
+            <div className="qr-code-block">
+              <img
+                className="qr-code-img"
+                src={qrUrl}
+                alt="QR code for your Antwerp itinerary"
+              />
             </div>
-            <div className="qr-liked-spots">
-              <p className="qr-spots-label">
-                Your {likesCount} liked spot{likesCount !== 1 ? "s" : ""}:
-              </p>
-              <div className="summary-vibes-tags">
-                {likedLocations.map((loc) => (
-                  <span key={loc.keyID || loc.name} className="summary-vibe-tag">📍 {loc.name}</span>
-                ))}
-              </div>
-            </div>
-            <div className="qr-traveler-badge">
-              <span>🧭 {travelerType}</span>
-            </div>
+
+            <p className="qr-scan-label">
+              Scan the QR and see your spots on<br />your phone to continue your journey.
+            </p>
+
+            <img src={aLogo} alt="City of Antwerp" className="qr-a-logo" />
           </>
         )}
       </div>
-
-      <div className="summary-actions">
-        <button onClick={onReset} className="btn-form btn-form--secondary" id="restart-button">
-          ↩ Start Over
-        </button>
-      </div>
-    </PrintingLayout>
+    </div>
   );
 }

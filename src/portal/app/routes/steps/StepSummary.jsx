@@ -1,16 +1,22 @@
-import { FullscreenLayout } from "../layouts/FullscreenLayout";
+import aLogo from "../../../assets/icons/a-logo.svg";
+import thumbUp   from "../../../assets/icons/hand-up.svg";
+import thumbDown from "../../../assets/icons/hand-down.svg";
+
+const CARD_COLORS = ["#e8b4bc", "#5b9bd5", "#e07070", "#7bc67e", "#f0d060", "#4a7a8a"];
 
 export function StepSummary({
   likesCount, likedLocations, reactionPhotos,
-  // camera refs
   videoRef, canvasRef,
-  // gesture state
   gestureStatus, gestureDetected, gestureProgress, gestureType, flash,
-  // actions
   onPrint, onSwipeAgain,
 }) {
+  const photos = reactionPhotos.length > 0
+    ? reactionPhotos
+    : likedLocations.map((loc) => ({ dataUrl: loc.image, locationName: loc.name }));
+
   return (
-    <FullscreenLayout id="step-8" className="summary-gesture-screen">
+    <div className="step-summary" id="step-8">
+      {/* Hidden camera elements */}
       <video ref={videoRef} style={{ display: "none" }} autoPlay playsInline muted />
       <canvas
         ref={canvasRef}
@@ -19,87 +25,69 @@ export function StepSummary({
       />
       <div className={`flash-overlay ${flash ? "flash" : ""}`} />
 
-      <div className="summary-gesture-content">
-        <div className="summary-gesture-header">
-          <h1 className="form-heading" style={{ color: "#fff", textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
-            Your Reaction Photos
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "1rem", marginTop: "0.5rem" }}>
-            You liked <strong>{likesCount}</strong> spot{likesCount !== 1 ? "s" : ""} in Antwerp
-          </p>
-        </div>
+      {/* Thumbs up icon */}
+      <div className="summary-top-icon">
+        <img src={thumbUp} alt="" className="summary-thumb-icon" />
+      </div>
 
-        <div className="photos-grid summary-photos-grid" id="photos-grid-container">
-          {reactionPhotos.length > 0 ? (
-            reactionPhotos.map((photo, i) => (
-              <div key={i} className="photo-cell">
-                <img src={photo.dataUrl} alt={`Reaction to ${photo.locationName}`} />
-                <div className="photo-cell-label">
-                  <span className="photo-cell-emoji">📍</span> {photo.locationName}
-                </div>
-                <a
-                  className="photo-download"
-                  href={photo.dataUrl}
-                  download={`reaction-${photo.locationName.replace(/\s+/g, "-").toLowerCase()}.jpg`}
-                  title="Download photo"
-                >⬇</a>
-              </div>
-            ))
-          ) : (
-            <div className="no-photos-msg" style={{ color: "#fff" }}>
-              <p>No reaction photos were captured.</p>
-              {likedLocations.length > 0 && (
-                <div className="summary-list" style={{ marginTop: "1.5rem" }}>
-                  <span className="summary-title" style={{ color: "#fff" }}>Your Liked Spots</span>
-                  <div className="summary-vibes-tags">
-                    {likedLocations.map((loc) => (
-                      <span key={loc.keyID} className="summary-vibe-tag">📍 {loc.name}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
+      {/* Heading */}
+      <h1 className="summary-heading">
+        Your version of<br />Antwerp is ready!
+      </h1>
+
+      {/* Photo grid */}
+      <div className="summary-photo-grid">
+        {photos.slice(0, 6).map((photo, i) => (
+          <div
+            key={i}
+            className="summary-photo-card"
+            style={{ "--card-color": CARD_COLORS[i % CARD_COLORS.length] }}
+          >
+            {photo.dataUrl ? (
+              <img src={photo.dataUrl} alt={photo.locationName} className="summary-photo-img" />
+            ) : (
+              <div className="summary-photo-placeholder" />
+            )}
+            <span className="summary-photo-label" style={{ color: CARD_COLORS[i % CARD_COLORS.length] }}>
+              {photo.locationName}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Gesture status (hidden but functional) */}
+      <div className={`summary-gesture-status-hidden ${gestureDetected ? "detected" : ""}`}>
+        {gestureStatus}
+      </div>
+
+      {/* Action buttons */}
+      <div className="summary-actions-row">
+        <button
+          className={`summary-action-btn summary-action-btn--print ${gestureType === "thumbsUp" ? "active" : ""}`}
+          onClick={onPrint}
+        >
+          <img src={thumbUp} alt="" className="summary-action-icon" />
+          {gestureType === "thumbsUp" && (
+            <div className="summary-progress-bar">
+              <div className="summary-progress-fill summary-progress-fill--like" style={{ width: `${gestureProgress}%` }} />
             </div>
           )}
-        </div>
+          <span>Start printing</span>
+        </button>
 
-        <div className="summary-gesture-choices">
-          <div
-            className={`summary-choice-card summary-choice-card--like ${gestureType === "thumbsUp" ? "active" : ""}`}
-            onClick={onPrint}
-            id="summary-choice-like"
-          >
-            <div className="summary-choice-icon">👍</div>
-            <div className="summary-choice-label">Print &amp; get QR</div>
-            <div className="summary-choice-hint">Hold thumbs up to print</div>
-            {gestureType === "thumbsUp" && (
-              <div className="summary-progress-bar">
-                <div className="summary-progress-fill summary-progress-fill--like"
-                  style={{ width: `${gestureProgress}%` }} />
-              </div>
-            )}
-          </div>
-
-          <div
-            className={`summary-choice-card summary-choice-card--dislike ${gestureType === "thumbsDown" ? "active" : ""}`}
-            onClick={onSwipeAgain}
-            id="summary-choice-dislike"
-          >
-            <div className="summary-choice-icon">👎</div>
-            <div className="summary-choice-label">Swipe again</div>
-            <div className="summary-choice-hint">Hold thumbs down</div>
-            {gestureType === "thumbsDown" && (
-              <div className="summary-progress-bar">
-                <div className="summary-progress-fill summary-progress-fill--dislike"
-                  style={{ width: `${gestureProgress}%` }} />
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className={`summary-gesture-status ${gestureDetected ? "detected" : ""}`} id="summary-gesture-status">
-          {gestureStatus}
-        </div>
+        <button
+          className={`summary-action-btn summary-action-btn--restart ${gestureType === "thumbsDown" ? "active" : ""}`}
+          onClick={onSwipeAgain}
+        >
+          <img src={thumbDown} alt="" className="summary-action-icon summary-action-icon--down" />
+          {gestureType === "thumbsDown" && (
+            <div className="summary-progress-bar">
+              <div className="summary-progress-fill summary-progress-fill--dislike" style={{ width: `${gestureProgress}%` }} />
+            </div>
+          )}
+          <span>Restart</span>
+        </button>
       </div>
-    </FullscreenLayout>
+    </div>
   );
 }

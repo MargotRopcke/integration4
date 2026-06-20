@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { saveSession, saveSessionPhotos } from "../data";
 import { FALLBACK_TRAVELERS } from "./constants";
 
@@ -54,6 +54,7 @@ export default function FormPage({ loaderData }) {
 
   // ── Print (step "printing") ─────────────────────────────────────────────────
   const print = usePrint();
+  const hasPrintedRef = useRef(false);
 
   // ── Swipe camera (step 7) ───────────────────────────────────────────────────
   // Initialised after deck so capturePhoto is available
@@ -131,14 +132,21 @@ export default function FormPage({ loaderData }) {
   }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Auto-trigger print ───────────────────────────────────────────────────────
+  // Wait until sessionUserId is set before printing so the QR code
+  // is included in the collage. The session save effect above runs
+  // on the same step change, so we depend on sessionUserId being truthy.
   useEffect(() => {
     if (step !== "printing") return;
+    if (!sessionUserId) return; // wait for session to be saved first
+    if (hasPrintedRef.current) return; // only print once
+    hasPrintedRef.current = true;
     print.startPrinting(
       deck.reactionPhotosRef.current,
-      deck.likedLocations,
+      sessionUserId,
+      chosenCategory?.name ?? "",
       () => setStep(9)
     );
-  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [step, sessionUserId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Full reset ───────────────────────────────────────────────────────────────
   const handleReset = useCallback(() => {
@@ -154,6 +162,7 @@ export default function FormPage({ loaderData }) {
     setSessionSaving(false);
     deck.resetDeck();
     print.reset();
+    hasPrintedRef.current = false;
     camera.stopCamera();
     setStep(0);
   }, [deck, print, camera]);
@@ -319,7 +328,8 @@ export default function FormPage({ loaderData }) {
             onRetry={() =>
               print.startPrinting(
                 deck.reactionPhotosRef.current,
-                deck.likedLocations,
+                sessionUserId,
+                chosenCategory?.name ?? "",
                 () => setStep(9)
               )
             }

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs";
 import { GESTURE_HOLD_SECONDS } from "../constants";
+
+const VISION_CDN = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs";
 
 /**
  * Initialises the step-7 camera, selfie segmentation, and gesture recognition.
@@ -137,6 +138,7 @@ export function useSwipeCamera({
       // Gesture recognizer
       if (!gestureRecRef.current) {
         try {
+          const { GestureRecognizer, FilesetResolver } = await import(/* @vite-ignore */ VISION_CDN);
           const vision = await FilesetResolver.forVisionTasks(
             "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/wasm"
           );

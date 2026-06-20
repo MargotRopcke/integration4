@@ -237,6 +237,18 @@ export async function saveSession({ userId, photoName, primaryCategoryId, travel
   return userId;
 }
 
+/**
+ * Save the printed collage (base64 JPEG data URL) to sessions.collage.
+ */
+export async function saveCollage(userId, collageDataUrl) {
+  const { error } = await supabase
+    .from("sessions")
+    .update({ collage: collageDataUrl })
+    .eq("user_id", userId);
+
+  if (error) throw error;
+}
+
 // ─── Webapp: Session → locations ──────────────────────────────────────────────
 
 /**
