@@ -24,10 +24,6 @@
   align-items: flex-end;
 }
 
-.location-detail__image-wrapper {
-  display: none;
-}
-
 .location-detail__image {
   width: 100%;
   height: 100%;
@@ -35,11 +31,10 @@
 }
 
 .location-detail__info {
-  min-width: 0;
   padding-left: var(--space-md);
   padding-right: var(--space-md);
   padding-top: var(--space-xs);
-  padding-bottom: var(--space-xs);
+  padding-bottom: 0.7rem;
   border-radius: var(--border-radius);
   background-color: var(--color-creamy-vanilla);
 }
@@ -63,7 +58,17 @@
 }
 
 .location-detail__distance-icon {
-  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-detail__distance-icon svg {
+  display: block;
+}
+
+.location-detail__distance-text {
+  line-height: 1;
 }
 
 /* Expand hint */
@@ -146,40 +151,43 @@
   margin-bottom: var(--space-sm);
 }
 
-/* Google Maps link */
-.location-detail__maps-link {
+.location-detail__button {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-md);
+  width: 100%;
+}
+
+.location-detail__button-link {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: 0.7rem 1.2rem;
-  background: var(--gradient-card);
-  border: 1px solid var(--color-border-accent);
-  border-radius: var(--radius-md);
-  color: var(--color-text-accent);
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all var(--transition-fast);
-  margin-top: var(--space-xs);
+  justify-content: center;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-blood-orange);
+  border-radius: var(--border-radius);
+  color: var(--color-creamy-vanilla) !important;
+  font-family: var(--font-secondary);
+  font-size: 1.25rem;
+  font-weight: 350;
+  text-decoration: none;
+  transition: background-color var(--transition-fast, 0.2s ease);
 }
 
-.location-detail__maps-link:hover {
-  background: rgba(124, 91, 245, 0.15);
-  border-color: var(--color-accent-primary);
-  transform: translateY(-1px);
+.location-detail__button-link:hover {
+  background-color: var(--color-socials-red);
 }
 
-.location-detail__maps-icon {
-  font-size: 1.1rem;
+.location-detail__button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-sm);
 }
 
-.location-detail__maps-arrow {
-  font-size: 0.8rem;
-  transition: transform var(--transition-fast);
+.location-detail__button-icon svg {
+  display: block;
 }
 
-.location-detail__maps-link:hover .location-detail__maps-arrow {
-  transform: translate(2px, -2px);
-}
 
 /* Quote */
 .location-detail__quote {
@@ -193,12 +201,12 @@
 }
 
 /* Price */
-.location-detail__price {
-  color: var(--color-accent-secondary);
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 700;
-}
+/* .location-detail__price {
+    color: var(--color-accent-secondary);
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 700;
+  } */
 
 /* Vibe tags */
 .location-detail__vibes {

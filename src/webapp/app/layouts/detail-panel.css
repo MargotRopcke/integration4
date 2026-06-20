@@ -1,140 +1,145 @@
-/* ============================================
-   DETAIL PANEL — Bottom Sheet Overlay
-   ============================================ */
-
-.detail-panel {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  background: var(--color-creamy-vanilla);
-  color: var(--color-text-blue);
-  transition: height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  overflow: visible;
-  animation: panel-slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  display: flex;
-  flex-direction: column;
-  border-radius: 1.5rem 1.5rem 0 0;
-}
-
-.detail-panel--collapsed {
-  height: 160px;
-  max-height: 160px;
-}
-
-.detail-panel--collapsed::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.2) 100%);
-  z-index: 1;
-  pointer-events: none;
-  border-radius: 1.5rem 1.5rem 0 0;
-}
-
-.detail-panel--expanded {
-  height: 85vh;
-  max-height: 85vh;
-}
-
-@keyframes panel-slide-up {
-  0% {
-    transform: translateY(100%);
-    opacity: 0;
+  .visually-hidden {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
   }
 
-  100% {
-    transform: translateY(0);
+  .detail-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--color-creamy-vanilla);
+    color: var(--color-text-blue);
+    transition: height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: visible;
+    animation: panel-slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+
+  .detail-panel--collapsed {
+    height: 160px;
+    max-height: 160px;
+  }
+
+  .detail-panel--collapsed::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.2) 100%);
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+
+  .detail-panel--expanded {
+    height: 85vh;
+    max-height: 85vh;
+  }
+
+  @keyframes panel-slide-up {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Drag handle */
+  .detail-panel__handle {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-md) 0;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+  }
+
+  .detail-panel__handle-bar {
+    width: 140px;
+    height: 5px;
+    background: var(--color-creamy-vanilla);
+    transition: all var(--transition-fast);
+    border-radius: var(--border-radius);
+  }
+
+  .detail-panel__wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 var(--space-lg) var(--space-lg);
+    position: relative;
+    z-index: 2;
+  }
+
+  .detail-panel--collapsed .detail-panel__wrapper {
+    overflow: hidden;
+  }
+
+  .detail-panel--expanded .detail-panel__wrapper {
+    padding-top: calc(28vh - 37px);
+  }
+
+  /* Expanded full-width 1/3 top banner (positioned absolutely behind the handle-bar) */
+  .detail-panel__banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 28vh;
+    overflow: hidden;
+    z-index: 1;
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+  }
+
+  .detail-panel__banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .detail-panel__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  .detail-panel__pagination {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    pointer-events: auto;
+  }
+
+  .detail-panel__pagination-dot {
+    height: 5px;
+    border-radius: 2px;
+    background-color: var(--color-muted-marine);
+    width: 20px;
+    transition: width 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+    opacity: 0.6;
+  }
+
+  .detail-panel__pagination-dot--active {
+    width: 30px;
+    background-color: var(--color-muted-marine);
     opacity: 1;
   }
-}
-
-/* Drag handle */
-.detail-panel__handle {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-md) 0;
-  cursor: pointer;
-  position: relative;
-  z-index: 2;
-}
-
-.detail-panel__handle-bar {
-  width: 140px;
-  height: 5px;
-  background: var(--color-creamy-vanilla);
-  transition: all var(--transition-fast);
-  border-radius: var(--border-radius);
-}
-
-.detail-panel__wrapper {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 var(--space-lg) var(--space-lg);
-  position: relative;
-  z-index: 2;
-}
-
-.detail-panel--collapsed .detail-panel__wrapper {
-  overflow: hidden;
-}
-
-.detail-panel--expanded .detail-panel__wrapper {
-  padding-top: calc(28vh - 37px);
-}
-
-/* Expanded full-width 1/3 top banner (positioned absolutely behind the handle-bar) */
-.detail-panel__banner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 28vh;
-  overflow: hidden;
-  z-index: 1;
-  border-top-left-radius: 1.5rem;
-  border-top-right-radius: 1.5rem;
-}
-
-.detail-panel__banner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Click-outside transparent overlay when expanded */
-.detail-panel__overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  background: transparent;
-  pointer-events: auto;
-}
-
-.detail-panel__pagination {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-md);
-  position: absolute;
-  bottom: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 60;
-  pointer-events: auto;
-}
-
-.detail-panel__pagination-dot {
-  height: 5px;
-  border-radius: 2px;
-  background-color: var(--color-muted-marine);
-  width: 20px;
-  transition: width 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
-  opacity: 0.6;
-}
-
-.detail-panel__pagination-dot--active {
-  width: 30px;
-  background-color: var(--color-muted-marine);
-  opacity: 1;
-}
