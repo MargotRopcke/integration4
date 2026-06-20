@@ -13,13 +13,12 @@
 
 html,
 body {
-  height: auto;
-  min-height: 100%;
-  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
-/* 
-html:has(.intro),
+/* html:has(.intro),
 body:has(.intro) {
   height: auto;
   min-height: 100%;

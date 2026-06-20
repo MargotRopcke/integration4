@@ -139,6 +139,14 @@ export default function LocationDetail({ loaderData }) {
             </div>
           )}
 
+          <div className="banner">
+            <div className="banner-track">
+              <span>The spot</span>
+              <span>The spot</span>
+              <span>The spot</span>
+              <span>The spot</span>
+            </div>
+          </div>
         </div>
       )}
     </div>

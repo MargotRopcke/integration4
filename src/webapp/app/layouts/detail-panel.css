@@ -77,6 +77,7 @@
   .detail-panel__wrapper {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 0 var(--space-lg) var(--space-lg);
     position: relative;
     z-index: 2;

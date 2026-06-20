@@ -21,7 +21,8 @@
 
 .welcome-text {
   font-family: var(--font-primary);
-  font-size: 4.375rem; /* keep hero h1 custom size for massive impact */
+  font-size: 4.375rem;
+  /* keep hero h1 custom size for massive impact */
   font-weight: var(--weight-regular);
   text-transform: uppercase;
 }
@@ -34,7 +35,7 @@
 
 .banner {
   position: relative;
-  width: 120%;
+  width: 120vw;
   left: -10%;
   overflow: hidden;
   background: var(--color-pear-sorbet);
@@ -44,12 +45,16 @@
   margin-top: 10vh;
 }
 
+.banner-track {
+  display: flex;
+  justify-content: space-around;
+}
+
 .banner-track span {
   font-family: var(--font-secondary);
   color: var(--color-text-blue);
   font-size: var(--size-base);
   font-weight: var(--weight-bold);
-  padding-right: var(--space-xl);
   white-space: nowrap;
 }
 
