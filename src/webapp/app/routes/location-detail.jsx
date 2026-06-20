@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useOutletContext } from "react-router";
 import { getLocation, getReactionPhoto, calculateDistance, formatDistance } from "../data";
 import "./location-detail.css";
@@ -22,9 +24,9 @@ export const clientLoader = async ({ request, params }) => {
 
 export default function LocationDetail({ loaderData }) {
   const { location, reactionPhoto } = loaderData;
-  // Get merged context from detail-panel layout (expanded + userPosition from map)
   const context = useOutletContext() || {};
   const { expanded = false, userPosition } = context;
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   if (!location) {
     return (
@@ -34,7 +36,6 @@ export default function LocationDetail({ loaderData }) {
     );
   }
 
-  // Calculate distance from user to this location
   let distanceText = "—";
   if (userPosition && location.latitude && location.longitude) {
     const dist = calculateDistance(
@@ -46,7 +47,6 @@ export default function LocationDetail({ loaderData }) {
     distanceText = formatDistance(dist);
   }
 
-  // Google Maps navigation link
   const googleMapsUrl = location.latitude && location.longitude
     ? `https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}`
     : location.address
@@ -54,7 +54,6 @@ export default function LocationDetail({ loaderData }) {
       : null; return (
         <div className="location-detail" id="location-detail">
           {!expanded ? (
-            /* === COLLAPSED VIEW (Mini Version) === */
             <div className="location-detail__summary">
               <div className="location-detail__info">
                 <h2 className="location-detail__name">{location.name}</h2>
@@ -70,7 +69,6 @@ export default function LocationDetail({ loaderData }) {
               </div>
             </div>
           ) : (
-            /* === EXPANDED VIEW === */
             <div className="location-detail__expanded">
               <div className="location-detail__header-grid">
                 <div className="location-detail__header">
@@ -86,7 +84,6 @@ export default function LocationDetail({ loaderData }) {
                       )}
                     </div>
 
-                    {/* Distance tag (styled exactly like the vibe tag) */}
                     <div className="location-detail__vibe-tag location-detail__vibe-tag--distance">
                       <span className="location-detail__distance-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="21" viewBox="0 0 16 21" fill="none">
@@ -99,7 +96,6 @@ export default function LocationDetail({ loaderData }) {
                   </div>
                 </div>
 
-                {/* Specialization Category Image */}
                 {location.specialization_categories?.image && (
                   <div className="location-detail__specialization-badge">
                     <img
@@ -110,7 +106,6 @@ export default function LocationDetail({ loaderData }) {
                 )}
               </div>
 
-              {/* Quote */}
               {location.quote && (
                 <div className="location-detail__section">
                   <blockquote className="location-detail__quote">
@@ -119,14 +114,15 @@ export default function LocationDetail({ loaderData }) {
                 </div>
               )}
 
-              {/* Address & Google Maps */}
               {location.address && (
                 <div className="location-detail__button">
                   {googleMapsUrl && (
                     <a
                       href={googleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowConfirmModal(true);
+                      }}
                       className="location-detail__button-link"
                       id="google-maps-link"
                     >
@@ -140,6 +136,34 @@ export default function LocationDetail({ loaderData }) {
                     </a>
                   )}
                 </div>
+              )}
+
+              {showConfirmModal && createPortal(
+                <div className="gmaps-modal-backdrop" onClick={() => setShowConfirmModal(false)}>
+                  <div className="gmaps-modal" onClick={(e) => e.stopPropagation()}>
+                    <p className="gmaps-modal__text">
+                      You will be redirected to Google Maps to view a list of your liked locations.
+                    </p>
+                    <div className="gmaps-modal__buttons">
+                      <button
+                        className="gmaps-modal__button-confirm"
+                        onClick={() => {
+                          window.open(googleMapsUrl, "_blank", "noopener,noreferrer");
+                          setShowConfirmModal(false);
+                        }}
+                      >
+                        Go to Google Maps
+                      </button>
+                      <button
+                        className="gmaps-modal__button-cancel"
+                        onClick={() => setShowConfirmModal(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>,
+                document.body
               )}
 
               <div className="location-detail__spot-banner">

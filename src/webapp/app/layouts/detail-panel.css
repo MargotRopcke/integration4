@@ -21,7 +21,7 @@
     animation: panel-slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     flex-direction: column;
-    border-radius: 1.5rem 1.5rem 0 0;
+    border-radius: var(--size-lg) var(--size-lg) 0 0;
   }
 
   .detail-panel--collapsed {
@@ -36,7 +36,7 @@
     background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.2) 100%);
     z-index: 1;
     pointer-events: none;
-    border-radius: 1.5rem 1.5rem 0 0;
+    border-radius: var(--size-lg) var(--size-lg) 0 0;
   }
 
   .detail-panel--expanded {
@@ -90,7 +90,6 @@
     padding-top: calc(28vh - 37px);
   }
 
-  /* Expanded full-width 1/3 top banner (positioned absolutely behind the handle-bar) */
   .detail-panel__banner {
     position: absolute;
     top: 0;
@@ -99,8 +98,8 @@
     height: 28vh;
     overflow: hidden;
     z-index: 1;
-    border-top-left-radius: 1.5rem;
-    border-top-right-radius: 1.5rem;
+    border-top-left-radius: var(--size-lg);
+    border-top-right-radius: var(--size-lg);
   }
 
   .detail-panel__banner img {

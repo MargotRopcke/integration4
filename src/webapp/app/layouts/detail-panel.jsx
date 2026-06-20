@@ -6,7 +6,6 @@ const DetailPanel = () => {
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
   const { locationId } = useParams();
-  // Get context from parent (map.jsx), which includes userPosition, userId, and locations
   const parentContext = useOutletContext() || {};
   const { locations, userId } = parentContext;
 
@@ -49,9 +48,8 @@ const DetailPanel = () => {
   const handleTouchEnd = () => {
     const diffX = touchStartX.current - touchEndX.current;
     const diffY = touchStartY.current - touchEndY.current;
-    const swipeThreshold = 40; // responsiveness threshold
+    const swipeThreshold = 40;
 
-    // Determine if the gesture was primarily horizontal or vertical
     if (Math.abs(diffX) > Math.abs(diffY)) {
       // Horizontal swipe
       if (Math.abs(diffX) > swipeThreshold) {
@@ -62,13 +60,10 @@ const DetailPanel = () => {
         }
       }
     } else {
-      // Vertical swipe
       if (Math.abs(diffY) > swipeThreshold) {
         if (diffY > 0) {
-          // Swiped up -> Expand
           setExpanded(true);
         } else {
-          // Swiped down -> Collapse
           setExpanded(false);
         }
       }
@@ -79,10 +74,10 @@ const DetailPanel = () => {
 
   const panelStyle = !expanded && activeLoc?.image
     ? {
-        backgroundImage: `url(${activeLoc.image})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }
+      backgroundImage: `url(${activeLoc.image})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }
     : {};
 
   const toggleExpand = () => {
@@ -106,33 +101,28 @@ const DetailPanel = () => {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Visual swiper pagination (drawn above the panel sheet) */}
         {locations && locations.length > 0 && (
           <div className="detail-panel__pagination" id="panel-pagination">
             {locations.map((loc, i) => (
               <span
                 key={loc.id}
-                className={`detail-panel__pagination-dot${
-                  i === currentIndex ? " detail-panel__pagination-dot--active" : ""
-                }`}
+                className={`detail-panel__pagination-dot${i === currentIndex ? " detail-panel__pagination-dot--active" : ""
+                  }`}
               />
             ))}
           </div>
         )}
 
-        {/* Drag handle to toggle expand/collapse */}
         <div className="detail-panel__handle" onClick={toggleExpand}>
           <div className="detail-panel__handle-bar" />
         </div>
 
-        {/* 1/3 image banner on top when expanded */}
         {expanded && activeLoc?.image && (
           <div className="detail-panel__banner">
             <img src={activeLoc.image} alt={activeLoc.name} />
           </div>
         )}
 
-        {/* Content area — renders location-detail.jsx */}
         <div className="detail-panel__wrapper" onClick={!expanded ? toggleExpand : undefined}>
           <Outlet context={{ ...parentContext, expanded }} />
         </div>
@@ -142,4 +132,3 @@ const DetailPanel = () => {
 };
 
 export default DetailPanel;
-
