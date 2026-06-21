@@ -2,9 +2,9 @@ import "./StepSwipe.css";
 import { useState, useEffect } from "react";
 import { MAX_LIKES } from "../constants";
 import { TutorialScreen } from "./TutorialScreen.jsx";
-import { GestureProgressIcon, GestureSVG } from "../components/GestureIcons.jsx";
+import { GestureProgressIcon } from "../components/GestureIcons.jsx";
 
-// ── Match popup — shown briefly after each like ───────────────────────────────
+// ── Match popup ───────────────────────────────────────────────────────────────
 function MatchPopup({ location, onDismiss }) {
   useEffect(() => {
     if (!location) return;
@@ -30,29 +30,40 @@ function MatchPopup({ location, onDismiss }) {
   );
 }
 
-// ── Done overlay — "you've seen it all" modal ─────────────────────────────────
+// ── Done overlay ──────────────────────────────────────────────────────────────
 function DoneOverlay({ visible, likesCount, gestureType, gestureProgress, onShowResults, onReset }) {
   if (!visible) return null;
   return (
     <div className="done-overlay visible">
       <div className="done-card">
-        {/* Gesture hint top */}
-        {gestureType && (
-          <div className="done-gesture-hint">
-            <GestureProgressIcon gesture={gestureType} progress={gestureProgress} size={52} />
-          </div>
-        )}
+        <div className="done-gesture-hint">
+          <GestureProgressIcon
+            gesture={gestureType || "thumbsUp"}
+            progress={gestureType ? gestureProgress : 0}
+            size={56}
+          />
+        </div>
         <h2 className="done-title">You've seen it all.</h2>
         <p className="done-sub">
-          {likesCount === 1 ? "You have one like left." : `You have ${MAX_LIKES - likesCount} like${MAX_LIKES - likesCount !== 1 ? "s" : ""} left.`}
+          {MAX_LIKES - likesCount === 1
+            ? "You have one like left."
+            : `You have ${MAX_LIKES - likesCount} likes left.`}
         </p>
         <div className="done-actions">
-          <button className="done-action-btn done-action-btn--like" onClick={onShowResults}>
-            <GestureSVG gesture="thumbsUp" size={44} />
+          <button className="done-action-btn" onClick={onShowResults}>
+            <GestureProgressIcon
+              gesture="thumbsUp"
+              progress={gestureType === "thumbsUp" ? gestureProgress : 0}
+              size={48}
+            />
             <span>Swipe again</span>
           </button>
-          <button className="done-action-btn done-action-btn--dislike" onClick={onReset}>
-            <GestureSVG gesture="thumbsDown" size={44} />
+          <button className="done-action-btn" onClick={onReset}>
+            <GestureProgressIcon
+              gesture="thumbsDown"
+              progress={gestureType === "thumbsDown" ? gestureProgress : 0}
+              size={48}
+            />
             <span>Finish</span>
           </button>
         </div>
@@ -73,17 +84,14 @@ export function StepSwipe({
   videoRef, canvasOverlayRef, outputCanvasRef, bgImageRef,
   cardRef,
   onVote, onGoBack, onShowResults, onReset,
-  categoryLabel, progressPct,
+  categoryLabel,
   likedLocations,
 }) {
   const [matchLocation, setMatchLocation] = useState(null);
-  const prevLikesRef = { current: likesCount };
 
-  // Show match popup whenever a new like is added
   useEffect(() => {
     if (likedLocations.length > 0 && !swipeDone) {
-      const latest = likedLocations[likedLocations.length - 1];
-      setMatchLocation(latest);
+      setMatchLocation(likedLocations[likedLocations.length - 1]);
     }
   }, [likedLocations.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -110,15 +118,11 @@ export function StepSwipe({
     );
   }
 
-  const GESTURE_COLOR = { thumbsUp: "#b6e388", thumbsDown: "#e13b2c", stopHand: "#ffcc00" };
-
   return (
     <div className="swipe-screen" id="swipe">
-
-      {/* ── Always-mounted camera elements ── */}
       <video ref={videoRef} style={{ display: "none" }} autoPlay playsInline muted />
 
-      {/* Fullscreen background — blurred location photo */}
+      {/* Fullscreen background */}
       <div className="swipe-bg" style={{ opacity: tutorialActive ? 0 : 1 }}>
         {currentCard && (
           <img ref={bgImageRef} className="swipe-bg__img" src={currentCard.image} alt="" crossOrigin="anonymous" />
@@ -129,22 +133,17 @@ export function StepSwipe({
       {/* Hand landmark canvas */}
       <canvas ref={canvasOverlayRef} className="swipe-landmark-canvas" style={{ opacity: tutorialActive ? 0 : 1 }} />
 
-      {/* ── Gesture hint — always on top, visible during tutorial too ── */}
+      {/* Gesture hint — always on top, including during tutorial */}
       <div
         className={`swipe-gesture-hint${gestureDetected && gestureType ? " swipe-gesture-hint--active" : ""}`}
         style={{ zIndex: tutorialActive ? 110 : 20 }}
       >
         {gestureDetected && gestureType && (
-          <GestureProgressIcon
-            gesture={gestureType}
-            progress={gestureProgress}
-            fillColor={GESTURE_COLOR[gestureType]}
-            size={70}
-          />
+          <GestureProgressIcon gesture={gestureType} progress={gestureProgress} size={70} />
         )}
       </div>
 
-      {/* ── Tutorial overlay ── */}
+      {/* Tutorial overlay */}
       {tutorialActive && (
         <div className="tutorial-overlay-new">
           <TutorialScreen
@@ -155,10 +154,9 @@ export function StepSwipe({
         </div>
       )}
 
-      {/* ── Live swipe UI ── */}
+      {/* Live swipe UI */}
       {!tutorialActive && (
         <>
-          {/* Bottom bar */}
           <div className="swipe-bottom">
 
             {/* Polaroid stack */}
@@ -166,14 +164,8 @@ export function StepSwipe({
               <div className="swipe-counter">{likesCount}/{MAX_LIKES}</div>
               <div className="swipe-stack-cards">
                 {likedLocations.slice(-3).map((loc, i) => (
-                  <div
-                    key={loc.keyID || i}
-                    className="swipe-stack-card"
-                    style={{
-                      transform: `rotate(${(i - 1) * 6}deg) translateY(${(2 - i) * 4}px)`,
-                      zIndex: i,
-                    }}
-                  >
+                  <div key={loc.keyID || i} className="swipe-stack-card"
+                    style={{ transform: `rotate(${(i - 1) * 6}deg) translateY(${(2 - i) * 4}px)`, zIndex: i }}>
                     {loc.image && <img src={loc.image} alt={loc.name} />}
                   </div>
                 ))}
@@ -181,17 +173,18 @@ export function StepSwipe({
               </div>
             </div>
 
-            {/* Gesture buttons */}
-            <div
-              className="swipe-gesture-btns"
-              style={{ pointerEvents: tutorialActive ? "none" : "auto" }}
-            >
+            {/* Gesture buttons — same icon, same component as everywhere else */}
+            <div className="swipe-gesture-btns" style={{ pointerEvents: tutorialActive ? "none" : "auto" }}>
               <button
                 className={`swipe-gesture-btn swipe-gesture-btn--like${gestureType === "thumbsUp" ? " swipe-gesture-btn--active" : ""}`}
                 onClick={() => onVote(true)}
                 title="Like"
               >
-                <GestureProgressIcon gesture="thumbsUp" progress={gestureType === "thumbsUp" ? gestureProgress : 0} size={32} />
+                <GestureProgressIcon
+                  gesture="thumbsUp"
+                  progress={gestureType === "thumbsUp" ? gestureProgress : 0}
+                  size={34}
+                />
               </button>
 
               <button
@@ -200,7 +193,11 @@ export function StepSwipe({
                 title="Undo"
                 style={{ opacity: deckIndex > 0 ? 1 : 0.35, pointerEvents: !tutorialActive && deckIndex > 0 ? "auto" : "none" }}
               >
-                <GestureProgressIcon gesture="stopHand" progress={gestureType === "stopHand" ? gestureProgress : 0} size={26} />
+                <GestureProgressIcon
+                  gesture="stopHand"
+                  progress={gestureType === "stopHand" ? gestureProgress : 0}
+                  size={26}
+                />
               </button>
 
               <button
@@ -208,7 +205,11 @@ export function StepSwipe({
                 onClick={() => onVote(false)}
                 title="Dislike"
               >
-                <GestureProgressIcon gesture="thumbsDown" progress={gestureType === "thumbsDown" ? gestureProgress : 0} size={32} />
+                <GestureProgressIcon
+                  gesture="thumbsDown"
+                  progress={gestureType === "thumbsDown" ? gestureProgress : 0}
+                  size={34}
+                />
               </button>
             </div>
 
@@ -236,10 +237,8 @@ export function StepSwipe({
         </>
       )}
 
-      {/* Match popup */}
       <MatchPopup location={matchLocation} onDismiss={() => setMatchLocation(null)} />
 
-      {/* Done overlay */}
       <DoneOverlay
         visible={swipeDone}
         likesCount={likesCount}
@@ -249,14 +248,12 @@ export function StepSwipe({
         onReset={() => onReset()}
       />
 
-      {/* Countdown */}
       <div className={`countdown-overlay${countdownVisible ? " visible" : ""}`}>
         <div className={`countdown-number${countdownCheese ? " cheese" : ""}`} key={countdownText}>
           {countdownText}
         </div>
       </div>
 
-      {/* Flash */}
       <div className={`flash-overlay${flashActive ? " flash" : ""}`} />
     </div>
   );

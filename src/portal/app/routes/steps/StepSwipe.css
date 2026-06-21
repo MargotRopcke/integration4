@@ -450,11 +450,7 @@
   white-space: nowrap;
 }
 
-/* ── GESTURE PROGRESS ICON ───────────────────────────────────────────────── */
-.gesture-progress-icon--done { animation: gpi-pulse 0.35s ease-out; }
 
-@keyframes gpi-pulse {
-  0%   { transform: scale(1); }
   50%  { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
