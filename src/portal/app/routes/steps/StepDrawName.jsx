@@ -17,7 +17,7 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
           </div>
           <div className="canvas-draw-area">
             <div className={`canvas-hint ${hasDrawn ? "hidden" : ""}`}>Draw here</div>
-            <canvas ref={canvasRef} id="canvas" width={950} height={700} className="canvas-element" />
+            <canvas ref={canvasRef} id="canvas" width={950} height={500} className="canvas-element" />
           </div>
           <div className="canvas-actions">
             <button onClick={onSave} className="canvas-action-btn" disabled={!hasDrawn}
