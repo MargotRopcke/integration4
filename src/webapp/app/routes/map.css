@@ -51,6 +51,14 @@
   justify-content: center;
 }
 
+.map-marker--active {
+  z-index: 2;
+}
+
+.maplibregl-marker:has(.map-marker--active) {
+  z-index: 2;
+}
+
 .map-marker__icon {
   width: 30px;
   height: 30px;
