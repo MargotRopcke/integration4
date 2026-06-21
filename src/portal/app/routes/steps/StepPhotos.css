@@ -1,0 +1,112 @@
+/* ── StepPhotos ──────────────────────────────────────────────────────────── */
+
+.photos-header {
+  flex-shrink: 0;
+  margin-bottom: var(--space-md);
+}
+
+.photos-heading {
+  font-family: var(--font-secondary);
+  font-weight: var(--weight-bold);
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+  color: var(--color-text-blue);
+  margin-bottom: var(--space-md);
+  line-height: 1.25;
+}
+
+.photos-desc {
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  color: var(--color-text-blue);
+  opacity: 0.8;
+  line-height: 1.6;
+  margin: 0 0 var(--space-sm);
+}
+.photos-desc strong { font-weight: var(--weight-bold); opacity: 1; }
+
+.photos-privacy {
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-blood-orange);
+  line-height: 1.5;
+  margin: var(--space-sm) 0 0;
+}
+
+/* Grid with crosshair lines */
+.photos-grid-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 calc(-1 * var(--space-xl));
+  min-height: 0;
+}
+
+.photos-gridlines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right,  var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%),
+    repeating-linear-gradient(to bottom, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%);
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.photos-cards {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-xl) var(--space-xxl);
+  width: 100%;
+}
+
+.polaroid {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+  flex: 1;
+  max-width: clamp(140px, 40vw, 210px);
+}
+.polaroid:active { transform: scale(0.96) !important; }
+
+.polaroid--yes { transform: rotate(-6deg) translateY(-10px); }
+.polaroid--no  { transform: rotate(5deg)  translateY(10px);  }
+
+.polaroid__photo {
+  width: 100%;
+  background: #fff;
+  border: 5px solid var(--color-blood-orange);
+  border-radius: 4px;
+  padding: var(--space-sm) var(--space-sm) 2.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+.polaroid__photo img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  border-radius: 2px;
+}
+.polaroid__photo--no img { filter: saturate(0.5) brightness(0.85); }
+
+.polaroid__label {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-primary);
+  font-size: var(--size-base);
+  color: var(--color-blood-orange);
+}

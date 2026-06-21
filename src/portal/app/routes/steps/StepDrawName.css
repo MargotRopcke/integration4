@@ -1,0 +1,110 @@
+/* ── StepDrawName ────────────────────────────────────────────────────────── */
+
+.step-draw__header .form-heading {
+  font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+  color: var(--color-text-blue);
+  margin-bottom: var(--space-sm);
+  line-height: 1.25;
+}
+
+.step-draw__header .form-subheading {
+  font-size: var(--size-sm);
+  color: var(--color-text-blue);
+  opacity: 0.7;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: var(--space-lg) 0;
+  min-height: 0; /* important: lets flex children shrink */
+}
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  background: var(--color-blood-orange);
+  border-radius: 16px;
+  overflow: hidden;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-title-row {
+  padding: 1rem 1.5rem 0.5rem;
+  text-align: center;
+}
+
+.canvas-title {
+  font-family: var(--font-primary);
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  color: var(--color-creamy-vanilla);
+  font-weight: var(--weight-regular);
+}
+
+.canvas-draw-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.canvas-element {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  display: block;
+  touch-action: none;
+}
+
+.canvas-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(253, 254, 239, 0.45);
+  font-family: var(--font-secondary);
+  font-size: var(--size-xl);
+  font-weight: var(--weight-light);
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+.canvas-hint.hidden { opacity: 0; }
+
+.canvas-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding: 0.75rem 1.5rem 1.25rem;
+}
+
+.canvas-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  line-height: 0;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.canvas-action-btn:active { transform: scale(0.92); }
+
+.canvas-privacy-note {
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-blue);
+  text-align: center;
+  margin-top: var(--space-md);
+  opacity: 0.7;
+}

@@ -1,3 +1,4 @@
+import "./StepCategory.css";
 import { FormStepLayout } from "../layouts/FormStepLayout";
 import bag from "../../../assets/stickers/bag-yellow.svg";
 import lips from "../../../assets/stickers/lips-green.svg";
@@ -14,7 +15,7 @@ const CATEGORY_META = {
 
 export function StepCategory({ categories, onSelect, onBack }) {
   return (
-    <FormStepLayout id="step-3" current={3} onBack={onBack}>
+    <FormStepLayout id="step-3" current={3} onBack={onBack} className="step-category-wrap">
       <div className="form-header">
         <h1 className="form-heading">What would you like to "taste" of Antwerp?</h1>
         <p className="form-subheading">Every portal needs an entry point.</p>

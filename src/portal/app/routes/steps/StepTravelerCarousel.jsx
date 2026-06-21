@@ -1,3 +1,4 @@
+import "./StepTravelerCarousel.css";
 import { FormStepLayout } from "../layouts/FormStepLayout";
 
 const CARD_COLORS = ["#E03C31", "#1477CC", "#7BC67A", "#F4A7B9", "#F5C842"];

@@ -1,3 +1,4 @@
+import "./StepDrawName.css";
 import { FormStepLayout } from "../layouts/FormStepLayout";
 
 export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {

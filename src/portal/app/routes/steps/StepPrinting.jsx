@@ -1,3 +1,4 @@
+import "./StepPrinting.css";
 import { useEffect, useState } from "react";
 
 export function StepPrinting({ status, collageUrl, errorMsg, onRetry, onSkip }) {

@@ -1,3 +1,4 @@
+import "./StepBudgetDistance.css";
 import { FormStepLayout } from "../layouts/FormStepLayout";
 
 const BUDGET_OPTIONS = [

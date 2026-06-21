@@ -4,6 +4,7 @@ import { MEDIAPIPE_SCRIPTS } from "./constants/scripts";
 import "./style/fonts.css";
 import "./style/root.css";
 import "./style/base.css";
+import "./style/globals.css";
 
 export { ErrorBoundary } from "./components/ErrorBoundary";
 export { HydrateFallback } from "./components/HydrateFallback";

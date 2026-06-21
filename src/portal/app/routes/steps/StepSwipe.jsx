@@ -1,32 +1,95 @@
+import "./StepSwipe.css";
+import { useState, useEffect } from "react";
 import { MAX_LIKES } from "../constants";
-import { TutorialScreen } from "./TutorialScreen";
+import { TutorialScreen } from "./TutorialScreen.jsx";
+import { GestureProgressIcon, GestureSVG } from "../components/GestureIcons.jsx";
 
+// ── Match popup — shown briefly after each like ───────────────────────────────
+function MatchPopup({ location, onDismiss }) {
+  useEffect(() => {
+    if (!location) return;
+    const t = setTimeout(onDismiss, 2200);
+    return () => clearTimeout(t);
+  }, [location, onDismiss]);
+
+  if (!location) return null;
+
+  return (
+    <div className="match-popup-overlay" onClick={onDismiss}>
+      <div className="match-popup-card" onClick={e => e.stopPropagation()}>
+        <div className="match-popup-photo">
+          {location.image && <img src={location.image} alt={location.name} />}
+          <div className="match-popup-sticker">
+            <img src="/assets/match.svg" alt="It's a match!" />
+          </div>
+        </div>
+        <h2 className="match-popup-name">{location.name}</h2>
+        <p className="match-popup-sub">Ready to take a picture?</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Done overlay — "you've seen it all" modal ─────────────────────────────────
+function DoneOverlay({ visible, likesCount, gestureType, gestureProgress, onShowResults, onReset }) {
+  if (!visible) return null;
+  return (
+    <div className="done-overlay visible">
+      <div className="done-card">
+        {/* Gesture hint top */}
+        {gestureType && (
+          <div className="done-gesture-hint">
+            <GestureProgressIcon gesture={gestureType} progress={gestureProgress} size={52} />
+          </div>
+        )}
+        <h2 className="done-title">You've seen it all.</h2>
+        <p className="done-sub">
+          {likesCount === 1 ? "You have one like left." : `You have ${MAX_LIKES - likesCount} like${MAX_LIKES - likesCount !== 1 ? "s" : ""} left.`}
+        </p>
+        <div className="done-actions">
+          <button className="done-action-btn done-action-btn--like" onClick={onShowResults}>
+            <GestureSVG gesture="thumbsUp" size={44} />
+            <span>Swipe again</span>
+          </button>
+          <button className="done-action-btn done-action-btn--dislike" onClick={onReset}>
+            <GestureSVG gesture="thumbsDown" size={44} />
+            <span>Finish</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main swipe screen ─────────────────────────────────────────────────────────
 export function StepSwipe({
-  // deck state
   loading, deck, deckIndex, currentCard,
   likesCount, swipeDone, cardSwipeClass,
   overlayLike, overlayNope,
   countdownVisible, countdownText, countdownCheese,
   flashActive,
-  // tutorial
-  tutorialActive, tutorialStep, tutorialHoldBars,
-  nextTutorialStep,
-  // gesture
-  gestureStatus, gestureDetected, noCameraNotice,
-  // camera DOM refs
+  tutorialActive, tutorialStep, tutorialHoldBars, nextTutorialStep,
+  gestureStatus, gestureDetected, gestureProgress, gestureType, noCameraNotice,
   videoRef, canvasOverlayRef, outputCanvasRef, bgImageRef,
-  // card drag ref
   cardRef,
-  // actions
   onVote, onGoBack, onShowResults, onReset,
-  // derived
   categoryLabel, progressPct,
-  // liked locations for polaroid stack
   likedLocations,
 }) {
+  const [matchLocation, setMatchLocation] = useState(null);
+  const prevLikesRef = { current: likesCount };
+
+  // Show match popup whenever a new like is added
+  useEffect(() => {
+    if (likedLocations.length > 0 && !swipeDone) {
+      const latest = likedLocations[likedLocations.length - 1];
+      setMatchLocation(latest);
+    }
+  }, [likedLocations.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (loading) {
     return (
-      <div className="swipe-screen" id="swipe">
+      <div className="swipe-screen">
         <div className="swipe-loading">
           <div className="loader" />
           <p>Loading your personalised spots…</p>
@@ -37,56 +100,53 @@ export function StepSwipe({
 
   if (deck.length === 0) {
     return (
-      <div className="swipe-screen" id="swipe">
+      <div className="swipe-screen">
         <div className="swipe-loading">
-          <p className="swipe-empty-icon">😔</p>
+          <p style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>😔</p>
           <p>No locations found matching your preferences.</p>
-          <button className="btn-form" onClick={() => onReset("preferences")}>
-            ← Adjust Preferences
-          </button>
+          <button className="btn-form" onClick={() => onReset("preferences")}>← Adjust Preferences</button>
         </div>
       </div>
     );
   }
 
+  const GESTURE_COLOR = { thumbsUp: "#b6e388", thumbsDown: "#e13b2c", stopHand: "#ffcc00" };
+
   return (
     <div className="swipe-screen" id="swipe">
 
-      {/* ── ALWAYS MOUNTED: video + canvases so camera runs during tutorial too ── */}
-      <video
-        ref={videoRef}
-        id="video-bg"
-        className="input_video"
-        style={{ display: "none" }}
-        autoPlay
-        playsInline
-        muted
-      />
+      {/* ── Always-mounted camera elements ── */}
+      <video ref={videoRef} style={{ display: "none" }} autoPlay playsInline muted />
 
-      {/* Background layer — hidden during tutorial, visible during live swipe */}
-      <div className="video-wrapper" style={{ opacity: tutorialActive ? 0 : 1 }}>
+      {/* Fullscreen background — blurred location photo */}
+      <div className="swipe-bg" style={{ opacity: tutorialActive ? 0 : 1 }}>
         {currentCard && (
-          <img
-            ref={bgImageRef}
-            className="bg-image"
-            src={currentCard.image}
-            alt="background"
-            crossOrigin="anonymous"
-          />
+          <img ref={bgImageRef} className="swipe-bg__img" src={currentCard.image} alt="" crossOrigin="anonymous" />
         )}
-        <canvas ref={outputCanvasRef} className="output_canvas" />
+        <canvas ref={outputCanvasRef} className="swipe-bg__canvas" />
       </div>
 
-      {/* Hand landmark canvas — hidden during tutorial */}
-      <canvas
-        ref={canvasOverlayRef}
-        id="canvas-overlay"
-        style={{ opacity: tutorialActive ? 0 : 1 }}
-      />
+      {/* Hand landmark canvas */}
+      <canvas ref={canvasOverlayRef} className="swipe-landmark-canvas" style={{ opacity: tutorialActive ? 0 : 1 }} />
 
-      {/* ── TUTORIAL OVERLAY — sits on top, camera runs underneath ── */}
+      {/* ── Gesture hint — always on top, visible during tutorial too ── */}
+      <div
+        className={`swipe-gesture-hint${gestureDetected && gestureType ? " swipe-gesture-hint--active" : ""}`}
+        style={{ zIndex: tutorialActive ? 110 : 20 }}
+      >
+        {gestureDetected && gestureType && (
+          <GestureProgressIcon
+            gesture={gestureType}
+            progress={gestureProgress}
+            fillColor={GESTURE_COLOR[gestureType]}
+            size={70}
+          />
+        )}
+      </div>
+
+      {/* ── Tutorial overlay ── */}
       {tutorialActive && (
-        <div className="tutorial-overlay-new" id="tutorial-overlay">
+        <div className="tutorial-overlay-new">
           <TutorialScreen
             tutorialStep={tutorialStep}
             tutorialHoldBars={tutorialHoldBars}
@@ -95,21 +155,13 @@ export function StepSwipe({
         </div>
       )}
 
-      {/* ── LIVE SWIPE UI — hidden during tutorial ── */}
+      {/* ── Live swipe UI ── */}
       {!tutorialActive && (
         <>
-          {/* Gesture status floating top-center */}
-          <div
-            className={`swipe-gesture-hint ${gestureDetected ? "detected" : ""}`}
-            id="gesture-status"
-          >
-            {gestureStatus}
-          </div>
-
-          {/* Bottom UI row: polaroid stack | gesture btns | location card */}
+          {/* Bottom bar */}
           <div className="swipe-bottom">
 
-            {/* Left: polaroid stack with liked counter */}
+            {/* Polaroid stack */}
             <div className="swipe-polaroid-stack">
               <div className="swipe-counter">{likesCount}/{MAX_LIKES}</div>
               <div className="swipe-stack-cards">
@@ -125,41 +177,47 @@ export function StepSwipe({
                     {loc.image && <img src={loc.image} alt={loc.name} />}
                   </div>
                 ))}
-                {likedLocations.length === 0 && (
-                  <div className="swipe-stack-card swipe-stack-card--empty" />
-                )}
+                {likedLocations.length === 0 && <div className="swipe-stack-card swipe-stack-card--empty" />}
               </div>
             </div>
 
-            {/* Center: like / undo / dislike buttons */}
-            <div className="swipe-gesture-btns">
+            {/* Gesture buttons */}
+            <div
+              className="swipe-gesture-btns"
+              style={{ pointerEvents: tutorialActive ? "none" : "auto" }}
+            >
               <button
-                className="swipe-gesture-btn swipe-gesture-btn--like"
+                className={`swipe-gesture-btn swipe-gesture-btn--like${gestureType === "thumbsUp" ? " swipe-gesture-btn--active" : ""}`}
                 onClick={() => onVote(true)}
                 title="Like"
-              >👍</button>
+              >
+                <GestureProgressIcon gesture="thumbsUp" progress={gestureType === "thumbsUp" ? gestureProgress : 0} size={32} />
+              </button>
+
               <button
-                className="swipe-gesture-btn swipe-gesture-btn--undo"
+                className={`swipe-gesture-btn swipe-gesture-btn--undo${gestureType === "stopHand" ? " swipe-gesture-btn--active" : ""}`}
                 onClick={onGoBack}
                 title="Undo"
-                style={{
-                  opacity: deckIndex > 0 ? 1 : 0.35,
-                  pointerEvents: deckIndex > 0 ? "auto" : "none",
-                }}
-              >✋</button>
+                style={{ opacity: deckIndex > 0 ? 1 : 0.35, pointerEvents: !tutorialActive && deckIndex > 0 ? "auto" : "none" }}
+              >
+                <GestureProgressIcon gesture="stopHand" progress={gestureType === "stopHand" ? gestureProgress : 0} size={26} />
+              </button>
+
               <button
-                className="swipe-gesture-btn swipe-gesture-btn--dislike"
+                className={`swipe-gesture-btn swipe-gesture-btn--dislike${gestureType === "thumbsDown" ? " swipe-gesture-btn--active" : ""}`}
                 onClick={() => onVote(false)}
                 title="Dislike"
-              >👎</button>
+              >
+                <GestureProgressIcon gesture="thumbsDown" progress={gestureType === "thumbsDown" ? gestureProgress : 0} size={32} />
+              </button>
             </div>
 
-            {/* Right: location card */}
+            {/* Location card */}
             {currentCard && (
               <div
-                className={`swipe-location-card ${cardSwipeClass}`}
-                id="location-card"
+                className={`swipe-location-card${cardSwipeClass ? ` ${cardSwipeClass}` : ""}`}
                 ref={cardRef}
+                style={{ pointerEvents: tutorialActive ? "none" : "auto" }}
               >
                 <div className="swipe-location-card__map" />
                 <div className="swipe-location-card__info">
@@ -173,31 +231,33 @@ export function StepSwipe({
           </div>
 
           {noCameraNotice && (
-            <div className="no-camera-notice" id="no-camera-notice">
-              No camera — use buttons to vote
-            </div>
+            <div className="no-camera-notice">No camera — use buttons to vote</div>
           )}
         </>
       )}
 
-      {/* Done overlay */}
-      <div className={`done-overlay ${swipeDone ? "visible" : ""}`} id="done-overlay">
-        <div className="done-emoji">🎉</div>
-        <h2>You've seen it all!</h2>
-        <p>You liked <strong>{likesCount}</strong> spots. Ready to see your picks?</p>
-        <button className="btn-form" onClick={onShowResults}>See My Picks →</button>
-        <button className="btn-back" onClick={onReset}>↩ Start Over</button>
-      </div>
+      {/* Match popup */}
+      <MatchPopup location={matchLocation} onDismiss={() => setMatchLocation(null)} />
 
-      {/* Countdown overlay */}
-      <div className={`countdown-overlay ${countdownVisible ? "visible" : ""}`} id="countdown-overlay">
-        <div className={`countdown-number ${countdownCheese ? "cheese" : ""}`} key={countdownText}>
+      {/* Done overlay */}
+      <DoneOverlay
+        visible={swipeDone}
+        likesCount={likesCount}
+        gestureType={gestureType}
+        gestureProgress={gestureProgress}
+        onShowResults={onShowResults}
+        onReset={() => onReset()}
+      />
+
+      {/* Countdown */}
+      <div className={`countdown-overlay${countdownVisible ? " visible" : ""}`}>
+        <div className={`countdown-number${countdownCheese ? " cheese" : ""}`} key={countdownText}>
           {countdownText}
         </div>
       </div>
 
-      {/* Flash overlay */}
-      <div className={`flash-overlay ${flashActive ? "flash" : ""}`} id="flash-overlay" />
+      {/* Flash */}
+      <div className={`flash-overlay${flashActive ? " flash" : ""}`} />
     </div>
   );
 }

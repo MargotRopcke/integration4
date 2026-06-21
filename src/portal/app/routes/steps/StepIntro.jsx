@@ -1,3 +1,4 @@
+import "./StepIntro.css";
 export function StepIntro({ onStart }) {
   return (
     <div className="step-intro" id="step-0">

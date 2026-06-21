@@ -152,21 +152,6 @@ export function useSummaryCamera({ active, gestureRecRef, onThumbsUp, onThumbsDo
               if (gesture === "thumbsUp")   setGestureStatus(`👍 Hold to confirm… (${elapsed.toFixed(1)}s)`);
               else                          setGestureStatus(`👎 Hold to swipe again… (${elapsed.toFixed(1)}s)`);
 
-              // Arc
-              const cx = canvas.width / 2, cy = canvas.height / 2, r = 50;
-              const color = gesture === "thumbsUp" ? "rgba(46,204,113,0.9)" : "rgba(231,76,60,0.9)";
-              ctx.beginPath();
-              ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + pct * 2 * Math.PI);
-              ctx.strokeStyle = color;
-              ctx.lineWidth   = 6;
-              ctx.lineCap     = "round";
-              ctx.stroke();
-              ctx.beginPath();
-              ctx.arc(cx, cy, r - 2, 0, 2 * Math.PI);
-              ctx.strokeStyle = gesture === "thumbsUp" ? "rgba(46,204,113,0.15)" : "rgba(231,76,60,0.15)";
-              ctx.lineWidth   = 6;
-              ctx.stroke();
-
               if (elapsed >= GESTURE_HOLD_SECONDS) {
                 hasTriggeredRef.current   = true;
                 currentGestureRef.current = null;

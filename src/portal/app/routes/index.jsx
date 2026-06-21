@@ -21,7 +21,6 @@ import { StepSwipe } from "./steps/StepSwipe";
 import { StepSummary } from "./steps/StepSummary";
 import { StepPrinting } from "./steps/StepPrinting";
 import { StepQR } from "./steps/StepQR";
-import "./styles/form.css";
 
 export { clientLoader } from "./clientLoader";
 
@@ -174,31 +173,10 @@ export default function FormPage({ loaderData }) {
   const categoryLabel = chosenCategory?.name?.trim() ?? "All Spots";
 
   // ── Render ───────────────────────────────────────────────────────────────────
-  const isFullscreen = step === 7 || step === 8;
 
   return (
-    <div
-      className={[
-        "form-page",
-        step === 7 ? "form-page--swipe" : "",
-        step === 8 ? "form-page--summary" : "",
-      ].join(" ").trim()}
-      id="form-screen"
-    >
-      {!isFullscreen && (
-        <>
-          <div className="form-glow form-glow--top" />
-          <div className="form-glow form-glow--bottom" />
-        </>
-      )}
-
-      <div
-        className={[
-          "form-card",
-          isFullscreen ? "form-card--fullscreen" : "",
-        ].join(" ").trim()}
-        id="form-content-card"
-      >
+    <div className="form-page" id="form-screen">
+      <div className="form-card" id="form-content-card">
         {step === 0 && (
           <StepIntro onStart={() => setStep(1)} />
         )}

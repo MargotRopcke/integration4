@@ -1,0 +1,119 @@
+/* ── StepVibes ───────────────────────────────────────────────────────────── */
+
+.vibes-header {
+  margin-bottom: var(--space-md);
+  flex-shrink: 0;
+}
+
+/* Subheading sits above heading (column-reverse on form-header) */
+.vibes-subheading {
+  font-size: var(--size-sm);
+  color: var(--color-text-blue);
+  opacity: 0.7;
+  margin: 0 0 var(--space-sm);
+  text-align: left;
+}
+
+/* Heading + deco sticker in a row */
+.vibes-heading-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.vibes-heading {
+  flex: 1;
+  font-family: var(--font-secondary);
+  font-weight: var(--weight-bold);
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+  color: var(--color-text-blue);
+  line-height: 1.25;
+  margin: 0;
+  text-align: left;
+}
+
+.vibes-deco {
+  width: clamp(80px, 18vw, 120px);
+  height: auto;
+  flex-shrink: 0;
+  margin-top: -8px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Grid wrap ── */
+.vibes-grid-wrap {
+  position: relative;
+  flex: 1;               /* fills remaining vertical space */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: var(--space-md) calc(-1 * var(--space-xl)); /* bleed to edges */
+  overflow: hidden;
+}
+
+/* Crosshair grid lines — decorative */
+.vibes-gridlines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right,  var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%),
+    repeating-linear-gradient(to bottom, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 33.333%);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.vibes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;               /* lines are the separators — no extra gap */
+  position: relative;
+  z-index: 1;
+  padding: 0;
+}
+
+/* ── Pills ── */
+.vibe-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-md) var(--space-xl); /* inset from the grid lines */
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-secondary);
+  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  text-align: center;
+  min-height: clamp(60px, 10vh, 90px);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+.vibe-pill:active { transform: scale(0.95); }
+
+.vibe-pill.selected {
+  background-color: var(--color-creamy-vanilla) !important;
+  color: var(--color-blood-orange) !important;
+  border: 3px solid var(--color-blood-orange);
+  box-shadow: 0 3px 10px rgba(225, 59, 44, 0.2);
+}
+
+/* ── Done button ── */
+.vibes-actions {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-lg) 0 var(--space-sm);
+  flex-shrink: 0;
+}
+
+.btn-form--vibes-done {
+  background: transparent;
+  color: var(--color-blood-orange);
+  border: 3px solid var(--color-blood-orange);
+  box-shadow: none;
+  font-size: var(--size-lg);
+  font-weight: var(--weight-bold);
+  padding: 0.75rem 3rem;
+}

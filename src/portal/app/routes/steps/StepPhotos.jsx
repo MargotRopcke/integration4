@@ -1,3 +1,4 @@
+import "./StepPhotos.css";
 import { useState } from "react";
 import { FormStepLayout } from "../layouts/FormStepLayout";
 
