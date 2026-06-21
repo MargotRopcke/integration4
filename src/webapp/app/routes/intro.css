@@ -1,11 +1,13 @@
 .intro {
-  padding-top: 1vh;
-  padding-bottom: 2vh;
   background: var(--color-blood-orange);
   color: var(--color-creamy-vanilla);
   max-width: 100%;
   overflow: hidden;
   min-height: 100vh;
+}
+
+.mobile-container {
+  margin-top: 1vh;
 }
 
 .header-section {
