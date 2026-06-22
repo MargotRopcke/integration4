@@ -73,22 +73,18 @@
   margin-top: -0.12em;
 }
 
-/* ── Polaroid card ── */
-/*
-  All children (photo, sticker label, silhouette) share a single grid cell
-  via grid-area: "layer". Overlapping is achieved with place-self, not position.
-*/
-.intro-card {
-  grid-area: card;
-  width: 88%;
-  max-width: 420px;
+/* .intro-card{
+
+} */
+
+.intro-card-photo {
+  /* grid-area: card; */
+  max-width: 50vw;
   background: var(--color-creamy-vanilla);
   border-radius: 4px;
   padding: 10px 10px 36px;
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.18);
   margin-top: var(--space-md);
   box-sizing: border-box;
-
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr auto;
@@ -103,27 +99,6 @@
   grid-area: photo;
 }
 
-/* "YOUR TASTE ONLY" stamp — bottom-center cell, rotated in place */
-.intro-card-sticker {
-  grid-area: stamp;
-  place-self: start center;
-  transform: rotate(-8deg) translateY(-60%);
-  background: var(--color-mint-green, #4caf7d);
-  color: #fff;
-  font-family: var(--font-secondary);
-  font-size: clamp(0.7rem, 3vw, 0.95rem);
-  font-weight: var(--weight-bold);
-  padding: 6px 12px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-  line-height: 1.2;
-  text-align: center;
-  pointer-events: none;
-  z-index: 1;
-}
-
 /* Silhouette — bottom-right cell */
 .intro-card-silhouette {
   grid-area: figure;
@@ -135,27 +110,21 @@
 
 /* ── Subheading ── */
 .intro-subheading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   grid-area: sub;
   font-family: var(--font-secondary);
-  font-size: var(--size-base);
-  color: var(--color-creamy-vanilla);
-  opacity: 0.92;
-  margin: var(--space-md) auto 0;
+  font-size: var(--size-md);
+  color: var(--color-text-blue);
   max-width: 320px;
-  line-height: var(--lh-loose);
   text-align: center;
-  padding: 0 var(--space-md);
+  font-weight: var(--weight-light);
 }
 
-/* ── Bottom CTA area ── */
-/*
-  3-row grid: [button] [icon] [badge]
-  Badge moves into document flow here — no fixed/absolute positioning.
-*/
 .intro-cta {
   grid-area: cta;
   width: 100%;
-
   display: grid;
   grid-template-rows: auto auto auto;
   grid-template-areas:

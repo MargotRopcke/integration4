@@ -3,18 +3,13 @@ import { useEffect, useRef } from "react";
 import touchAnimation from "../../../assets/animations/touch.json";
 
 const LipsSVG = () => (
-  <img src="../../../assets/stickers/lips-green.svg" alt="lips" />
+  <img src="../../../assets/stickers/flavour-pink.svg" alt="lips" />
 );
-
 const BagSVG = () => (
-  <img src="../../../assets/stickers/bag-yellow.svg" alt="bag" />
+  <img src="../../../assets/stickers/style-red-yellow.svg" alt="bag" />
 );
-
 const SilhouetteSVG = () => (
-  <img src="../../../assets/stickers/silhouette.svg" alt="silhouette" />
-);
-const TasteSVG = () => (
-  <img src="../../../assets/stickers/taste.svg" alt="silhouette" />
+  <img src="../../../assets/images/intro-photo.jpg" alt="silhouette" />
 );
 const StreetPhoto = () => (
   <img src="../../../assets/images/intro-bg.png" alt="street in Antwerp" />
@@ -56,19 +51,16 @@ export function StepIntro({ onStart }) {
         <span className="intro-title-portal">PORTAL</span>
       </div>
 
-      {/* ── Polaroid card: grid [photo / stamp + silhouette] ── */}
       <div className="intro-card">
-        <div className="intro-card-photo-wrap">
-          <StreetPhoto />
+        <div className="intro-card-photo">
+          <div className="intro-card-photo-wrap">
+            <SilhouetteSVG />
+          </div>
         </div>
-        <div className="intro-card-sticker"><TasteSVG /></div>
-        <div className="intro-card-silhouette"><SilhouetteSVG /></div>
+        <p className="intro-subheading">
+          One step and you enter your version of Antwerp.
+        </p>
       </div>
-
-      {/* ── Subheading ── */}
-      <p className="intro-subheading">
-        One step and you enter your version of Antwerp.
-      </p>
 
       {/* ── CTA: grid [button / icon / badge] ── */}
       <div className="intro-cta">
