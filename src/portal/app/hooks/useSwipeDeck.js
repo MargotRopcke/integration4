@@ -2,6 +2,42 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { getFilteredLocations } from "../services/data";
 import { MAX_LIKES } from "../constants/constants";
 
+// Programmatic camera click sound using Web Audio API
+const playCameraSound = () => {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const audioCtx = new AudioContextClass();
+    
+    // Noise burst representing the shutter click
+    const bufferSize = audioCtx.sampleRate * 0.08; // 80ms burst
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "highpass";
+    filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.07);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    noise.start();
+  } catch (err) {
+    console.warn("Failed to play camera sound:", err);
+  }
+};
+
 export function useSwipeDeck({
   active,
   chosenCategory,
@@ -177,6 +213,12 @@ export function useSwipeDeck({
 
         // Call capturePhoto via ref — returns dataUrl, store it immediately
         if (capturePhotoRef.current) {
+          playCameraSound();
+          setFlashActive(true);
+          setTimeout(() => {
+            setFlashActive(false);
+          }, 150);
+
           const dataUrl = capturePhotoRef.current();
           if (dataUrl) {
             const loc = deckRef.current[deckIndexRef.current];
