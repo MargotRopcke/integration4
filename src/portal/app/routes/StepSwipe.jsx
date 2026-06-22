@@ -123,7 +123,7 @@ export function StepSwipe({
       <video ref={videoRef} style={{ display: "none" }} autoPlay playsInline muted />
 
       {/* Fullscreen background */}
-      <div className="swipe-bg" style={{ opacity: tutorialActive ? 0 : 1 }}>
+      <div className="swipe-bg" style={{ opacity: (tutorialActive && tutorialStep === 1) ? 0 : 1 }}>
         {currentCard && (
           <img ref={bgImageRef} className="swipe-bg__img" src={currentCard.image} alt="" crossOrigin="anonymous" />
         )}
@@ -131,17 +131,7 @@ export function StepSwipe({
       </div>
 
       {/* Hand landmark canvas */}
-      <canvas ref={canvasOverlayRef} className="swipe-landmark-canvas" style={{ opacity: tutorialActive ? 0 : 1 }} />
-
-      {/* Gesture hint — always on top, including during tutorial */}
-      <div
-        className={`swipe-gesture-hint${gestureDetected && gestureType ? " swipe-gesture-hint--active" : ""}`}
-        style={{ zIndex: tutorialActive ? 110 : 20 }}
-      >
-        {gestureDetected && gestureType && (
-          <GestureProgressIcon gesture={gestureType} progress={gestureProgress} size={70} />
-        )}
-      </div>
+      <canvas ref={canvasOverlayRef} className="swipe-landmark-canvas" style={{ opacity: (tutorialActive && tutorialStep === 1) ? 0 : 1 }} />
 
       {/* Tutorial overlay */}
       {tutorialActive && (

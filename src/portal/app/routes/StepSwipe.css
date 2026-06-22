@@ -58,21 +58,6 @@
   z-index: 2;
 }
 
-/* ── GESTURE HINT ────────────────────────────────────────────────────────── */
-.swipe-gesture-hint {
-  position: absolute;
-  top: clamp(1rem, 5vh, 2.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 20;
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s;
-}
-
 .swipe-gesture-hint:not(.swipe-gesture-hint--active) {
   opacity: 0;
 }
