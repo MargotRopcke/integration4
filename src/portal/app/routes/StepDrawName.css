@@ -1,75 +1,57 @@
 /* ── StepDrawName ────────────────────────────────────────────────────────── */
 
-.step-draw__header {
-  padding-top: var(--space-xl, 2rem);
-}
-
-.step-draw__header .form-heading {
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
-  color: var(--color-text-blue);
-  margin-bottom: var(--space-sm, 0.5rem);
-  line-height: 1.2;
-}
-
-.step-draw__header .form-subheading {
-  font-size: var(--size-sm);
-  color: var(--color-text-blue);
-  opacity: 0.7;
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* ── Canvas wrapper ─────────────────────────────────────────────────────── */
-
+/* Canvas wrapper: flex: 1 inherited from FormStepLayout's auto-fill rule */
 .canvas-wrapper {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin: var(--space-xl, 2rem) 0 var(--space-lg, 1.5rem);
-  min-height: 0;
+  gap: var(--space-md);
 }
 
-/* ── Grid: banner and card share "main" area; pencil gets its own column ─── */
-
+/* ── Grid: [card] [pencil col] ──────────────────────────────────────────── */
 .canvas-grid {
   display: grid;
-  /* card takes remaining space, pencil col is fixed width */
   grid-template-columns: 1fr 3rem;
-  /* single row — banner and card both placed in row 1 */
-  grid-template-rows: 1fr;
-  grid-template-areas: "main pencil";
-  align-items: center;
+  grid-template-areas: "card pencil";
+  /* Card fills the wrapper height */
+  flex: 1;
   width: 100%;
-  max-width: 520px;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 1rem;
 }
 
-/* Banner occupies the same "main" cell as the card, sits behind it */
+/* ── Banner ─────────────────────────────────────────────────────────────── */
 .canvas-banner {
-  grid-area: main;
-  align-self: stretch;
-  background: #9AC44A;
+  grid-area: card;
+  align-self: center;
+  justify-self: stretch;
+  height: 2.5rem;
+  width: 150%;
+  margin-left: -25%;
+  background: #9ac44a;
   color: #2a4a08;
   font-family: var(--font-secondary);
-  font-size: 0.75rem;
+  font-size: var(--size-base);
   font-weight: var(--weight-bold);
   letter-spacing: 0.06em;
-  /* rotate a wide strip diagonally across the card */
-  transform: rotate(-25deg) scaleX(2.5);
-  transform-origin: center center;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 0;
+  transform: rotate(-25deg);
+  z-index: 2;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
-/* Card sits in the same "main" cell, on top of the banner */
+/* ── Red card ────────────────────────────────────────────────────────────── */
 .canvas-container {
-  grid-area: main;
+  grid-area: card;
   width: 100%;
+  height: 100%;
   background: var(--color-blood-orange);
-  border-radius: 16px;
+  border-radius: 1rem;
   overflow: hidden;
   touch-action: none;
   display: flex;
@@ -78,58 +60,58 @@
 }
 
 /* ── Pencil column ──────────────────────────────────────────────────────── */
-
 .canvas-pencil-col {
   grid-area: pencil;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 1rem;
+  padding-top: var(--space-md);
+  z-index: 3;
 }
 
 .canvas-pencil-svg {
-  width: 36px;
+  width: 2.5rem;
   height: auto;
   transform: rotate(15deg);
 }
 
 /* ── Canvas title ───────────────────────────────────────────────────────── */
-
 .canvas-title-row {
-  padding: 1.25rem 1.5rem 0.75rem;
+  padding: var(--space-lg) var(--space-xl) var(--space-sm);
   text-align: center;
+  flex-shrink: 0;
 }
 
 .canvas-title {
   font-family: var(--font-primary);
-  font-size: clamp(1.3rem, 4vw, 1.9rem);
+  font-size: var(--size-xxl);
   color: var(--color-creamy-vanilla);
   font-weight: var(--weight-regular);
 }
 
-/* ── Draw area: canvas + hint stacked via grid ──────────────────────────── */
-
+/* ── Draw area: fills remaining card height ─────────────────────────────── */
 .canvas-draw-area {
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  aspect-ratio: 4 / 3;
   display: grid;
   place-items: center;
 }
 
 .canvas-element {
+  grid-area: 1 / 1;
   width: 100%;
   height: 100%;
   cursor: crosshair;
   display: block;
   touch-action: none;
-  grid-area: 1 / 1;
 }
 
 .canvas-hint {
   grid-area: 1 / 1;
   color: rgba(253, 254, 239, 0.45);
   font-family: var(--font-secondary);
-  font-size: var(--size-xl);
+  font-size: var(--size-xxl);
   font-weight: var(--weight-light);
   pointer-events: none;
   user-select: none;
@@ -143,19 +125,19 @@
 }
 
 /* ── Action buttons ─────────────────────────────────────────────────────── */
-
 .canvas-actions {
   display: flex;
   justify-content: center;
-  gap: var(--space-xl, 2rem);
-  padding: 0.75rem 1.5rem 1.5rem;
+  gap: var(--space-xxl);
+  padding: var(--space-md) var(--space-xl) var(--space-lg);
+  flex-shrink: 0;
 }
 
 .canvas-action-btn {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.4rem;
+  padding: var(--space-sm);
   line-height: 0;
   transition: opacity 0.2s, transform 0.15s;
 }
@@ -165,13 +147,12 @@
 }
 
 /* ── Privacy note ───────────────────────────────────────────────────────── */
-
 .canvas-privacy-note {
   font-family: var(--font-secondary);
   font-size: var(--size-sm);
   font-weight: var(--weight-bold);
   color: var(--color-text-blue);
   text-align: center;
-  margin-top: var(--space-md, 1rem);
   opacity: 0.7;
+  flex-shrink: 0;
 }

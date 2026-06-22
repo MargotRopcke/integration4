@@ -12,20 +12,12 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
       </div>
 
       <div className="canvas-wrapper">
-        {/* grid: banner and card share the same area, banner sits behind via z-index */}
         <div className="canvas-grid">
 
-          {/* Banner spans full grid area, behind the card */}
-          <div className="canvas-banner" aria-hidden="true">
-            <span>Your version</span>
-          </div>
+          {/* Banner: rendered first so card sits on top of it via z-index */}
+          <div className="canvas-banner" aria-hidden="true">Your version</div>
 
-          {/* Pencil sits in its own column to the right */}
-          <div className="canvas-pencil-col" aria-hidden="true">
-            <img src="../../assets/stickers/pencil.svg" alt="" className="canvas-pencil" />
-          </div>
-
-          {/* Centre: the red drawing card */}
+          {/* Card: same grid area as banner, z-index 1 covers it */}
           <div className="canvas-container">
             <div className="canvas-title-row">
               <span className="canvas-title">What is your name?</span>
@@ -35,7 +27,8 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
               <canvas ref={canvasRef} id="canvas" width={950} height={700} className="canvas-element" />
             </div>
             <div className="canvas-actions">
-              <button onClick={onSave} className="canvas-action-btn" disabled={!hasDrawn}
+              <button
+                onClick={onSave} className="canvas-action-btn" disabled={!hasDrawn}
                 style={{ opacity: hasDrawn ? 1 : 0.4, cursor: hasDrawn ? "pointer" : "not-allowed" }}
                 id="save" aria-label="Save name">
                 <svg xmlns="http://www.w3.org/2000/svg" width="89" height="76" viewBox="0 0 89 76" fill="none">
@@ -53,6 +46,19 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
                 </svg>
               </button>
             </div>
+          </div>
+
+          {/* Pencil: own grid column, peeks out from right edge of card */}
+          <div className="canvas-pencil-col" aria-hidden="true">
+            <svg className="canvas-pencil-svg" viewBox="0 0 52 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="11" y="8" width="30" height="90" rx="4" fill="#FDFEEF" stroke="#1B9BD1" strokeWidth="3" />
+              <rect x="11" y="76" width="30" height="10" fill="#1B9BD1" />
+              <path d="M11 98 L41 98 L26 126 Z" fill="#F5C4A0" />
+              <path d="M19 114 L33 114 L26 126 Z" fill="#555" />
+              <rect x="11" y="3" width="30" height="10" rx="2" fill="#F9A0A0" />
+              <rect x="11" y="10" width="30" height="4" fill="#1B9BD1" />
+              <line x1="20" y1="14" x2="20" y2="95" stroke="rgba(255,255,255,0.4)" strokeWidth="3" strokeLinecap="round" />
+            </svg>
           </div>
 
         </div>

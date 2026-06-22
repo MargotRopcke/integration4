@@ -1,70 +1,61 @@
 /* ==========================================================================
-   globals.css — shared design tokens, page shell, shared components
-   Imported once in root.jsx. Step-specific CSS lives next to each step.
+   globals.css — design tokens, page shell, shared components
    ========================================================================== */
 
-/* ── DESIGN TOKENS (aliases on top of root.css) ──────────────────────────── */
 :root {
-  /* Form context */
-  --form-bg:          var(--color-creamy-vanilla);
-  --form-text:        var(--color-text-blue);
-  --form-text-muted:  rgba(250, 252, 240, 0.55);
-  --form-accent:      var(--color-blood-orange);
+  --form-bg: var(--color-creamy-vanilla);
+  --form-text: var(--color-text-blue);
+  --form-text-muted: rgba(250, 252, 240, 0.55);
+  --form-accent: var(--color-blood-orange);
   --form-accent-glow: rgba(225, 59, 44, 0.35);
-  --form-surface:     #1e5463;
-  --form-radius:      var(--border-radius);
+  --form-surface: #1e5463;
+  --form-radius: var(--border-radius);
 
-  /* Swipe / dark-context aliases */
-  --sw-bg:       var(--color-text-blue);
-  --sw-surface:  #1e5463;
+  --sw-bg: var(--color-text-blue);
+  --sw-surface: #1e5463;
   --sw-surface2: #255f70;
-  --sw-text:     var(--color-creamy-vanilla);
-  --sw-text2:    rgba(250, 252, 240, 0.55);
-  --sw-like:     var(--color-pear-sorbet);
-  --sw-dislike:  var(--color-blood-orange);
+  --sw-text: var(--color-creamy-vanilla);
+  --sw-text2: rgba(250, 252, 240, 0.55);
+  --sw-like: var(--color-pear-sorbet);
+  --sw-dislike: var(--color-blood-orange);
 }
 
 /* ── PAGE SHELL ──────────────────────────────────────────────────────────── */
-/* Every step is fullscreen — no centering, no max-width */
 .form-page {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--form-bg);
-  color: var(--form-text);
-  font-family: var(--font-secondary);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Inner card — fills the page, each step manages its own scroll/overflow */
-.form-card {
-  position: relative;
-  z-index: 1;
   width: 100%;
   height: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  background-color: var(--form-bg);
+  color: var(--form-text);
+  font-family: var(--font-secondary);
   overflow: hidden;
 }
 
-/* ── FORM HEADER (shared heading block for steps 1–6) ────────────────────── */
-.form-header {
-  margin-bottom: var(--space-xl);
+.form-card {
   display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── FORM HEADER — base styles, layout context sets alignment/spacing ─────── */
+.form-header {
+  display: flex;
+  /* Subheading above heading: DOM order is heading then subheading,
+     column-reverse flips them visually */
   flex-direction: column-reverse;
+  gap: var(--space-xs);
 }
 
 .form-heading {
   font-family: var(--font-primary);
-  font-size: clamp(var(--size-xl), 4vw, var(--size-xxxl));
+  font-size: var(--size-xxxl);
   font-weight: var(--weight-regular);
-  line-height: var(--lh-base);
-  margin-bottom: var(--space-md);
+  line-height: var(--lh-tight);
   color: var(--color-text-blue);
 }
 
@@ -73,6 +64,7 @@
   font-size: var(--size-md);
   line-height: var(--lh-loose);
   color: var(--color-text-blue);
+  opacity: 0.7;
 }
 
 .form-prompt {
@@ -83,60 +75,6 @@
   text-align: center;
 }
 
-/* ── STEP CONTAINER (FormStepLayout wrapper) ─────────────────────────────── */
-.step-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  box-sizing: border-box;
-  overflow-y: auto;
-  /* Consistent safe padding for all form steps */
-  padding: 5rem var(--space-xl) var(--space-xl);
-}
-
-/* Back button clears safely above the padding */
-.step-container .btn-back-top {
-  top: 1.25rem;
-  left: 1.25rem;
-}
-
-/* ── BACK BUTTON ─────────────────────────────────────────────────────────── */
-.btn-back-top {
-  position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  line-height: 0;
-  z-index: 10;
-  transition: opacity 0.2s;
-}
-.btn-back-top:active { opacity: 0.6; }
-
-/* ── STEP PROGRESS DOTS ──────────────────────────────────────────────────── */
-.step-progress {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: auto;
-  padding: var(--space-lg) 0 var(--space-md);
-  flex-shrink: 0;
-}
-
-.step-progress__dot {
-  width: 2rem;
-  height: 0.35rem;
-  border-radius: 99px;
-  background: rgba(22, 67, 79, 0.2);
-  transition: background 0.3s ease;
-}
-
-.step-progress__dot--active { background: var(--color-blood-orange); }
-
 /* ── SHARED BUTTONS ──────────────────────────────────────────────────────── */
 .btn-form {
   display: inline-flex;
@@ -144,17 +82,20 @@
   justify-content: center;
   background: var(--color-creamy-vanilla);
   color: var(--color-blood-orange);
-  border: 5px solid var(--color-blood-orange);
-  padding: 0.9rem 2.2rem;
+  border: 0.2rem solid var(--color-blood-orange);
+  padding: var(--space-md) var(--space-xl);
   border-radius: var(--border-radius);
   font-family: var(--font-secondary);
-  font-size: var(--size-xl);
+  font-size: var(--size-lg);
   font-weight: var(--weight-bold);
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(225, 59, 44, 0.25);
+  box-shadow: 0 0.25rem 0.9rem rgba(225, 59, 44, 0.25);
 }
-.btn-form:active { transform: translateY(1px); }
+
+.btn-form:active {
+  transform: translateY(0.0625rem);
+}
 
 .btn-form--secondary {
   background: var(--form-surface);
@@ -168,10 +109,10 @@
   align-items: center;
   gap: var(--space-sm);
   background: var(--sw-surface2);
-  border: 1px solid rgba(250, 252, 240, 0.12);
+  border: 0.0625rem solid rgba(250, 252, 240, 0.12);
   color: var(--sw-text2);
   padding: var(--space-sm) var(--space-lg);
-  border-radius: 50px;
+  border-radius: 50rem;
   font-family: var(--font-secondary);
   font-size: var(--size-sm);
   cursor: pointer;
@@ -180,23 +121,27 @@
 
 /* ── SHARED LOADER ───────────────────────────────────────────────────────── */
 .loader {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(250, 252, 240, 0.1);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0.1875rem solid rgba(250, 252, 240, 0.1);
   border-top-color: var(--color-blood-orange);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-/* ── SHARED POPUP ────────────────────────────────────────────────────────── */
+/* ── SHARED POPUP — fixed to cover full screen ───────────────────────────── */
 .popup-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -204,22 +149,36 @@
   animation: popup-fade-in 0.25s ease;
 }
 
-@keyframes popup-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popup-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
 
 .popup-card {
   background: var(--form-surface);
   border-radius: calc(var(--border-radius) * 2.5);
   padding: var(--space-xxl) var(--space-xl);
-  max-width: 420px;
-  width: 100%;
+  width: 32rem;
   text-align: center;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 1.5rem 3.75rem rgba(0, 0, 0, 0.45);
   animation: popup-slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes popup-slide-up {
-  from { transform: translateY(20px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(1.25rem);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .popup-title {
@@ -231,7 +190,7 @@
 
 .popup-desc {
   color: var(--form-text-muted);
-  font-size: var(--size-sm);
+  font-size: var(--size-md);
   line-height: var(--lh-loose);
   margin-bottom: var(--space-xl);
 }
@@ -242,9 +201,11 @@
   gap: var(--space-sm);
 }
 
-.popup-actions .btn-form { width: 100%; }
+.popup-actions .btn-form {
+  width: 100%;
+}
 
-/* ── FLASH OVERLAY (used by StepSwipe + StepSummary) ─────────────────────── */
+/* ── FLASH OVERLAY ───────────────────────────────────────────────────────── */
 .flash-overlay {
   position: fixed;
   inset: 0;
@@ -254,4 +215,7 @@
   pointer-events: none;
   transition: opacity 0.05s;
 }
-.flash-overlay.flash { opacity: 1; }
+
+.flash-overlay.flash {
+  opacity: 1;
+}

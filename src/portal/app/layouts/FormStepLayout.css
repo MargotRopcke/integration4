@@ -1,1 +1,85 @@
-/* FormStepLayout styles are in globals.css (.step-container, .btn-back-top, .step-progress) */
+/* ==========================================================================
+   FormStepLayout.css — layout, spacing and chrome for every form step
+   ========================================================================== */
+
+.step-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    overflow: hidden;
+    padding: var(--space-xl) var(--space-xxl) var(--space-md);
+}
+
+/* ── BACK BUTTON — in normal flex flow ──────────────────────────────────── */
+.btn-back-top {
+    display: flex;
+    align-self: flex-start;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-xs);
+    margin-left: calc(-1 * var(--space-xs));
+    margin-bottom: var(--space-sm);
+    flex-shrink: 0;
+    line-height: 0;
+    transition: opacity 0.2s;
+}
+
+.btn-back-top:active {
+    opacity: 0.6;
+}
+
+/* ── FORM HEADER ─────────────────────────────────────────────────────────── */
+/*
+  column-reverse: subheading renders above heading visually.
+  text-align center matches all reference screens.
+*/
+.step-container .form-header {
+    text-align: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+    flex-shrink: 0;
+}
+
+.step-container .form-heading {
+    font-size: var(--size-xxxl);
+    line-height: var(--lh-tight);
+}
+
+.step-container .form-subheading {
+    font-size: var(--size-md);
+    line-height: var(--lh-base);
+}
+
+/* ── STEP CONTENT — fills remaining vertical space ───────────────────────── */
+/*
+  Every step's main content area should get flex: 1 in its own CSS.
+  This rule ensures the direct child after the header stretches.
+*/
+.step-container>*:not(.form-header):not(.step-progress):not(.btn-back-top) {
+    flex: 1;
+    min-height: 0;
+}
+
+/* ── STEP PROGRESS DOTS ──────────────────────────────────────────────────── */
+.step-progress {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+    padding: var(--space-md) 0 var(--space-sm);
+}
+
+.step-progress__dot {
+    width: 2.5rem;
+    height: 0.4rem;
+    border-radius: 50rem;
+    background: rgba(22, 67, 79, 0.2);
+    transition: background 0.3s ease;
+}
+
+.step-progress__dot--active {
+    background: var(--color-blood-orange);
+}

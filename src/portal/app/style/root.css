@@ -1,7 +1,5 @@
 :root {
-    /* ==========================================================================
-	   1. COLORS (Sampled from Screenshot 2026-06-15 at 21.31.35.png)
-	   ========================================================================== */
+    /* ── COLORS ────────────────────────────────────────────────────────────── */
     --color-blood-orange: #e13b2c;
     --color-sunshine: #ffcc00;
     --color-pink-piggy: #fcd7de;
@@ -10,20 +8,18 @@
     --color-creamy-vanilla: #fafcf0;
     --color-text-blue: #16434f;
 
-    /* ==========================================================================
-	   2. TEXT STYLES & FONTS (Using your SunAntwerpen family)
-	   ========================================================================== */
+    /* ── FONTS ─────────────────────────────────────────────────────────────── */
     --font-primary: 'Antwerpen', Verdana, sans-serif;
     --font-secondary: 'SunAntwerpen', Verdana, sans-serif;
     --font-Antwerpen-Tall: 'AntwerpenTallTall', Verdana, sans-serif;
     --font-Antwerpen-SmallCaps: 'AntwerpenSmallCaps', Verdana, sans-serif;
-    /* Font Weights */
+
     --weight-light: 300;
     --weight-regular: 500;
     --weight-bold: 700;
     --weight-extra-bold: 800;
 
-    /* Font Sizes (Modular Scale placeholders - adjust as needed) */
+    /* ── TYPE SCALE ─────────────────────────────────────────────────────────── */
     --size-xs: 0.75rem;
     /* 12px */
     --size-sm: 0.875rem;
@@ -41,26 +37,18 @@
     --size-xxxl: 3rem;
     /* 48px */
 
-    /* Line Heights */
+    /* ── LINE HEIGHTS ───────────────────────────────────────────────────────── */
     --lh-tight: 1.2;
     --lh-base: 1.5;
     --lh-loose: 1.75;
 
-    /* ==========================================================================
-	   3. MARGINS & SPACING (8px Grid placeholders - adjust as needed)
-	   ========================================================================== */
+    /* ── SPACING (rem, 8px grid) ────────────────────────────────────────────── */
     --space-xs: 0.25rem;
-    /* 4px */
     --space-sm: 0.5rem;
-    /* 8px */
     --space-md: 1rem;
-    /* 16px */
     --space-lg: 1.5rem;
-    /* 24px */
     --space-xl: 2rem;
-    /* 32px */
     --space-xxl: 3rem;
-    /* 48px */
 
     --border-radius: 0.5rem;
 }
