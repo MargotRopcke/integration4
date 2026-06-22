@@ -10,17 +10,17 @@ import { useSummaryCamera } from "../hooks/useSummaryCamera";
 import { usePrint } from "../hooks/usePrint";
 
 // Steps
-import { StepIntro } from "StepIntro";
-import { StepDrawName } from "StepDrawName";
-import { StepTravelerCarousel } from "StepTravelerCarousel";
-import { StepCategory } from "StepCategory";
-import { StepVibes } from "StepVibes";
-import { StepBudgetDistance } from "StepBudgetDistance";
-import { StepPhotos } from "StepPhotos";
-import { StepSwipe } from "StepSwipe";
-import { StepSummary } from "StepSummary";
-import { StepPrinting } from "StepPrinting";
-import { StepQR } from "StepQR";
+import { StepIntro } from "./StepIntro";
+import { StepDrawName } from "./StepDrawName";
+import { StepTravelerCarousel } from "./StepTravelerCarousel";
+import { StepCategory } from "./StepCategory";
+import { StepVibes } from "./StepVibes";
+import { StepBudgetDistance } from "./StepBudgetDistance";
+import { StepPhotos } from "./StepPhotos";
+import { StepSwipe } from "./StepSwipe";
+import { StepSummary } from "./StepSummary";
+import { StepPrinting } from "./StepPrinting";
+import { StepQR } from "./StepQR";
 
 export { clientLoader } from "../services/clientLoader";
 

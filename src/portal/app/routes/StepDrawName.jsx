@@ -22,7 +22,7 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
 
           {/* Pencil sits in its own column to the right */}
           <div className="canvas-pencil-col" aria-hidden="true">
-            <img src="../assets/stickers/pencil.svg" alt="" className="canvas-pencil" />
+            <img src="../../assets/stickers/pencil.svg" alt="" className="canvas-pencil" />
           </div>
 
           {/* Centre: the red drawing card */}

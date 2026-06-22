@@ -77,7 +77,7 @@ export function StepIntro({ onStart }) {
         </div>
 
         <div className="intro-antwerp-badge" aria-label="Visit Antwerp">
-          <img src="../../../assets/icons/a-logo.svg" alt="logo visit antwerp" />
+          <img src="../../assets/icons/a-logo.svg" alt="logo visit antwerp" />
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { saveCollage } from "../services/data";
-import bagSvg  from "../../../assets/stickers/bag-yellow.svg";
-import lipsSvg from "../../../assets/stickers/lips-green.svg";
+import bagSvg  from "../../assets/stickers/bag-yellow.svg";
+import lipsSvg from "../../assets/stickers/lips-green.svg";
 
 const CARD_COLORS = ["#e8b4bc", "#5b9bd5", "#e07070", "#7bc67e", "#f0d060", "#4a7a8a"];
 
