@@ -41,6 +41,7 @@ See the figma for more detail: https://www.figma.com/design/mpJdmvMZZ3YsKBAPYG6O
 To run the project on your own machine, follow these steps:
 
 1. Download the project folders
+2. run 'npm i' & 'npm install lottie-web'
 
 Copy both the portal and webapp folders into your local src directory.
 
