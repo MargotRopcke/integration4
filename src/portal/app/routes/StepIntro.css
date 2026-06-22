@@ -29,15 +29,15 @@
 
 .intro-sticker--lips {
   align-self: end;
-  width: 19vh;
+  width: 19vw;
   z-index: 2;
   padding-bottom: 3vh;
   position: relative;
-  left: 4vw;
+  left: 7vw;
 }
 
 .intro-sticker--bag {
-  width: 19vh;
+  width: 19vw;
 }
 
 .intro-sticker--lips img,
@@ -48,17 +48,17 @@
 
 .intro-title-the {
   font-family: var(--font-primary);
-  font-size: 20vh;
+  font-size: 20vw;
   font-weight: 400;
   color: var(--color-creamy-vanilla);
   line-height: 1;
   text-align: center;
-  margin-bottom: 2vh;
+  margin-bottom: 2vw;
 }
 
 .intro-title-portal {
   font-family: var(--font-primary);
-  font-size: 18vh;
+  font-size: 18vw;
   color: var(--color-dark-teal);
   font-weight: 400;
   line-height: 0.85;
@@ -77,7 +77,7 @@
 }
 
 .intro-card-photo {
-  max-width: 40vh;
+  max-width: 40vw;
   box-sizing: border-box;
 }
 
@@ -85,13 +85,14 @@
   font-family: var(--font-secondary);
   font-size: var(--size-md);
   color: var(--color-text-blue);
-  max-width: 40vh;
+  max-width: 40vw;
   text-align: center;
 }
 
 .intro-cta {
   justify-items: center;
   margin-top: auto;
+  margin-bottom: 5vh;
 }
 
 .btn-intro {
