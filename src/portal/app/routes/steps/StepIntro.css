@@ -73,9 +73,13 @@
   margin-top: -0.12em;
 }
 
-/* .intro-card{
-
-} */
+.intro-card {
+  background-color: var(--color-creamy-vanilla);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
 
 .intro-card-photo {
   /* grid-area: card; */
@@ -110,9 +114,6 @@
 
 /* ── Subheading ── */
 .intro-subheading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   grid-area: sub;
   font-family: var(--font-secondary);
   font-size: var(--size-md);
