@@ -18,6 +18,20 @@ Integration 4: Femke Denoo, Mila Jakiç, Eline Deblancq, Margot Röpcke
 - Figjam: https://www.figma.com/board/Ln5E4FdmMkBqnhtheX4yGl/INT4-FJ?node-id=41-2&t=bEkD5Hre0IFDZGRn-1
 - Figma: https://www.figma.com/design/mpJdmvMZZ3YsKBAPYG6O1x/INT4?node-id=43-60&t=kTfVcQNCcco6jNe3-1
 
+## Development Process
+
+The project was developed using an iterative and research-driven approach. Before implementing major features, multiple prototypes and proof-of-concepts were created to evaluate technical feasibility and compare different solutions.
+
+Several technologies were researched and tested throughout the development process, including ML5, MediaPipe, MapLibre, Supabase, React Router, touchscreen input and browser-based video processing. Existing tutorials, classroom exercises, official documentation and community resources were used as starting points for experimentation and implementation.
+
+The application was built with React and React Router, allowing different parts of the project to be structured into reusable components and routes. Supabase was chosen as the backend database solution based on its ease of integration and suitability for the project's requirements. Database tables and seed data were created using a combination of manually entered content and AI-assisted SQL generation. Location data was collected manually through Google Maps and imported into the database.
+
+During development, multiple approaches were explored for gesture recognition and background segmentation. Initial experiments with ML5 were eventually replaced by MediaPipe after evaluating performance, available documentation and reliability. Similar research and prototyping were conducted for mapping solutions, eventually leading to the adoption of MapLibre as a free and customizable alternative to Google Maps and Mapbox.
+
+AI tools were used throughout the project as a development aid. They were primarily used for generating initial code structures, debugging, explaining unfamiliar technologies, adapting example code to project-specific requirements and accelerating repetitive development tasks. All AI-generated code was reviewed, tested and modified before being integrated into the project.
+
+To ensure transparency regarding AI usage, every pull request requires the completion of an AI usage questionnaire. Contributors must document whether AI was used, how it was used and which parts of the implementation were influenced by AI-generated suggestions before a merge can be approved.
+
  
 ## setup
 To run the project on your own machine, follow these steps:
