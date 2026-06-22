@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { getFilteredLocations } from "../../data";
-import { MAX_LIKES } from "../constants";
+import { getFilteredLocations } from "../services/data";
+import { MAX_LIKES } from "../constants/constants";
 
 export function useSwipeDeck({
   active,

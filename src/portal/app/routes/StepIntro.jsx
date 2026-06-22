@@ -1,18 +1,18 @@
 import "./StepIntro.css";
 import { useEffect, useRef } from "react";
-import touchAnimation from "../../../assets/animations/touch.json";
+import touchAnimation from "../../assets/animations/touch.json";
 
 const LipsSVG = () => (
-  <img src="../../../assets/stickers/flavour-pink.svg" alt="lips" />
+  <img src="../../assets/stickers/flavour-pink.svg" alt="lips" />
 );
 const BagSVG = () => (
-  <img src="../../../assets/stickers/style-red-yellow.svg" alt="bag" />
+  <img src="../../assets/stickers/style-red-yellow.svg" alt="bag" />
 );
 const SilhouetteSVG = () => (
-  <img src="../../../assets/images/intro-photo.jpg" alt="silhouette" />
+  <img src="../../assets/images/intro-photo.jpg" alt="silhouette" />
 );
 const StreetPhoto = () => (
-  <img src="../../../assets/images/intro-bg.png" alt="street in Antwerp" />
+  <img src="../../assets/images/intro-bg.png" alt="street in Antwerp" />
 );
 
 export function StepIntro({ onStart }) {

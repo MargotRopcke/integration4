@@ -1,7 +1,7 @@
 import "./StepCategory.css";
 import { FormStepLayout } from "../layouts/FormStepLayout";
-import bag from "../../../assets/stickers/bag-yellow.svg";
-import lips from "../../../assets/stickers/lips-green.svg";
+import bag from "../../assets/stickers/bag-yellow.svg";
+import lips from "../../assets/stickers/lips-green.svg";
 
 const CATEGORY_DECO = {
   style: bag,

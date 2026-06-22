@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { GestureProgressIcon } from "../components/GestureIcons.jsx";
-import feetAnimation from "../../../assets/animations/feet.json";
+import feetAnimation from "../../assets/animations/feet.json";
 const TUTORIAL_CONFIG = {
   2: {
     panelBg: "#b6e388", titleColor: "#16434f",

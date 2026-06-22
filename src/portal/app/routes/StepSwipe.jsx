@@ -1,6 +1,6 @@
 import "./StepSwipe.css";
 import { useState, useEffect } from "react";
-import { MAX_LIKES } from "../constants";
+import { MAX_LIKES } from "../constants/constants.js";
 import { TutorialScreen } from "./TutorialScreen.jsx";
 import { GestureProgressIcon } from "../components/GestureIcons.jsx";
 

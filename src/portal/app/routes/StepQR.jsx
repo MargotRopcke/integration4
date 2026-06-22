@@ -1,5 +1,5 @@
 import "./StepQR.css";
-import aLogo from "../../../assets/icons/a-logo.svg";
+import aLogo from "../../assets/icons/a-logo.svg";
 
 export function StepQR({ sessionUserId, sessionSaving, likesCount, likedLocations, travelerType, onReset }) {
   const qrUrl = sessionUserId

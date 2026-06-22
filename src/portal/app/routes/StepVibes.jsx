@@ -1,7 +1,7 @@
 import "./StepVibes.css";
 import { FormStepLayout } from "../layouts/FormStepLayout";
-import styleBag from "../../../assets/stickers/style.svg";
-import flavourLips from "../../../assets/stickers/flavour.svg";
+import styleBag from "../../assets/stickers/style.svg";
+import flavourLips from "../../assets/stickers/flavour.svg";
 
 const CATEGORY_DECO = {
   style: styleBag,

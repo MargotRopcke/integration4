@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { GESTURE_HOLD_SECONDS } from "../constants";
+import { GESTURE_HOLD_SECONDS } from "../constants/constants";
 
 const VISION_CDN = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs";
 

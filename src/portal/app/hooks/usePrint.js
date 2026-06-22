@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { saveCollage } from "../../data";
+import { saveCollage } from "../services/data";
 import bagSvg  from "../../../assets/stickers/bag-yellow.svg";
 import lipsSvg from "../../../assets/stickers/lips-green.svg";
 

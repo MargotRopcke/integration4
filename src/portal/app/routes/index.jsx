@@ -1,28 +1,28 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { saveSession, saveSessionPhotos } from "../data";
-import { FALLBACK_TRAVELERS } from "./constants";
+import { saveSession, saveSessionPhotos } from "../services/data";
+import { FALLBACK_TRAVELERS } from "../constants/constants";
 
 // Hooks
-import { useCanvasDrawing } from "./hooks/useCanvasDrawing";
-import { useSwipeDeck } from "./hooks/useSwipeDeck";
-import { useSwipeCamera } from "./hooks/useSwipeCamera";
-import { useSummaryCamera } from "./hooks/useSummaryCamera";
-import { usePrint } from "./hooks/usePrint";
+import { useCanvasDrawing } from "../hooks/useCanvasDrawing";
+import { useSwipeDeck } from "../hooks/useSwipeDeck";
+import { useSwipeCamera } from "../hooks/useSwipeCamera";
+import { useSummaryCamera } from "../hooks/useSummaryCamera";
+import { usePrint } from "../hooks/usePrint";
 
 // Steps
-import { StepIntro } from "./steps/StepIntro";
-import { StepDrawName } from "./steps/StepDrawName";
-import { StepTravelerCarousel } from "./steps/StepTravelerCarousel";
-import { StepCategory } from "./steps/StepCategory";
-import { StepVibes } from "./steps/StepVibes";
-import { StepBudgetDistance } from "./steps/StepBudgetDistance";
-import { StepPhotos } from "./steps/StepPhotos";
-import { StepSwipe } from "./steps/StepSwipe";
-import { StepSummary } from "./steps/StepSummary";
-import { StepPrinting } from "./steps/StepPrinting";
-import { StepQR } from "./steps/StepQR";
+import { StepIntro } from "StepIntro";
+import { StepDrawName } from "StepDrawName";
+import { StepTravelerCarousel } from "StepTravelerCarousel";
+import { StepCategory } from "StepCategory";
+import { StepVibes } from "StepVibes";
+import { StepBudgetDistance } from "StepBudgetDistance";
+import { StepPhotos } from "StepPhotos";
+import { StepSwipe } from "StepSwipe";
+import { StepSummary } from "StepSummary";
+import { StepPrinting } from "StepPrinting";
+import { StepQR } from "StepQR";
 
-export { clientLoader } from "./clientLoader";
+export { clientLoader } from "../services/clientLoader";
 
 export default function FormPage({ loaderData }) {
   const {

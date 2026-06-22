@@ -3,8 +3,8 @@ import { useState } from "react";
 import { FormStepLayout } from "../layouts/FormStepLayout";
 
 // Drop your photos into app/assets/images/ with these names
-import photoYes from "../../../assets/images/photo-yes.png";
-import photoNo from "../../../assets/images/photo-no.png";
+import photoYes from "../../assets/images/photo-yes.png";
+import photoNo from "../../assets/images/photo-no.png";
 
 export function StepPhotos({ takePictures, onChoose, onBack }) {
   const [showPopup, setShowPopup] = useState(false);
