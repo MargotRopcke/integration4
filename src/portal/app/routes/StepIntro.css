@@ -53,13 +53,11 @@
 }
 
 .intro-title-the {
-  grid-area: the;
   font-family: var(--font-Antwerpen-Tall);
-  font-size: clamp(3rem, 18vw, 7rem);
+  font-size: 10rem;
   color: var(--color-creamy-vanilla);
-  line-height: 0.95;
+  line-height: 1;
   text-align: center;
-  letter-spacing: -0.01em;
 }
 
 .intro-title-portal {
@@ -69,58 +67,30 @@
   color: var(--color-dark-teal, #1a4a4a);
   line-height: 0.85;
   text-align: center;
-  letter-spacing: -0.02em;
   margin-top: -0.12em;
 }
 
 .intro-card {
   background-color: var(--color-creamy-vanilla);
   display: flex;
+  gap: var(--space-sm);
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  padding: var(--size-lg);
 }
 
 .intro-card-photo {
-  /* grid-area: card; */
   max-width: 50vw;
-  background: var(--color-creamy-vanilla);
-  border-radius: 4px;
-  padding: 10px 10px 36px;
-  margin-top: var(--space-md);
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr auto;
-  grid-template-areas:
-    "photo  photo  photo"
-    ".      stamp  figure";
-  row-gap: 0;
-  column-gap: 0;
 }
 
-.intro-card-photo-wrap {
-  grid-area: photo;
-}
-
-/* Silhouette — bottom-right cell */
-.intro-card-silhouette {
-  grid-area: figure;
-  place-self: end center;
-  width: clamp(55px, 14vw, 80px);
-  transform: translateY(-8px);
-  pointer-events: none;
-}
-
-/* ── Subheading ── */
 .intro-subheading {
-  grid-area: sub;
   font-family: var(--font-secondary);
   font-size: var(--size-md);
   color: var(--color-text-blue);
-  max-width: 320px;
+  max-width: 40vw;
   text-align: center;
-  font-weight: var(--weight-light);
 }
 
 .intro-cta {
