@@ -1,8 +1,130 @@
 import "./StepSwipe.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MAX_LIKES } from "../constants/constants.js";
 import { TutorialScreen } from "./TutorialScreen.jsx";
 import { GestureProgressIcon } from "../components/GestureIcons.jsx";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+
+// ── Mini Map for Location Card ───────────────────────────────────────────────
+function SwipeMiniMap({ latitude, longitude }) {
+  const containerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    // Initialize MapLibre Map
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      center: [lng, lat],
+      zoom: 14,
+      attributionControl: false,
+      interactive: false,
+    });
+
+    mapRef.current = map;
+
+    map.on("load", () => {
+      map.resize();
+    });
+
+    setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.resize();
+      }
+    }, 100);
+
+    // Custom coloring to match screenshot styles
+    map.on("styledata", () => {
+      if (map.getLayer("water")) {
+        map.setPaintProperty("water", "fill-color", "#74a3cc");
+      }
+      if (map.getLayer("background")) {
+        map.setPaintProperty("background", "background-color", "#fff2e0");
+      }
+
+      const allLayers = map.getStyle().layers;
+      allLayers.forEach((layer) => {
+        if (
+          layer.type === "line" &&
+          (layer.id.includes("road") || layer.id.includes("highway") || layer.id.includes("rail"))
+        ) {
+          try {
+            map.setPaintProperty(layer.id, "line-color", "#f7c247bf");
+          } catch (e) {}
+        }
+      });
+
+      allLayers.forEach((layer) => {
+        if (
+          layer.id.includes("building") ||
+          layer.id.includes("poi") ||
+          layer.id.includes("label") ||
+          layer.id.includes("park") ||
+          layer.id.includes("leisure")
+        ) {
+          if (!layer.id.includes("water") && !layer.id.includes("road")) {
+            try {
+              map.setLayoutProperty(layer.id, "visibility", "none");
+            } catch (e) {}
+          }
+        }
+      });
+    });
+
+    // Create customized red/orange marker representing location dot
+    const el = document.createElement("div");
+    el.className = "swipe-map-marker";
+    el.style.width = "16px";
+    el.style.height = "16px";
+    el.style.borderRadius = "50%";
+    el.style.backgroundColor = "#e03c31";
+    el.style.border = "3px solid #fff2e0";
+    el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+
+    const marker = new maplibregl.Marker({ element: el })
+      .setLngLat([lng, lat])
+      .addTo(map);
+
+    markerRef.current = marker;
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      if (markerRef.current) {
+        markerRef.current.remove();
+        markerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Dynamically jump to next location when swiping/changing cards
+  useEffect(() => {
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    if (isNaN(lat) || isNaN(lng) || !mapRef.current) return;
+
+    mapRef.current.jumpTo({
+      center: [lng, lat],
+      zoom: 14,
+    });
+
+    if (markerRef.current) {
+      markerRef.current.setLngLat([lng, lat]);
+    }
+  }, [latitude, longitude]);
+
+  return <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />;
+}
 
 // ── Match popup ───────────────────────────────────────────────────────────────
 function MatchPopup({ location, onDismiss }) {
@@ -210,7 +332,9 @@ export function StepSwipe({
                 ref={cardRef}
                 style={{ pointerEvents: tutorialActive ? "none" : "auto" }}
               >
-                <div className="swipe-location-card__map" />
+                <div className="swipe-location-card__map">
+                  <SwipeMiniMap latitude={currentCard.latitude} longitude={currentCard.longitude} />
+                </div>
                 <div className="swipe-location-card__info">
                   <div className="swipe-location-card__name">{currentCard.name}</div>
                   <div className="swipe-location-card__type">{categoryLabel}</div>

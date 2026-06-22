@@ -350,6 +350,8 @@
     repeating-linear-gradient(0deg, rgba(180, 140, 80, 0.15) 0px, rgba(180, 140, 80, 0.15) 1px, transparent 1px, transparent 20px),
     repeating-linear-gradient(90deg, rgba(180, 140, 80, 0.15) 0px, rgba(180, 140, 80, 0.15) 1px, transparent 1px, transparent 30px);
   background-color: #f5e8c8;
+  position: relative;
+  overflow: hidden;
 }
 
 .swipe-location-card__info {
