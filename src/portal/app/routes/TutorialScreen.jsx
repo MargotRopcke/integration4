@@ -95,9 +95,6 @@ export function TutorialScreen({ tutorialStep, tutorialHoldBars, nextTutorialSte
       <div className="tutorial-panel" style={{ background: cfg.panelBg }}>
         <h2 className="tutorial-heading" style={{ color: cfg.titleColor }}>{cfg.title}</h2>
         <p className="tutorial-body" style={{ color: cfg.titleColor }}>{cfg.desc}</p>
-        <div className="tutorial-hold-track">
-          <div className="tutorial-hold-fill" style={{ width: `${progress}%`, background: cfg.titleColor }} />
-        </div>
       </div>
     </div>
   );
