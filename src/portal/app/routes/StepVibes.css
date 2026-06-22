@@ -44,11 +44,13 @@
 /* ── Grid wrap ── */
 .vibes-grid-wrap {
   position: relative;
-  flex: 1;               /* fills remaining vertical space */
+  flex: 1;
+  /* fills remaining vertical space */
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: var(--space-md) calc(-1 * var(--space-xl)); /* bleed to edges */
+  margin: var(--space-md) calc(-1 * var(--space-xl));
+  /* bleed to edges */
   overflow: hidden;
 }
 
@@ -57,7 +59,7 @@
   position: absolute;
   inset: 0;
   background-image:
-    repeating-linear-gradient(to right,  var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%),
+    repeating-linear-gradient(to right, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%),
     repeating-linear-gradient(to bottom, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 33.333%);
   opacity: 0.1;
   pointer-events: none;
@@ -66,7 +68,8 @@
 .vibes-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;               /* lines are the separators — no extra gap */
+  gap: 0;
+  /* lines are the separators — no extra gap */
   position: relative;
   z-index: 1;
   padding: 0;
@@ -77,7 +80,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: var(--space-md) var(--space-xl); /* inset from the grid lines */
+  margin: var(--space-md) var(--space-xl);
+  /* inset from the grid lines */
   padding: var(--space-md) var(--space-lg);
   border-radius: var(--border-radius);
   border: none;
@@ -88,16 +92,17 @@
   line-height: 1.2;
   text-align: center;
   min-height: clamp(60px, 10vh, 90px);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease;
 }
-.vibe-pill:active { transform: scale(0.95); }
+
+.vibe-pill:active {
+  transform: scale(0.95);
+}
 
 .vibe-pill.selected {
   background-color: var(--color-creamy-vanilla) !important;
   color: var(--color-blood-orange) !important;
   border: 3px solid var(--color-blood-orange);
-  box-shadow: 0 3px 10px rgba(225, 59, 44, 0.2);
 }
 
 /* ── Done button ── */
@@ -112,7 +117,6 @@
   background: transparent;
   color: var(--color-blood-orange);
   border: 3px solid var(--color-blood-orange);
-  box-shadow: none;
   font-size: var(--size-lg);
   font-weight: var(--weight-bold);
   padding: 0.75rem 3rem;

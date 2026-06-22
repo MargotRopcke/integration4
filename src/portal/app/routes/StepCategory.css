@@ -32,10 +32,12 @@
   align-items: stretch;
   cursor: pointer;
   transition: transform 0.2s ease;
-  box-shadow: 0 6px 20px rgba(225, 59, 44, 0.25);
   overflow: visible;
 }
-.category-card:active { transform: scale(0.97); }
+
+.category-card:active {
+  transform: scale(0.97);
+}
 
 .category-card-deco {
   position: absolute;
@@ -45,8 +47,16 @@
   pointer-events: none;
   z-index: 2;
 }
-.category-card--style   .category-card-deco { bottom: -16px; left:  -16px; }
-.category-card--flavour .category-card-deco { top:   -16px; right: -8px; }
+
+.category-card--style .category-card-deco {
+  bottom: -16px;
+  left: -16px;
+}
+
+.category-card--flavour .category-card-deco {
+  top: -16px;
+  right: -8px;
+}
 
 .category-card__inner {
   background: #fff;
