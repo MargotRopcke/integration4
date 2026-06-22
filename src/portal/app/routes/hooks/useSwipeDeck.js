@@ -168,7 +168,7 @@ export function useSwipeDeck({
     countdownActiveRef.current = true;
     setCountdownVisible(true);
 
-    const steps = ["3", "2", "1", "📸 Say Cheese!"];
+    const steps = ["3", "2", "1", "Say Cheese!"];
     let i = 0;
     const tick = () => {
       if (i >= steps.length) {

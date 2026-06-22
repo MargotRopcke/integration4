@@ -41,14 +41,15 @@ export function StepTravelerCarousel({ travelers, activeIndex, onPrev, onNext, o
                   ? <img src={type.image} alt={type.name} />
                   : <div className="traveler-card__photo-placeholder" style={{ background: color }} />}
               </div>
-              <div className="traveler-card__label" style={{ background: color }}>
+              <div className="traveler-card__label">
                 <p className="traveler-card__name">{type.name}</p>
               </div>
-              <p className="traveler-active-desc">{active.description}</p>
             </div>
           );
         })}
       </div>
+
+      <p className="traveler-active-desc">{active.description}</p>
 
 
 

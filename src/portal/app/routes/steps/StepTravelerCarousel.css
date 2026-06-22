@@ -27,15 +27,15 @@
   align-items: center;
   justify-content: center;
   min-height: 0;
-  margin: var(--space-md) 0;
+  margin: var(--space-md) 0 0;
 }
 
 .traveler-card {
   position: absolute;
-  width: clamp(180px, 48vw, 260px);
+  width: clamp(220px, 62vw, 300px);
   border-radius: var(--border-radius);
   overflow: hidden;
-  border: clamp(8px, 2vw, 14px) solid var(--card-color, #E03C31);
+  border: clamp(10px, 2.5vw, 16px) solid var(--card-color, #E03C31);
   background: #fff;
   transform-origin: bottom center;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
@@ -48,6 +48,7 @@
   overflow: hidden;
   background: #ddd;
 }
+
 .traveler-card__photo img {
   width: 100%;
   height: 100%;
@@ -59,6 +60,7 @@
   padding: 0.6rem 0.8rem 0.8rem;
   background: var(--card-color);
 }
+
 .traveler-card__name {
   font-family: var(--font-primary);
   font-size: clamp(1rem, 3.5vw, 1.4rem);
@@ -78,6 +80,7 @@
   line-height: var(--lh-loose);
   min-height: 3rem;
   flex-shrink: 0;
+  margin: var(--space-sm) auto var(--space-xs);
 }
 
 .carousel-select-area {
@@ -102,7 +105,11 @@
   transition: transform 0.15s ease, opacity 0.15s;
   flex-shrink: 0;
 }
-.carousel-btn--square:active { transform: scale(0.93); opacity: 0.85; }
+
+.carousel-btn--square:active {
+  transform: scale(0.93);
+  opacity: 0.85;
+}
 
 .btn-form--traveler-select {
   background: transparent;

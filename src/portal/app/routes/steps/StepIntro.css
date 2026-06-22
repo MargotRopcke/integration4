@@ -1,54 +1,215 @@
+/* ── Page shell ── */
 .step-intro {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  /*                  title card  sub  gap  cta        */
+  grid-template-areas:
+    "title"
+    "card"
+    "sub"
+    "."
+    "cta";
+  align-items: start;
+  justify-items: center;
   width: 100%;
-  height: 100%;
-  padding: var(--space-xxl) var(--space-md);
+  min-height: 100%;
+  padding: 0;
   background: var(--color-blood-orange);
   box-sizing: border-box;
   overflow-y: auto;
 }
 
-.intro-portal-icon {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  margin-bottom: var(--space-xl);
-  display: flex;
+/* ── Hero title block ── */
+/*
+  3-column grid: [lips] [text] [bag]
+  Row 1: lips span, "THE" in middle, bag span
+  Row 2: (empty)   "PORTAL"  (empty)
+  The stickers sit in their own column cells — no absolute positioning.
+*/
+.intro-title-block {
+  grid-area: title;
+  width: 100%;
+  padding: var(--space-xl) var(--space-md) 0;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: clamp(55px, 14vw, 90px) 1fr clamp(45px, 11vw, 72px);
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "lips  the  bag"
+    ".     portal  .";
   align-items: center;
-  justify-content: center;
+  column-gap: var(--space-sm);
 }
 
-.intro-heading {
+.intro-sticker--lips {
+  grid-area: lips;
+  align-self: end;
+}
+
+.intro-sticker--bag {
+  grid-area: bag;
+  align-self: start;
+}
+
+.intro-title-the {
+  grid-area: the;
   font-family: var(--font-Antwerpen-Tall);
-  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-size: clamp(3rem, 18vw, 7rem);
   color: var(--color-creamy-vanilla);
-  margin-bottom: var(--space-md);
+  line-height: 0.95;
+  text-align: center;
+  letter-spacing: -0.01em;
 }
 
-.intro-subheading {
+.intro-title-portal {
+  grid-area: portal;
+  font-family: var(--font-Antwerpen-Tall);
+  font-size: clamp(3.8rem, 22vw, 9rem);
+  color: var(--color-dark-teal, #1a4a4a);
+  line-height: 0.85;
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin-top: -0.12em;
+}
+
+/* ── Polaroid card ── */
+/*
+  All children (photo, sticker label, silhouette) share a single grid cell
+  via grid-area: "layer". Overlapping is achieved with place-self, not position.
+*/
+.intro-card {
+  grid-area: card;
+  width: 88%;
+  max-width: 420px;
+  background: var(--color-creamy-vanilla);
+  border-radius: 4px;
+  padding: 10px 10px 36px;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.18);
+  margin-top: var(--space-md);
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "photo  photo  photo"
+    ".      stamp  figure";
+  row-gap: 0;
+  column-gap: 0;
+}
+
+.intro-card-photo-wrap {
+  grid-area: photo;
+}
+
+/* "YOUR TASTE ONLY" stamp — bottom-center cell, rotated in place */
+.intro-card-sticker {
+  grid-area: stamp;
+  place-self: start center;
+  transform: rotate(-8deg) translateY(-60%);
+  background: var(--color-mint-green, #4caf7d);
+  color: #fff;
   font-family: var(--font-secondary);
-  font-size: var(--size-lg);
+  font-size: clamp(0.7rem, 3vw, 0.95rem);
+  font-weight: var(--weight-bold);
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  line-height: 1.2;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Silhouette — bottom-right cell */
+.intro-card-silhouette {
+  grid-area: figure;
+  place-self: end center;
+  width: clamp(55px, 14vw, 80px);
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+/* ── Subheading ── */
+.intro-subheading {
+  grid-area: sub;
+  font-family: var(--font-secondary);
+  font-size: var(--size-base);
   color: var(--color-creamy-vanilla);
-  opacity: 0.85;
-  margin-bottom: var(--space-xxl);
-  max-width: 380px;
+  opacity: 0.92;
+  margin: var(--space-md) auto 0;
+  max-width: 320px;
   line-height: var(--lh-loose);
+  text-align: center;
+  padding: 0 var(--space-md);
+}
+
+/* ── Bottom CTA area ── */
+/*
+  3-row grid: [button] [icon] [badge]
+  Badge moves into document flow here — no fixed/absolute positioning.
+*/
+.intro-cta {
+  grid-area: cta;
+  width: 100%;
+
+  display: grid;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "cta-btn"
+    "cta-icon"
+    "cta-badge";
+  justify-items: center;
+  align-items: center;
+  padding: var(--space-xl) var(--space-md) var(--space-xl);
+  gap: var(--space-sm);
 }
 
 .btn-intro {
+  grid-area: cta-btn;
   font-family: var(--font-secondary);
   font-size: var(--size-base);
   font-weight: var(--weight-bold);
-  color: var(--color-blood-orange);
-  background: var(--color-creamy-vanilla);
+  color: var(--color-creamy-vanilla);
+  background: transparent;
   border: none;
-  padding: var(--space-md) var(--space-xl);
-  border-radius: var(--border-radius);
+  padding: 0;
   cursor: pointer;
+  letter-spacing: 0.01em;
+  opacity: 0.9;
   transition: opacity 0.2s;
 }
-.btn-intro:active { opacity: 0.8; }
+
+.btn-intro:active {
+  opacity: 0.6;
+}
+
+.intro-portal-icon {
+  grid-area: cta-icon;
+  width: 80px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+}
+
+/* ── Antwerp badge — in flow at bottom of CTA ── */
+.intro-antwerp-badge {
+  grid-area: cta-badge;
+  justify-self: end;
+  width: 56px;
+  height: 56px;
+  background: var(--color-blood-orange);
+  border: 2.5px solid var(--color-creamy-vanilla);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  margin-right: var(--space-md);
+}
+
+.intro-antwerp-badge svg {
+  width: 36px;
+  height: 36px;
+}
