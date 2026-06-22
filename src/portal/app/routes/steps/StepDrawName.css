@@ -31,66 +31,42 @@
   min-height: 0;
 }
 
-/* ── 3-column grid: left banner | card | right col ──────────────────────── */
+/* ── Grid: banner and card share "main" area; pencil gets its own column ─── */
 
 .canvas-grid {
   display: grid;
-  grid-template-columns: 2rem 1fr 3.5rem;
+  /* card takes remaining space, pencil col is fixed width */
+  grid-template-columns: 1fr 3rem;
+  /* single row — banner and card both placed in row 1 */
+  grid-template-rows: 1fr;
+  grid-template-areas: "main pencil";
   align-items: center;
   width: 100%;
   max-width: 520px;
-  gap: 0;
 }
 
-/* ── Side columns: flex column, centred ─────────────────────────────────── */
-
-.canvas-side {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: 1rem;
-}
-
-/* ── Diagonal "Your version" banner ─────────────────────────────────────── */
-
+/* Banner occupies the same "main" cell as the card, sits behind it */
 .canvas-banner {
+  grid-area: main;
+  align-self: stretch;
   background: #9AC44A;
   color: #2a4a08;
   font-family: var(--font-secondary);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: var(--weight-bold);
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-  padding: 4px 20px;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  /* flip so text reads top-to-bottom */
+  letter-spacing: 0.06em;
+  /* rotate a wide strip diagonally across the card */
+  transform: rotate(-25deg) scaleX(2.5);
+  transform-origin: center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
 }
 
-/* Left banner: rotated so it slants across */
-.canvas-side--left .canvas-banner {
-  transform: rotate(200deg);
-}
-
-/* Right banner: slants the other way */
-.canvas-side--right .canvas-banner {
-  transform: rotate(200deg);
-}
-
-/* ── Pencil SVG ──────────────────────────────────────────────────────────── */
-
-.canvas-pencil-svg {
-  width: 36px;
-  height: auto;
-  flex-shrink: 0;
-  transform: rotate(15deg);
-}
-
-/* ── Red card ────────────────────────────────────────────────────────────── */
-
+/* Card sits in the same "main" cell, on top of the banner */
 .canvas-container {
+  grid-area: main;
   width: 100%;
   background: var(--color-blood-orange);
   border-radius: 16px;
@@ -98,6 +74,23 @@
   touch-action: none;
   display: flex;
   flex-direction: column;
+  z-index: 1;
+}
+
+/* ── Pencil column ──────────────────────────────────────────────────────── */
+
+.canvas-pencil-col {
+  grid-area: pencil;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.canvas-pencil-svg {
+  width: 36px;
+  height: auto;
+  transform: rotate(15deg);
 }
 
 /* ── Canvas title ───────────────────────────────────────────────────────── */
@@ -114,11 +107,10 @@
   font-weight: var(--weight-regular);
 }
 
-/* ── Draw area ──────────────────────────────────────────────────────────── */
+/* ── Draw area: canvas + hint stacked via grid ──────────────────────────── */
 
 .canvas-draw-area {
   width: 100%;
-  /* padding-top trick for stable 4:3 area without position:absolute sizing */
   aspect-ratio: 4 / 3;
   display: grid;
   place-items: center;
