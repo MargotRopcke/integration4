@@ -1,15 +1,47 @@
 /* ==========================================================================
    FormStepLayout.css — layout, spacing and chrome for every form step
    ========================================================================== */
+.title {
+    width: 60vw;
+    color: var(--style-text-blue, #144552);
+    text-align: center;
+    font-family: var(--font-primary);
+    font-size: 3.75rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+    /* 5.25rem */
+}
+
+.subtitle {
+    color: var(--style-text-blue, #144552);
+    text-align: center;
+    /* portal/body */
+    font-family: var(--font-secondary);
+    font-size: 2.25rem;
+
+    font-weight: 350;
+    line-height: normal;
+}
 
 .step-container {
     display: flex;
     flex-direction: column;
+
+    align-items: center;
     width: 100%;
     height: 100%;
     flex: 1;
     overflow: hidden;
     padding: var(--space-xl) var(--space-xxl) var(--space-md);
+}
+
+.title-container {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
 }
 
 /* ── BACK BUTTON — in normal flex flow ──────────────────────────────────── */
@@ -38,7 +70,7 @@
 */
 .step-container .form-header {
     text-align: center;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
     margin-bottom: var(--space-xl);
     flex-shrink: 0;
 }
@@ -67,19 +99,24 @@
 .step-progress {
     display: flex;
     justify-content: center;
-    gap: var(--space-sm);
+    gap: var(--space-md);
+
     flex-shrink: 0;
-    padding: var(--space-md) 0 var(--space-sm);
+    padding: var(--space-xl) 0 var(--space-xxl);
+
 }
 
 .step-progress__dot {
-    width: 2.5rem;
-    height: 0.4rem;
+    width: 2.70831rem;
+    height: 0.8125rem;
     border-radius: 50rem;
-    background: rgba(22, 67, 79, 0.2);
+    border-radius: 0.33856rem;
+    background: #F6CFC1;
     transition: background 0.3s ease;
 }
 
 .step-progress__dot--active {
     background: var(--color-blood-orange);
+    width: 4.73956rem;
+
 }

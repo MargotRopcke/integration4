@@ -50,15 +50,7 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
 
           {/* Pencil: own grid column, peeks out from right edge of card */}
           <div className="canvas-pencil-col" aria-hidden="true">
-            <svg className="canvas-pencil-svg" viewBox="0 0 52 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="11" y="8" width="30" height="90" rx="4" fill="#FDFEEF" stroke="#1B9BD1" strokeWidth="3" />
-              <rect x="11" y="76" width="30" height="10" fill="#1B9BD1" />
-              <path d="M11 98 L41 98 L26 126 Z" fill="#F5C4A0" />
-              <path d="M19 114 L33 114 L26 126 Z" fill="#555" />
-              <rect x="11" y="3" width="30" height="10" rx="2" fill="#F9A0A0" />
-              <rect x="11" y="10" width="30" height="4" fill="#1B9BD1" />
-              <line x1="20" y1="14" x2="20" y2="95" stroke="rgba(255,255,255,0.4)" strokeWidth="3" strokeLinecap="round" />
-            </svg>
+            <img src="../../assets/icons/pencil.svg" alt="pencil icon" className="canvas-pencil" />
           </div>
 
         </div>

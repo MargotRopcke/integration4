@@ -10,12 +10,9 @@ export function StepPhotos({ takePictures, onChoose, onBack }) {
   const [showPopup, setShowPopup] = useState(false);
 
   return (
-    <FormStepLayout id="step-6" current={6} onBack={onBack}>
+    <FormStepLayout id="step-6" current={6} onBack={onBack} title={"Take pictures during the experience?"} >
 
       <div className="photos-header">
-        <h1 className="form-heading photos-heading">
-          Take pictures during experience?
-        </h1>
         <p className="photos-desc">
           <strong>6 Pictures</strong> will be taken of you during the
           experience to create <strong>a photo collage</strong>.
