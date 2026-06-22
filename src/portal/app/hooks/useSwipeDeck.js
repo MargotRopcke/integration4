@@ -24,6 +24,8 @@ export function useSwipeDeck({
   const [overlayLike,    setOverlayLike]    = useState(0);
   const [overlayNope,    setOverlayNope]    = useState(0);
 
+  const [matchLocation, setMatchLocation] = useState(null);
+
   // ── Countdown state ─────────────────────────────────────────────────────────
   const [countdownVisible, setCountdownVisible] = useState(false);
   const [countdownText,    setCountdownText]    = useState("");
@@ -154,9 +156,8 @@ export function useSwipeDeck({
     }, 360);
   }, [onDeckDone]);
 
-  const triggerCountdownAndVote = useCallback((liked) => {
+  const triggerCountdownAndVote = useCallback(() => {
     if (countdownActiveRef.current) return;
-    if (!liked) { commitVote(false); return; }
     if (likesCountRef.current >= MAX_LIKES) return;
 
     // When no photos: skip countdown entirely, just vote
@@ -208,8 +209,27 @@ export function useSwipeDeck({
     if (deckIndexRef.current >= deckRef.current.length) return;
     if (countdownActiveRef.current) return;
     if (tutorialActiveRef.current) return;
-    triggerCountdownAndVote(liked);
-  }, [triggerCountdownAndVote]);
+    if (matchLocation) return; // Prevent double trigger while match popup is active
+
+    if (!liked) {
+      commitVote(false);
+      return;
+    }
+
+    if (likesCountRef.current >= MAX_LIKES) return;
+
+    const loc = deckRef.current[deckIndexRef.current];
+    if (!loc) return;
+
+    // Show match popup FIRST
+    setMatchLocation(loc);
+
+    // Wait 1.5 seconds, then continue to countdown/vote
+    setTimeout(() => {
+      setMatchLocation(null);
+      triggerCountdownAndVote();
+    }, 1500);
+  }, [commitVote, triggerCountdownAndVote, matchLocation]);
 
   const handleGoBack = useCallback(() => {
     const currentIdx = deckIndexRef.current;
@@ -284,6 +304,7 @@ export function useSwipeDeck({
     setLikedLocations([]);
     setLikesCount(0);
     setReactionPhotos([]);
+    setMatchLocation(null);
     setSwipeDone(false);
     setCardSwipeClass("");
     setTutorialActive(false);
@@ -351,6 +372,7 @@ export function useSwipeDeck({
     overlayLike, overlayNope,
     countdownVisible, countdownText, countdownCheese, flashActive, setFlashActive,
     tutorialActive, tutorialStep, tutorialHoldBars,
+    matchLocation, setMatchLocation,
     // refs (shared with camera hook and index.jsx)
     deckRef, deckIndexRef, likesCountRef, likedLocationsRef, reactionPhotosRef,
     countdownActiveRef, tutorialActiveRef, tutorialStepRef, cardLoadedTimeRef,

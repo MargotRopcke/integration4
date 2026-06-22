@@ -279,6 +279,8 @@ export default function FormPage({ loaderData }) {
             categoryLabel={categoryLabel}
             progressPct={progressPct}
             likedLocations={deck.likedLocations}
+            matchLocation={deck.matchLocation}
+            setMatchLocation={deck.setMatchLocation}
           />
         )}
 

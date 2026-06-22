@@ -130,7 +130,7 @@ function SwipeMiniMap({ latitude, longitude }) {
 function MatchPopup({ location, onDismiss }) {
   useEffect(() => {
     if (!location) return;
-    const t = setTimeout(onDismiss, 2200);
+    const t = setTimeout(onDismiss, 1500); // reduced from 2200 to 1500ms
     return () => clearTimeout(t);
   }, [location, onDismiss]);
 
@@ -208,14 +208,9 @@ export function StepSwipe({
   onVote, onGoBack, onShowResults, onReset,
   categoryLabel,
   likedLocations,
+  matchLocation,
+  setMatchLocation,
 }) {
-  const [matchLocation, setMatchLocation] = useState(null);
-
-  useEffect(() => {
-    if (likedLocations.length > 0 && !swipeDone) {
-      setMatchLocation(likedLocations[likedLocations.length - 1]);
-    }
-  }, [likedLocations.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
@@ -351,7 +346,7 @@ export function StepSwipe({
         </>
       )}
 
-      <MatchPopup location={matchLocation} onDismiss={() => setMatchLocation(null)} />
+      <MatchPopup location={matchLocation} onDismiss={() => setMatchLocation && setMatchLocation(null)} />
 
       <DoneOverlay
         visible={swipeDone}
