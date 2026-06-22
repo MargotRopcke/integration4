@@ -12,32 +12,52 @@
 }
 
 .intro-title-block {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  margin-bottom: -5.3vh;
+  z-index: 1;
+}
+
+.intro-title-block-first {
+  display: grid;
+  grid-template-columns: 20vh 1fr 20vh;
+  align-items: end;
+  margin-bottom: -6vh;
 }
 
 .intro-sticker--lips {
   align-self: end;
+  width: 19vh;
+  z-index: 2;
+  padding-bottom: 3vh;
+  position: relative;
+  left: 4vw;
 }
 
 .intro-sticker--bag {
-  align-self: start;
+  width: 19vh;
+}
+
+.intro-sticker--lips img,
+.intro-sticker--bag img {
+  width: 100%;
+  height: auto;
 }
 
 .intro-title-the {
   font-family: var(--font-primary);
-  font-size: 30vh;
+  font-size: 20vh;
   font-weight: 400;
   color: var(--color-creamy-vanilla);
   line-height: 1;
   text-align: center;
-  margin-bottom: -11vh;
+  margin-bottom: 2vh;
 }
 
 .intro-title-portal {
   font-family: var(--font-primary);
-  font-size: 26vh;
+  font-size: 18vh;
   color: var(--color-dark-teal);
   font-weight: 400;
   line-height: 0.85;
@@ -56,7 +76,7 @@
 }
 
 .intro-card-photo {
-  max-width: 50vw;
+  max-width: 40vh;
   box-sizing: border-box;
 }
 
@@ -64,42 +84,21 @@
   font-family: var(--font-secondary);
   font-size: var(--size-md);
   color: var(--color-text-blue);
-  max-width: 40vw;
+  max-width: 40vh;
   text-align: center;
 }
 
 .intro-cta {
-  grid-area: cta;
-  width: 100%;
-  display: grid;
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "cta-btn"
-    "cta-icon"
-    "cta-badge";
   justify-items: center;
-  align-items: center;
-  padding: var(--space-xl) var(--space-md) var(--space-xl);
-  gap: var(--space-sm);
 }
 
 .btn-intro {
-  grid-area: cta-btn;
   font-family: var(--font-secondary);
   font-size: var(--size-base);
   font-weight: var(--weight-bold);
   color: var(--color-creamy-vanilla);
   background: transparent;
   border: none;
-  padding: 0;
-  cursor: pointer;
-  letter-spacing: 0.01em;
-  opacity: 0.9;
-  transition: opacity 0.2s;
-}
-
-.btn-intro:active {
-  opacity: 0.6;
 }
 
 .intro-portal-icon {
@@ -110,21 +109,13 @@
   place-items: center;
 }
 
-/* ── Antwerp badge — in flow at bottom of CTA ── */
 .intro-antwerp-badge {
-  grid-area: cta-badge;
-  justify-self: end;
+  position: fixed;
+  bottom: var(--space-md);
+  right: var(--space-md);
   width: 56px;
   height: 56px;
   background: var(--color-blood-orange);
   border: 2.5px solid var(--color-creamy-vanilla);
   border-radius: 6px;
-  display: grid;
-  place-items: center;
-  margin-right: var(--space-md);
-}
-
-.intro-antwerp-badge svg {
-  width: 36px;
-  height: 36px;
 }
