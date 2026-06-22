@@ -32,6 +32,8 @@ AI tools were used throughout the project as a development aid. They were primar
 
 To ensure transparency regarding AI usage, every pull request requires the completion of an AI usage questionnaire. Contributors must document whether AI was used, how it was used and which parts of the implementation were influenced by AI-generated suggestions before a merge can be approved.
 
+See the figma for more detail: https://www.figma.com/design/mpJdmvMZZ3YsKBAPYG6O1x/INT4?node-id=203-11718&t=SjhZnUqHX3G5SI3Y-1
+
  
 ## setup
 To run the project on your own machine, follow these steps:
