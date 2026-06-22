@@ -29,6 +29,12 @@
   font-weight: var(--weight-bold);
   color: var(--color-text-blue);
   text-align: center;
+  color: var(--style-text-blue, #144552);
+  font-family: SunAntwerpen;
+  font-size: 3.75rem;
+  font-style: normal;
+  font-weight: 350;
+  line-height: normal;
 }
 
 .bd-options-row {
@@ -61,16 +67,38 @@
   transition: background 0.2s, color 0.2s, transform 0.15s;
   min-height: 64px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1rem;
 }
-.bd-btn:active     { transform: scale(0.95); }
-.bd-btn--active    { background: var(--color-creamy-vanilla); color: var(--color-blood-orange); }
-.bd-btn__icon-img  { width: 28px; height: 28px; object-fit: contain; filter: invert(1); }
-.bd-btn--active .bd-btn__icon-img { filter: none; }
-.bd-btn__label     { font-family: var(--font-secondary); font-size: var(--size-xs); font-weight: var(--weight-bold); line-height: 1; }
+
+.bd-btn:active {
+  transform: scale(0.95);
+}
+
+.bd-btn--active {
+  background: var(--color-creamy-vanilla);
+  color: var(--color-blood-orange);
+}
+
+.bd-btn__icon-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: invert(1);
+}
+
+.bd-btn--active .bd-btn__icon-img {
+  filter: none;
+}
+
+.bd-btn__label {
+  font-family: var(--font-secondary);
+  font-size: var(--size-xs);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+}
 
 .bd-sub {
   font-family: var(--font-secondary);

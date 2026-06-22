@@ -27,8 +27,6 @@ export function StepBudgetDistance({ budget, distance, onBudget, onDistance, onN
 
   return (
     <FormStepLayout id="step-5" current={5} onBack={onBack} title={"Shape the path to where you want to be."}>
-
-
       <div className="bd-container">
 
         {/* ── BUDGET ── */}

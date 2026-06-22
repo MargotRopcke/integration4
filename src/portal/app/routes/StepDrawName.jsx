@@ -3,14 +3,7 @@ import { FormStepLayout } from "../layouts/FormStepLayout";
 
 export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
   return (
-    <FormStepLayout id="step-1" current={1} className="step-draw">
-      <div className="form-header step-draw__header">
-        <h1 className="form-heading">Hey there! <br /> Ready to make your own version of Antwerp?</h1>
-        <p className="form-subheading">
-          Most visitors see the same city. The Portal helps you discover local Antwerp your way.
-        </p>
-      </div>
-
+    <FormStepLayout id="step-1" current={1} className="step-draw" title={"Hey there! Ready to make your own version of Antwerp?"} subtitle="Most visitors see the same city. The Portal helps you discover local Antwerp your way.">
       <div className="canvas-wrapper">
         <div className="canvas-grid">
 
@@ -57,6 +50,6 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
 
         <p className="canvas-privacy-note">Your experience is private and only visible to you.</p>
       </div>
-    </FormStepLayout>
+    </FormStepLayout >
   );
 }

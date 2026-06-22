@@ -19,11 +19,12 @@ import { StepProgress } from "../components/StepProgress";
 export function FormStepLayout({ id, current, total = 6, onBack, className = "", title, subtitle = "", children }) {
   return (
     <div className={`step-container ${className}`} id={id}>
-
-      {onBack && <BackButton onClick={onBack} />}
-      <div className="title-container">
-        {title && <h1 className="title">{title}</h1>}
-        {subtitle && <p className="subtitle">{subtitle}</p>}
+      <div className="header-container">
+        {onBack && <BackButton onClick={onBack} />}
+        <div className="title-container">
+          {title && <h1 className="title">{title}</h1>}
+          {subtitle && <p className="subtitle">{subtitle}</p>}
+        </div>
       </div>
       {children}
       <StepProgress current={current} total={total} />
