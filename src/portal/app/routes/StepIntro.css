@@ -1,15 +1,7 @@
-/* ── Page shell ── */
 .step-intro {
-  display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
-  /*                  title card  sub  gap  cta        */
-  grid-template-areas:
-    "title"
-    "card"
-    "sub"
-    "."
-    "cta";
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-items: center;
   width: 100%;
   min-height: 100%;
@@ -19,55 +11,38 @@
   overflow-y: auto;
 }
 
-/* ── Hero title block ── */
-/*
-  3-column grid: [lips] [text] [bag]
-  Row 1: lips span, "THE" in middle, bag span
-  Row 2: (empty)   "PORTAL"  (empty)
-  The stickers sit in their own column cells — no absolute positioning.
-*/
 .intro-title-block {
-  grid-area: title;
-  width: 100%;
-  padding: var(--space-xl) var(--space-md) 0;
-  box-sizing: border-box;
-
   display: grid;
-  grid-template-columns: clamp(55px, 14vw, 90px) 1fr clamp(45px, 11vw, 72px);
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    "lips  the  bag"
-    ".     portal  .";
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
-  column-gap: var(--space-sm);
 }
 
 .intro-sticker--lips {
-  grid-area: lips;
   align-self: end;
 }
 
 .intro-sticker--bag {
-  grid-area: bag;
   align-self: start;
 }
 
 .intro-title-the {
-  font-family: var(--font-Antwerpen-Tall);
-  font-size: 10rem;
+  font-family: var(--font-primary);
+  font-size: 30vh;
+  font-weight: 400;
   color: var(--color-creamy-vanilla);
   line-height: 1;
   text-align: center;
+  margin-bottom: -11vh;
 }
 
 .intro-title-portal {
-  grid-area: portal;
-  font-family: var(--font-Antwerpen-Tall);
-  font-size: clamp(3.8rem, 22vw, 9rem);
-  color: var(--color-dark-teal, #1a4a4a);
+  font-family: var(--font-primary);
+  font-size: 26vh;
+  color: var(--color-dark-teal);
+  font-weight: 400;
   line-height: 0.85;
   text-align: center;
-  margin-top: -0.12em;
+  grid-column: 2;
 }
 
 .intro-card {
