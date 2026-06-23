@@ -77,3 +77,37 @@ database-data.md – Description of the initial data and its contents.
 5. Start the application
 
 Once the QR code URL, environment variables, and database have been configured, you can run the project locally.
+
+## Printer Setup Guide
+
+The portal prints the final photocollage automatically through the server-side `/print` route ([src/portal/app/services/print.js](src/portal/app/services/print.js)), which shells out to your OS's native print command. Since it doesn't go through a print dialog, the printer needs to be configured **on the machine running the portal server** before going live.
+
+### 1. Connect the printer
+Plug in or pair the printer (USB or Wi-Fi) to the host machine and install its OS driver as you normally would, so it shows up as a regular system printer.
+
+### 2. Find the exact printer name
+- **Windows**: Settings → Bluetooth & devices → Printers & scanners → copy the printer's exact display name.
+- **macOS/Linux**: run `lpstat -p` in a terminal to list configured printer names (CUPS).
+
+### 3. Update the config in `print.js`
+Open [print.js:16](src/portal/app/services/print.js:16) and set:
+```js
+const PRINTER_NAME = "Your Exact Printer Name";
+```
+The name must match exactly — it's passed straight into the OS print command.
+
+### 4. Windows only — install SumatraPDF
+On Windows, silent (no-dialog) printing requires [SumatraPDF](https://www.sumatrapdfreader.org/download-free-pdf-viewer). Install it, then update [print.js:21](src/portal/app/services/print.js:21):
+```js
+const SUMATRA_PATH = "C:\\Path\\To\\SumatraPDF.exe";
+```
+If SumatraPDF isn't found at that path, the code falls back to `mspaint`'s print-to dialog, which is **not silent** — a window may flash up during printing.
+
+macOS/Linux don't need anything extra; they use the built-in `lp` command (CUPS), which is installed by default.
+
+### 5. Test it
+With the dev server running, POST a small base64 JPEG to `/print` (or just walk through the portal's flow to the printing step) and confirm a physical page comes out. Check the server console for errors if `success: false` is returned — common issues are a typo'd `PRINTER_NAME` or the printer being offline.
+
+### Notes
+- Printing is forced to grayscale (`monochrome` / `ColorModel=Gray`) and scaled to fit the page automatically.
+- Each print job writes a temporary `_collage_print.jpg` to the project root before sending it to the printer — this file is overwritten on every print, not cleaned up automatically.
