@@ -130,7 +130,7 @@ function SwipeMiniMap({ latitude, longitude }) {
 function MatchPopup({ location, onDismiss, takePictures }) {
   useEffect(() => {
     if (!location) return;
-    const t = setTimeout(onDismiss, 1500); // reduced from 2200 to 1500ms
+    const t = setTimeout(onDismiss, 2500);
     return () => clearTimeout(t);
   }, [location, onDismiss]);
 
@@ -149,11 +149,11 @@ function MatchPopup({ location, onDismiss, takePictures }) {
           </svg>
 
           <div className="match-popup-polaroid">
+            <div className="match-popup-sticker">
+              <img src="/assets/match.svg" alt="It's a match!" />
+            </div>
             <div className="match-popup-photo-wrap">
               {location.image && <img src={location.image} alt={location.name} className="match-popup-img" />}
-              <div className="match-popup-sticker">
-                <img src="/assets/match.svg" alt="It's a match!" />
-              </div>
             </div>
             <h2 className="match-popup-name">{location.name}</h2>
           </div>
@@ -281,12 +281,19 @@ export function StepSwipe({
         </div>
       )}
 
-      {/* Live swipe UI */}
       {!tutorialActive && (
         <>
-          <div className="swipe-bottom">
+          {gestureDetected && gestureType && (
+            <div className="swipe-top-gesture-hint">
+              <GestureProgressIcon
+                gesture={gestureType}
+                progress={gestureProgress}
+                size={80}
+              />
+            </div>
+          )}
 
-            {/* Polaroid stack */}
+          <div className="swipe-bottom">
             <div className="swipe-polaroid-stack">
               <div className="swipe-counter">{likesCount}/{MAX_LIKES}</div>
               <div className="swipe-stack-cards">
@@ -309,7 +316,8 @@ export function StepSwipe({
                 >
                   <GestureProgressIcon
                     gesture="thumbsUp"
-                    progress={gestureType === "thumbsUp" ? gestureProgress : 0}
+                    progress={100}
+                    pulse={false}
                     size={60}
                   />
                 </button>
@@ -322,7 +330,8 @@ export function StepSwipe({
                 >
                   <GestureProgressIcon
                     gesture="stopHand"
-                    progress={gestureType === "stopHand" ? gestureProgress : 0}
+                    progress={100}
+                    pulse={false}
                     size={65}
                   />
                 </button>
@@ -334,7 +343,8 @@ export function StepSwipe({
                 >
                   <GestureProgressIcon
                     gesture="thumbsDown"
-                    progress={gestureType === "thumbsDown" ? gestureProgress : 0}
+                    progress={100}
+                    pulse={false}
                     size={60}
                   />
                 </button>

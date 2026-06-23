@@ -44,13 +44,13 @@ const GESTURES = {
  * @param {number} progress  0–100. 0 = idle (faint), 100 = full + pulse.
  * @param {number} size      Height in px. Width scales with viewBox aspect ratio.
  */
-export function GestureProgressIcon({ gesture, progress = 0, size = 60 }) {
+export function GestureProgressIcon({ gesture, progress = 0, size = 60, pulse = true }) {
   const uid = useId();
   const g = GESTURES[gesture];
   if (!g) return null;
 
   const pct     = Math.min(Math.max(progress, 0), 100);
-  const done    = pct >= 100;
+  const done    = pct >= 100 && pulse;
   const aspect  = g.w / g.h;
   const clipTop = g.h - (g.h * pct) / 100;
 

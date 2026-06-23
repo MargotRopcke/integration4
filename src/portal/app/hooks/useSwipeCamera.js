@@ -225,29 +225,19 @@ export function useSwipeCamera({
                   // Tutorial progress bars
                   const ts2 = tutorialStepRef.current;
                   const correctTutorial =
-                      tutorialActiveRef.current && (
-                          (ts2 === 2 && gesture === "thumbsUp") ||
-                          (ts2 === 3 && gesture === "thumbsDown") ||
-                          (ts2 === 4 && gesture === "stopHand")
-                      );
+                    tutorialActiveRef.current && (
+                      (ts2 === 2 && gesture === "thumbsUp") ||
+                      (ts2 === 3 && gesture === "thumbsDown") ||
+                      (ts2 === 4 && gesture === "stopHand")
+                    );
                   setTutorialHoldBars(correctTutorial
-                      ? (prev) => ({ ...prev, [ts2]: pct * 100 })
-                      : { 2: 0, 3: 0, 4: 0 });
+                    ? (prev) => ({ ...prev, [ts2]: pct * 100 })
+                    : { 2: 0, 3: 0, 4: 0 });
 
                   setGestureDetected(true);
                   if (gesture === "thumbsUp") setGestureStatus(`👍 Hold (${elapsed.toFixed(1)}s)${pct >= 1 ? " ✓ LIKED!" : ""}`);
                   else if (gesture === "thumbsDown") setGestureStatus(`👎 Hold (${elapsed.toFixed(1)}s)${pct >= 1 ? " ✓ NOPE!" : ""}`);
                   else if (gesture === "stopHand") setGestureStatus(`✋ Hold (${elapsed.toFixed(1)}s)${pct >= 1 ? " ✓ BACK!" : ""}`);
-
-                  // Arc progress (drawn only when swiping locations, not during tutorial)
-                  if (!tutorialActiveRef.current) {
-                    const cx = canvas.width * 0.5, cy = 80;
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, 30, -Math.PI / 2, -Math.PI / 2 + pct * 2 * Math.PI);
-                    ctx.strokeStyle = gesture === "thumbsUp" ? "#2ecc71" : gesture === "thumbsDown" ? "#e74c3c" : "#00c6ff";
-                    ctx.lineWidth = 4;
-                    ctx.stroke();
-                  }
 
                   if (elapsed >= GESTURE_HOLD_SECONDS) {
                     if (tutorialActiveRef.current && !correctTutorial) return;

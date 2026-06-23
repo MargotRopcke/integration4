@@ -71,7 +71,6 @@ export function TutorialScreen({ tutorialStep, tutorialHoldBars, nextTutorialSte
     );
   }
 
-
   const cfg = TUTORIAL_CONFIG[tutorialStep];
   if (!cfg) return null;
 
