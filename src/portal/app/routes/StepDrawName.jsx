@@ -5,10 +5,11 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
   return (
     <FormStepLayout id="step-1" current={1} className="step-draw" title={"Hey there! Ready to make your own version of Antwerp?"} subtitle="Most visitors see the same city. The Portal helps you discover local Antwerp your way.">
       <div className="canvas-wrapper">
+        <div className="canvas-banner" aria-hidden="true">Your version Your version Your version Your version Your version Your version Your version Your version</div>
+
         <div className="canvas-grid">
 
           {/* Banner: rendered first so card sits on top of it via z-index */}
-          <div className="canvas-banner" aria-hidden="true">Your version</div>
 
           {/* Card: same grid area as banner, z-index 1 covers it */}
           <div className="canvas-container">

@@ -7,6 +7,7 @@
   align-items: center;
   width: 100%;
   gap: var(--space-md);
+  margin: 8rem;
 }
 
 /* ── Grid: [card] [pencil col] ──────────────────────────────────────────── */
@@ -16,7 +17,7 @@
   grid-template-areas: "card pencil";
   /* Card fills the wrapper height */
   flex: 1;
-  width: 100%;
+  width: 70vw;
   min-height: 0;
   overflow: hidden;
   border-radius: 1rem;
@@ -26,10 +27,9 @@
 .canvas-banner {
   grid-area: card;
   align-self: center;
-  justify-self: stretch;
   height: 2.5rem;
   width: 150%;
-  margin-left: -25%;
+  margin-bottom: -8rem;
   background: #9ac44a;
   color: #2a4a08;
   font-family: var(--font-secondary);
@@ -39,10 +39,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: rotate(-25deg);
-  z-index: 2;
-  pointer-events: none;
-  white-space: nowrap;
+  transform: rotate(-20deg);
+  z-index: 0;
+  border: 3px solid #2a4a08;
+
+
 }
 
 /* ── Red card ────────────────────────────────────────────────────────────── */
@@ -63,17 +64,13 @@
 .canvas-pencil-col {
   grid-area: pencil;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding-top: var(--space-md);
   z-index: 3;
+  margin-left: -6rem;
 }
 
-.canvas-pencil-svg {
-  width: 2.5rem;
-  height: auto;
-  transform: rotate(15deg);
-}
 
 /* ── Canvas title ───────────────────────────────────────────────────────── */
 .canvas-title-row {
@@ -153,6 +150,13 @@
   font-weight: var(--weight-bold);
   color: var(--color-text-blue);
   text-align: center;
-  opacity: 0.7;
-  flex-shrink: 0;
+
+
+}
+
+.canvas-pencil {
+  width: 14.625rem;
+  height: 19.75rem;
+  aspect-ratio: 97/131;
+  transform: rotate(15deg);
 }
