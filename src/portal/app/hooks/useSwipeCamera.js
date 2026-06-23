@@ -25,43 +25,45 @@ export function useSwipeCamera({
   cardLoadedTimeRef,
   setTutorialHoldBars,
 }) {
-  const [cameraReady,      setCameraReady]      = useState(false);
-  const [gestureStatus,    setGestureStatus]    = useState("📷 Camera loading…");
-  const [gestureDetected,  setGestureDetected]  = useState(false);
-  const [noCameraNotice,   setNoCameraNotice]   = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [gestureStatus, setGestureStatus] = useState("📷 Camera loading…");
+  const [gestureDetected, setGestureDetected] = useState(false);
+  const [noCameraNotice, setNoCameraNotice] = useState(false);
+  const [gestureProgress, setGestureProgress] = useState(0);
+  const [gestureType, setGestureType] = useState(null);
 
   // DOM refs (passed back so StepSwipe can attach them to elements)
-  const videoRef         = useRef(null);
+  const videoRef = useRef(null);
   const canvasOverlayRef = useRef(null);
-  const outputCanvasRef  = useRef(null);
-  const bgImageRef       = useRef(null);
+  const outputCanvasRef = useRef(null);
+  const bgImageRef = useRef(null);
 
   // Internal refs
-  const cameraReadyRef        = useRef(false);
-  const gestureRecRef         = useRef(null);
-  const selfieSegRef          = useRef(null);
-  const cameraInstanceRef     = useRef(null);
-  const currentGestureRef     = useRef(null);
-  const gestureStartTimeRef   = useRef(null);
-  const hasTriggeredRef       = useRef(false);
-  const showBgReplacementRef  = useRef(true);
+  const cameraReadyRef = useRef(false);
+  const gestureRecRef = useRef(null);
+  const selfieSegRef = useRef(null);
+  const cameraInstanceRef = useRef(null);
+  const currentGestureRef = useRef(null);
+  const gestureStartTimeRef = useRef(null);
+  const hasTriggeredRef = useRef(false);
+  const showBgReplacementRef = useRef(true);
 
   // Expose capturePhoto so useSwipeDeck can call it
   const capturePhoto = useCallback(() => {
     const video = videoRef.current;
     if (!video || !cameraReadyRef.current) return null;
 
-    const c   = document.createElement("canvas");
-    c.width   = 1280;
-    c.height  = 720;
+    const c = document.createElement("canvas");
+    c.width = 1280;
+    c.height = 720;
     const ctx = c.getContext("2d");
 
-    const out   = outputCanvasRef.current;
+    const out = outputCanvasRef.current;
     const bgImg = bgImageRef.current;
 
     if (showBgReplacementRef.current && bgImg && out) {
       ctx.drawImage(bgImg, 0, 0, 1280, 720);
-      ctx.drawImage(out,   0, 0, 1280, 720);
+      ctx.drawImage(out, 0, 0, 1280, 720);
     } else if (out) {
       ctx.drawImage(out, 0, 0, 1280, 720);
     } else {
@@ -74,7 +76,7 @@ export function useSwipeCamera({
   useEffect(() => {
     if (!active) return;
 
-    const video  = videoRef.current;
+    const video = videoRef.current;
     const canvas = canvasOverlayRef.current;
     if (!video || !canvas) return;
 
@@ -82,7 +84,7 @@ export function useSwipeCamera({
     const ctx = canvas.getContext("2d");
 
     const resizeCanvas = () => {
-      canvas.width  = window.innerWidth;
+      canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
     resizeCanvas();
@@ -102,7 +104,7 @@ export function useSwipeCamera({
       if (showBgReplacementRef.current) {
         ctx2.drawImage(results.segmentationMask, 0, 0, out.width, out.height);
         ctx2.globalCompositeOperation = "source-in";
-        ctx2.drawImage(results.image,            0, 0, out.width, out.height);
+        ctx2.drawImage(results.image, 0, 0, out.width, out.height);
       } else {
         ctx2.drawImage(results.image, 0, 0, out.width, out.height);
       }
@@ -149,8 +151,8 @@ export function useSwipeCamera({
           await gestureRecRef.current.setOptions({
             runningMode: "VIDEO",
             minHandDetectionConfidence: 0.4,
-            minHandPresenceConfidence:  0.4,
-            minTrackingConfidence:      0.4,
+            minHandPresenceConfidence: 0.4,
+            minTrackingConfidence: 0.4,
           });
         } catch (err) {
           console.error("Failed to init GestureRecognizer:", err);
@@ -187,11 +189,13 @@ export function useSwipeCamera({
                 (performance.now() - cardLoadedTimeRef.current < 2000);
 
               if (countdownActiveRef.current || inGrace) {
-                currentGestureRef.current   = null;
+                currentGestureRef.current = null;
                 gestureStartTimeRef.current = null;
-                hasTriggeredRef.current     = false;
+                hasTriggeredRef.current = false;
                 setGestureStatus("👋 Show thumbs up, thumbs down, or stop hand");
                 setGestureDetected(false);
+                setGestureProgress(0);
+                setGestureType(null);
                 setTutorialHoldBars({ 2: 0, 3: 0, 4: 0 });
               } else {
                 // Classify gesture
@@ -202,17 +206,19 @@ export function useSwipeCamera({
                     if (!top) continue;
                     const threshold = top.categoryName === "Open_Palm" ? 0.45 : 0.6;
                     if (top.score > threshold) {
-                      if      (top.categoryName === "Thumb_Up")   gesture = "thumbsUp";
+                      if (top.categoryName === "Thumb_Up") gesture = "thumbsUp";
                       else if (top.categoryName === "Thumb_Down") gesture = "thumbsDown";
-                      else if (top.categoryName === "Open_Palm")  gesture = "stopHand";
+                      else if (top.categoryName === "Open_Palm") gesture = "stopHand";
                     }
                   }
                 }
 
                 if (gesture === null || gesture !== currentGestureRef.current) {
-                  currentGestureRef.current   = gesture;
+                  currentGestureRef.current = gesture;
                   gestureStartTimeRef.current = gesture ? performance.now() : null;
-                  hasTriggeredRef.current     = false;
+                  hasTriggeredRef.current = false;
+                  setGestureProgress(0);
+                  setGestureType(gesture);
                   setTutorialHoldBars({ 2: 0, 3: 0, 4: 0 });
                   if (!gesture) {
                     setGestureStatus("👋 Show thumbs up, thumbs down, or stop hand");
@@ -220,38 +226,44 @@ export function useSwipeCamera({
                   }
                 } else if (!hasTriggeredRef.current) {
                   const elapsed = (performance.now() - gestureStartTimeRef.current) / 1000;
-                  const pct     = Math.min(elapsed / GESTURE_HOLD_SECONDS, 1);
+                  const pct = Math.min(elapsed / GESTURE_HOLD_SECONDS, 1);
+                  setGestureProgress(pct * 100);
+                  setGestureType(gesture);
 
                   // Tutorial progress bars
                   const ts2 = tutorialStepRef.current;
                   const correctTutorial =
-                    tutorialActiveRef.current && (
-                      (ts2 === 2 && gesture === "thumbsUp") ||
-                      (ts2 === 3 && gesture === "thumbsDown") ||
-                      (ts2 === 4 && gesture === "stopHand")
-                    );
+                      tutorialActiveRef.current && (
+                          (ts2 === 2 && gesture === "thumbsUp") ||
+                          (ts2 === 3 && gesture === "thumbsDown") ||
+                          (ts2 === 4 && gesture === "stopHand")
+                      );
                   setTutorialHoldBars(correctTutorial
-                    ? (prev) => ({ ...prev, [ts2]: pct * 100 })
-                    : { 2: 0, 3: 0, 4: 0 });
+                      ? (prev) => ({ ...prev, [ts2]: pct * 100 })
+                      : { 2: 0, 3: 0, 4: 0 });
 
                   setGestureDetected(true);
-                  if      (gesture === "thumbsUp")   setGestureStatus(`👍 Hold (${elapsed.toFixed(1)}s)${pct >= 1 ? " ✓ LIKED!" : ""}`);
+                  if (gesture === "thumbsUp") setGestureStatus(`👍 Hold (${elapsed.toFixed(1)}s)${pct >= 1 ? " ✓ LIKED!" : ""}`);
                   else if (gesture === "thumbsDown") setGestureStatus(`👎 Hold (${elapsed.toFixed(1)}s)${pct >= 1 ? " ✓ NOPE!" : ""}`);
-                  else if (gesture === "stopHand")   setGestureStatus(`✋ Hold (${elapsed.toFixed(1)}s)${pct >= 1 ? " ✓ BACK!" : ""}`);
+                  else if (gesture === "stopHand") setGestureStatus(`✋ Hold (${elapsed.toFixed(1)}s)${pct >= 1 ? " ✓ BACK!" : ""}`);
 
-                  // Arc progress
-                  const cx = canvas.width * 0.5, cy = 80;
-                  ctx.beginPath();
-                  ctx.arc(cx, cy, 30, -Math.PI / 2, -Math.PI / 2 + pct * 2 * Math.PI);
-                  ctx.strokeStyle = gesture === "thumbsUp" ? "#2ecc71" : gesture === "thumbsDown" ? "#e74c3c" : "#00c6ff";
-                  ctx.lineWidth   = 4;
-                  ctx.stroke();
+                  // Arc progress (drawn only when swiping locations, not during tutorial)
+                  if (!tutorialActiveRef.current) {
+                    const cx = canvas.width * 0.5, cy = 80;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 30, -Math.PI / 2, -Math.PI / 2 + pct * 2 * Math.PI);
+                    ctx.strokeStyle = gesture === "thumbsUp" ? "#2ecc71" : gesture === "thumbsDown" ? "#e74c3c" : "#00c6ff";
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                  }
 
                   if (elapsed >= GESTURE_HOLD_SECONDS) {
                     if (tutorialActiveRef.current && !correctTutorial) return;
-                    hasTriggeredRef.current     = true;
+                    hasTriggeredRef.current = true;
                     gestureStartTimeRef.current = null;
-                    currentGestureRef.current   = null;
+                    currentGestureRef.current = null;
+                    setGestureProgress(0);
+                    setGestureType(null);
                     handleGestureAction(gesture);
                     setTutorialHoldBars({ 2: 0, 3: 0, 4: 0 });
                   }
@@ -261,6 +273,7 @@ export function useSwipeCamera({
 
             // ── Selfie segmentation ────────────────────────────────────────
             if (selfieSegRef.current) {
+              showBgReplacementRef.current = !(tutorialActiveRef.current && tutorialStepRef.current >= 2);
               try { await selfieSegRef.current.send({ image: video }); } catch { /* ignore */ }
             }
           },
@@ -283,7 +296,7 @@ export function useSwipeCamera({
       cameraInstanceRef.current = null;
     };
   }, [active, handleGestureAction, countdownActiveRef, tutorialActiveRef,
-      tutorialStepRef, cardLoadedTimeRef, setTutorialHoldBars]);
+    tutorialStepRef, cardLoadedTimeRef, setTutorialHoldBars]);
 
   const stopCamera = useCallback(() => {
     try { cameraInstanceRef.current?.stop(); } catch { /* ignore */ }
@@ -293,6 +306,7 @@ export function useSwipeCamera({
   return {
     // state
     cameraReady, gestureStatus, gestureDetected, noCameraNotice,
+    gestureProgress, gestureType,
     // DOM refs for StepSwipe
     videoRef, canvasOverlayRef, outputCanvasRef, bgImageRef,
     // actions

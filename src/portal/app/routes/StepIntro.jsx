@@ -41,14 +41,16 @@ export function StepIntro({ onStart }) {
 
   return (
     <div className="step-intro" id="step-0" onClick={onStart}>
-
-      {/* ── Title block: 3-col grid [lips | THE/PORTAL | bag] ── */}
       <div className="intro-title-block">
-        <div className="intro-sticker--lips"><LipsSVG /></div>
-        <span className="intro-title-the">THE</span>
-        <div className="intro-sticker--bag"><BagSVG /></div>
-        {/* PORTAL spans the full middle column on row 2 */}
-        <span className="intro-title-portal">PORTAL</span>
+        <div className="intro-title-block-first">
+          <div className="intro-sticker--lips"><LipsSVG /></div>
+          <span className="intro-title-the">THE</span>
+          <div className="intro-sticker--bag"><BagSVG /></div>
+        </div>
+        <span className="intro-title-portal">
+          PORTAL
+          <div className="intro-portal-overlay-line" />
+        </span>
       </div>
 
       <div className="intro-card">
@@ -62,7 +64,6 @@ export function StepIntro({ onStart }) {
         </p>
       </div>
 
-      {/* ── CTA: grid [button / icon / badge] ── */}
       <div className="intro-cta">
         <button
           className="btn-intro"
@@ -75,11 +76,11 @@ export function StepIntro({ onStart }) {
         <div className="intro-portal-icon">
           <div ref={containerRef} style={{ width: 80, height: 80 }} />
         </div>
-
-        <div className="intro-antwerp-badge" aria-label="Visit Antwerp">
-          <img src="../../assets/icons/a-logo.svg" alt="logo visit antwerp" />
-        </div>
       </div>
+      <div className="intro-antwerp-badge" aria-label="Visit Antwerp">
+        <img src="../../assets/icons/a-logo.svg" alt="logo visit antwerp" />
+      </div>
+
 
     </div>
   );

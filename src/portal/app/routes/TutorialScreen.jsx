@@ -78,7 +78,13 @@ export function TutorialScreen({ tutorialStep, tutorialHoldBars, nextTutorialSte
   const progress = tutorialHoldBars?.[tutorialStep] ?? 0;
 
   return (
-    <div className="tutorial-screen tutorial-screen--gesture">
+    <div
+      className="tutorial-screen tutorial-screen--gesture"
+      style={{
+        background: `${cfg.panelBg}40`, /* 25% opacity colored overlay */
+        transition: "background 0.3s ease",
+      }}
+    >
 
       <div className="tutorial-icons">
         {/* Small progress icon — fills as user holds */}
@@ -92,12 +98,15 @@ export function TutorialScreen({ tutorialStep, tutorialHoldBars, nextTutorialSte
         </div>
       </div>
 
-      <div className="tutorial-panel" style={{ background: cfg.panelBg }}>
-        <h2 className="tutorial-heading" style={{ color: cfg.titleColor }}>{cfg.title}</h2>
+      <div
+        className="tutorial-panel"
+        style={{
+          background: `${cfg.panelBg}e6`,
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+        }}
+      >        <h2 className="tutorial-heading" style={{ color: cfg.titleColor }}>{cfg.title}</h2>
         <p className="tutorial-body" style={{ color: cfg.titleColor }}>{cfg.desc}</p>
-        <div className="tutorial-hold-track">
-          <div className="tutorial-hold-fill" style={{ width: `${progress}%`, background: cfg.titleColor }} />
-        </div>
       </div>
     </div>
   );

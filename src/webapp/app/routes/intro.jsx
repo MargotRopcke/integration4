@@ -3,7 +3,6 @@ import { getSessionLocations } from '../data';
 import { NoUserFallback } from "../components/NoUserFallback";
 import "./intro.css";
 
-// intro.jsx
 export async function clientLoader({ request }) {
   let userId = new URL(request.url).searchParams.get('user');
   console.log('userId from URL:', userId, typeof userId);
@@ -25,7 +24,6 @@ export async function clientLoader({ request }) {
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
   );
 
-  // Raw query to see exactly what's in the table
   const { data, error } = await supabase
     .from("sessions_photos")
     .select("*")
@@ -49,8 +47,6 @@ export default function Intro() {
 
   console.log('sessionPhotos:', sessionPhotos);
   console.log('first photo value:', sessionPhotos?.[0]?.photo?.slice(0, 50));
-  // Prefer the user's own reaction selfies for the polaroids;
-  // fall back to location images if no photos were captured.
   const polaroidSources = (
     sessionPhotos && sessionPhotos.length > 0
       ? sessionPhotos.slice(0, 6).map((p) => {
@@ -74,7 +70,7 @@ export default function Intro() {
               hi
             </h1>
             {session?.photo_name
-              ? <img src={session.photo_name} alt="your name" style={{ width: '30%', height: '30%', objectFit: 'cover' }} />
+              ? <img className="welcome-name" src={session.photo_name} alt="your name" />
               : "Traveler"}
           </div>
           <p className="subtitle">The {session?.traveler_type?.name || "Explorer"}</p>

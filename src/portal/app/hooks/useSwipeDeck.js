@@ -2,6 +2,42 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { getFilteredLocations } from "../services/data";
 import { MAX_LIKES } from "../constants/constants";
 
+// Programmatic camera click sound using Web Audio API
+const playCameraSound = () => {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const audioCtx = new AudioContextClass();
+    
+    // Noise burst representing the shutter click
+    const bufferSize = audioCtx.sampleRate * 0.08; // 80ms burst
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "highpass";
+    filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.07);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    noise.start();
+  } catch (err) {
+    console.warn("Failed to play camera sound:", err);
+  }
+};
+
 export function useSwipeDeck({
   active,
   chosenCategory,
@@ -23,6 +59,8 @@ export function useSwipeDeck({
   const [cardSwipeClass, setCardSwipeClass] = useState("");
   const [overlayLike,    setOverlayLike]    = useState(0);
   const [overlayNope,    setOverlayNope]    = useState(0);
+
+  const [matchLocation, setMatchLocation] = useState(null);
 
   // ── Countdown state ─────────────────────────────────────────────────────────
   const [countdownVisible, setCountdownVisible] = useState(false);
@@ -46,6 +84,8 @@ export function useSwipeDeck({
   const tutorialStepRef    = useRef(1);
   const cardLoadedTimeRef  = useRef(0);
   const cardRef            = useRef(null);
+  const onResetRef         = useRef(null);
+  const onShowResultsRef   = useRef(null);
 
   // ── capturePhoto ref — written by index.jsx after camera initialises ─────────
   // useSwipeCamera.capturePhoto() returns a dataUrl string or null.
@@ -154,9 +194,8 @@ export function useSwipeDeck({
     }, 360);
   }, [onDeckDone]);
 
-  const triggerCountdownAndVote = useCallback((liked) => {
+  const triggerCountdownAndVote = useCallback(() => {
     if (countdownActiveRef.current) return;
-    if (!liked) { commitVote(false); return; }
     if (likesCountRef.current >= MAX_LIKES) return;
 
     // When no photos: skip countdown entirely, just vote
@@ -176,6 +215,12 @@ export function useSwipeDeck({
 
         // Call capturePhoto via ref — returns dataUrl, store it immediately
         if (capturePhotoRef.current) {
+          playCameraSound();
+          setFlashActive(true);
+          setTimeout(() => {
+            setFlashActive(false);
+          }, 150);
+
           const dataUrl = capturePhotoRef.current();
           if (dataUrl) {
             const loc = deckRef.current[deckIndexRef.current];
@@ -208,8 +253,27 @@ export function useSwipeDeck({
     if (deckIndexRef.current >= deckRef.current.length) return;
     if (countdownActiveRef.current) return;
     if (tutorialActiveRef.current) return;
-    triggerCountdownAndVote(liked);
-  }, [triggerCountdownAndVote]);
+    if (matchLocation) return; // Prevent double trigger while match popup is active
+
+    if (!liked) {
+      commitVote(false);
+      return;
+    }
+
+    if (likesCountRef.current >= MAX_LIKES) return;
+
+    const loc = deckRef.current[deckIndexRef.current];
+    if (!loc) return;
+
+    // Show match popup FIRST
+    setMatchLocation(loc);
+
+    // Wait 1.5 seconds, then continue to countdown/vote
+    setTimeout(() => {
+      setMatchLocation(null);
+      triggerCountdownAndVote();
+    }, 1500);
+  }, [commitVote, triggerCountdownAndVote, matchLocation]);
 
   const handleGoBack = useCallback(() => {
     const currentIdx = deckIndexRef.current;
@@ -267,10 +331,20 @@ export function useSwipeDeck({
 
   const handleGestureAction = useCallback((gesture) => {
     if (tutorialActiveRef.current) { handleTutorialGesture(gesture); return; }
+
+    if (swipeDone) {
+      if (gesture === "thumbsDown") {
+        if (onResetRef.current) onResetRef.current();
+      } else if (gesture === "thumbsUp") {
+        if (onShowResultsRef.current) onShowResultsRef.current();
+      }
+      return;
+    }
+
     if (gesture === "thumbsUp")        handleVote(true);
     else if (gesture === "thumbsDown") handleVote(false);
     else if (gesture === "stopHand")   handleGoBack();
-  }, [handleTutorialGesture, handleVote, handleGoBack]);
+  }, [handleTutorialGesture, handleVote, handleGoBack, swipeDone]);
 
   // ── Reset ────────────────────────────────────────────────────────────────────
   const resetDeck = useCallback(() => {
@@ -284,6 +358,7 @@ export function useSwipeDeck({
     setLikedLocations([]);
     setLikesCount(0);
     setReactionPhotos([]);
+    setMatchLocation(null);
     setSwipeDone(false);
     setCardSwipeClass("");
     setTutorialActive(false);
@@ -351,11 +426,14 @@ export function useSwipeDeck({
     overlayLike, overlayNope,
     countdownVisible, countdownText, countdownCheese, flashActive, setFlashActive,
     tutorialActive, tutorialStep, tutorialHoldBars,
+    matchLocation, setMatchLocation,
     // refs (shared with camera hook and index.jsx)
     deckRef, deckIndexRef, likesCountRef, likedLocationsRef, reactionPhotosRef,
     countdownActiveRef, tutorialActiveRef, tutorialStepRef, cardLoadedTimeRef,
     capturePhotoRef,
     cardRef,
+    onResetRef,
+    onShowResultsRef,
     // actions
     handleVote, handleGoBack, handleGestureAction,
     nextTutorialStep, finishTutorial,

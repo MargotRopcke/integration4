@@ -22,6 +22,12 @@
   opacity: 0.8;
   line-height: 1.6;
   margin: 0 0 var(--space-sm);
+}
+
+.photos-desc strong {
+  font-weight: var(--weight-bold);
+  opacity: 1;
+
   color: var(--style-text-blue, #144552);
   font-family: SunAntwerpen;
   font-size: 2.25rem;
@@ -77,6 +83,16 @@
   justify-content: center;
   margin: 0 calc(-1 * var(--space-xl));
   min-height: 0;
+}
+
+.photos-gridlines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%),
+    repeating-linear-gradient(to bottom, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%);
+  opacity: 0.08;
+  pointer-events: none;
   background: url(../../assets/bg-grid.svg);
   width: 100vw;
 }
@@ -110,6 +126,18 @@
   transform: scale(0.96) !important;
 }
 
+.polaroid:active {
+  transform: scale(0.96) !important;
+}
+
+.polaroid--yes {
+  transform: rotate(-6deg) translateY(-10px);
+}
+
+.polaroid--no {
+  transform: rotate(5deg) translateY(10px);
+}
+
 .polaroid--yes {
   transform: rotate(-6deg) translateY(-10px);
 }
@@ -124,9 +152,9 @@
   border: 5px solid var(--color-blood-orange);
   border-radius: 4px;
   padding: var(--space-sm) var(--space-sm) 2.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   position: relative;
 }
+
 
 .polaroid__photo img {
   width: 100%;
@@ -134,11 +162,6 @@
   object-fit: cover;
   display: block;
   border-radius: 2px;
-  border: 3px solid var(--color-blood-orange);
-}
-
-.polaroid__photo--no img {
-  filter: saturate(0.5) brightness(0.85);
 }
 
 .polaroid__label {
@@ -155,5 +178,5 @@
   font-style: normal;
   font-weight: 500;
   line-height: normal;
-  
+
 }

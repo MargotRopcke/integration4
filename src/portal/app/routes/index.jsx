@@ -167,6 +167,10 @@ export default function FormPage({ loaderData }) {
     setStep(0);
   }, [deck, print, camera]);
 
+  // Bind DoneOverlay callback refs for gestures
+  deck.onResetRef.current = handleReset;
+  deck.onShowResultsRef.current = () => setStep(8);
+
   // ── Derived values ───────────────────────────────────────────────────────────
   const currentCard = deck.deck[deck.deckIndex] ?? null;
   const progressPct = deck.deck.length > 0 ? (deck.deckIndex / deck.deck.length) * 100 : 0;
@@ -266,6 +270,8 @@ export default function FormPage({ loaderData }) {
             nextTutorialStep={deck.nextTutorialStep}
             gestureStatus={camera.gestureStatus}
             gestureDetected={camera.gestureDetected}
+            gestureProgress={camera.gestureProgress}
+            gestureType={camera.gestureType}
             noCameraNotice={camera.noCameraNotice}
             videoRef={camera.videoRef}
             canvasOverlayRef={camera.canvasOverlayRef}
@@ -279,6 +285,8 @@ export default function FormPage({ loaderData }) {
             categoryLabel={categoryLabel}
             progressPct={progressPct}
             likedLocations={deck.likedLocations}
+            matchLocation={deck.matchLocation}
+            setMatchLocation={deck.setMatchLocation}
           />
         )}
 

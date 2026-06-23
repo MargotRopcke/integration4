@@ -73,13 +73,13 @@ export function GestureProgressIcon({ gesture, progress = 0, size = 60 }) {
           </clipPath>
         </defs>
 
-        {/* Base layer — always visible, very faint — shows shape at rest */}
+        {/* Base layer — always visible — shows shape at rest */}
         <path
           d={g.path}
           fill={g.fill}
-          fillOpacity={0.15}
+          fillOpacity={0.45}
           stroke={g.stroke}
-          strokeOpacity={0.3}
+          strokeOpacity={1.0}
           strokeWidth={g.sw}
           strokeLinecap="round"
           strokeLinejoin="round"

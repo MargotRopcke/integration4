@@ -23,7 +23,6 @@
   align-items: stretch;
   cursor: pointer;
   transition: transform 0.2s ease;
-  box-shadow: 0 6px 20px rgba(225, 59, 44, 0.25);
   overflow: visible;
   width: 30vw;
 }

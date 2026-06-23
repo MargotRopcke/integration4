@@ -34,6 +34,9 @@
   grid-template-columns: 1fr 1fr;
   width: 100vw;
   height: 50vh;
+  gap: 0;
+  /* lines are the separators — no extra gap */
+  position: relative;
   z-index: 1;
   padding: var(--space-xl);
   background: url(../../assets/bg-grid.svg);
@@ -45,6 +48,8 @@
   align-items: center;
   justify-content: center;
   margin: var(--space-md) var(--space-xxl);
+  margin: var(--space-md) var(--space-xl);
+  /* inset from the grid lines */
   padding: var(--space-md) var(--space-lg);
   border-radius: var(--border-radius);
   border: none;
@@ -56,6 +61,10 @@
 
   color: var(--style-creamy-vanilla, #FDFEEF);
 
+}
+
+.vibe-pill:active {
+  transform: scale(0.95);
 }
 
 .vibe-pill:active {
@@ -80,7 +89,6 @@
   background: transparent;
   color: var(--color-blood-orange);
   border: 3px solid var(--color-blood-orange);
-  box-shadow: none;
   font-size: var(--size-lg);
   font-weight: var(--weight-bold);
   padding: 0.75rem 3rem;

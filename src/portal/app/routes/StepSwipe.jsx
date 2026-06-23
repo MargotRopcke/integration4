@@ -1,14 +1,136 @@
 import "./StepSwipe.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MAX_LIKES } from "../constants/constants.js";
 import { TutorialScreen } from "./TutorialScreen.jsx";
 import { GestureProgressIcon } from "../components/GestureIcons.jsx";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+
+// ── Mini Map for Location Card ───────────────────────────────────────────────
+function SwipeMiniMap({ latitude, longitude }) {
+  const containerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    // Initialize MapLibre Map
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      center: [lng - 0.010, lat + 0.004],
+      zoom: 12.0,
+      attributionControl: false,
+      interactive: false,
+    });
+
+    mapRef.current = map;
+
+    map.on("load", () => {
+      map.resize();
+    });
+
+    setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.resize();
+      }
+    }, 100);
+
+    // Custom coloring to match screenshot styles
+    map.on("styledata", () => {
+      if (map.getLayer("water")) {
+        map.setPaintProperty("water", "fill-color", "#74a3cc");
+      }
+      if (map.getLayer("background")) {
+        map.setPaintProperty("background", "background-color", "#fff2e0");
+      }
+
+      const allLayers = map.getStyle().layers;
+      allLayers.forEach((layer) => {
+        if (
+          layer.type === "line" &&
+          (layer.id.includes("road") || layer.id.includes("highway") || layer.id.includes("rail"))
+        ) {
+          try {
+            map.setPaintProperty(layer.id, "line-color", "#f7c247bf");
+          } catch (e) { }
+        }
+      });
+
+      allLayers.forEach((layer) => {
+        if (
+          layer.id.includes("building") ||
+          layer.id.includes("poi") ||
+          layer.id.includes("label") ||
+          layer.id.includes("park") ||
+          layer.id.includes("leisure")
+        ) {
+          if (!layer.id.includes("water") && !layer.id.includes("road")) {
+            try {
+              map.setLayoutProperty(layer.id, "visibility", "none");
+            } catch (e) { }
+          }
+        }
+      });
+    });
+
+    // Create customized red/orange marker representing location dot
+    const el = document.createElement("div");
+    el.className = "swipe-map-marker";
+    el.style.width = "16px";
+    el.style.height = "16px";
+    el.style.borderRadius = "50%";
+    el.style.backgroundColor = "#e03c31";
+    el.style.border = "3px solid #fff2e0";
+    el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+
+    const marker = new maplibregl.Marker({ element: el })
+      .setLngLat([lng, lat])
+      .addTo(map);
+
+    markerRef.current = marker;
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      if (markerRef.current) {
+        markerRef.current.remove();
+        markerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Dynamically jump to next location when swiping/changing cards
+  useEffect(() => {
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    if (isNaN(lat) || isNaN(lng) || !mapRef.current) return;
+
+    mapRef.current.jumpTo({
+      center: [lng - 0.010, lat + 0.004],
+      zoom: 12.0,
+    });
+
+    if (markerRef.current) {
+      markerRef.current.setLngLat([lng, lat]);
+    }
+  }, [latitude, longitude]);
+
+  return <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />;
+}
 
 // ── Match popup ───────────────────────────────────────────────────────────────
 function MatchPopup({ location, onDismiss }) {
   useEffect(() => {
     if (!location) return;
-    const t = setTimeout(onDismiss, 2200);
+    const t = setTimeout(onDismiss, 1500); // reduced from 2200 to 1500ms
     return () => clearTimeout(t);
   }, [location, onDismiss]);
 
@@ -38,9 +160,9 @@ function DoneOverlay({ visible, likesCount, gestureType, gestureProgress, onShow
       <div className="done-card">
         <div className="done-gesture-hint">
           <GestureProgressIcon
-            gesture={gestureType || "thumbsUp"}
-            progress={gestureType ? gestureProgress : 0}
-            size={56}
+            gesture="thumbsUp"
+            progress={gestureType === "thumbsUp" ? gestureProgress : 0}
+            size={48}
           />
         </div>
         <h2 className="done-title">You've seen it all.</h2>
@@ -50,19 +172,19 @@ function DoneOverlay({ visible, likesCount, gestureType, gestureProgress, onShow
             : `You have ${MAX_LIKES - likesCount} likes left.`}
         </p>
         <div className="done-actions">
-          <button className="done-action-btn" onClick={onShowResults}>
-            <GestureProgressIcon
-              gesture="thumbsUp"
-              progress={gestureType === "thumbsUp" ? gestureProgress : 0}
-              size={48}
-            />
-            <span>Swipe again</span>
-          </button>
           <button className="done-action-btn" onClick={onReset}>
             <GestureProgressIcon
               gesture="thumbsDown"
               progress={gestureType === "thumbsDown" ? gestureProgress : 0}
               size={48}
+            />
+            <span>Swipe again</span>
+          </button>
+          <button className="done-action-btn" onClick={onShowResults}>
+            <GestureProgressIcon
+              gesture={gestureType || "thumbsUp"}
+              progress={gestureType ? gestureProgress : 0}
+              size={56}
             />
             <span>Finish</span>
           </button>
@@ -86,14 +208,9 @@ export function StepSwipe({
   onVote, onGoBack, onShowResults, onReset,
   categoryLabel,
   likedLocations,
+  matchLocation,
+  setMatchLocation,
 }) {
-  const [matchLocation, setMatchLocation] = useState(null);
-
-  useEffect(() => {
-    if (likedLocations.length > 0 && !swipeDone) {
-      setMatchLocation(likedLocations[likedLocations.length - 1]);
-    }
-  }, [likedLocations.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
@@ -123,7 +240,7 @@ export function StepSwipe({
       <video ref={videoRef} style={{ display: "none" }} autoPlay playsInline muted />
 
       {/* Fullscreen background */}
-      <div className="swipe-bg" style={{ opacity: tutorialActive ? 0 : 1 }}>
+      <div className="swipe-bg" style={{ opacity: (tutorialActive && tutorialStep === 1) ? 0 : 1 }}>
         {currentCard && (
           <img ref={bgImageRef} className="swipe-bg__img" src={currentCard.image} alt="" crossOrigin="anonymous" />
         )}
@@ -131,17 +248,7 @@ export function StepSwipe({
       </div>
 
       {/* Hand landmark canvas */}
-      <canvas ref={canvasOverlayRef} className="swipe-landmark-canvas" style={{ opacity: tutorialActive ? 0 : 1 }} />
-
-      {/* Gesture hint — always on top, including during tutorial */}
-      <div
-        className={`swipe-gesture-hint${gestureDetected && gestureType ? " swipe-gesture-hint--active" : ""}`}
-        style={{ zIndex: tutorialActive ? 110 : 20 }}
-      >
-        {gestureDetected && gestureType && (
-          <GestureProgressIcon gesture={gestureType} progress={gestureProgress} size={70} />
-        )}
-      </div>
+      <canvas ref={canvasOverlayRef} className="swipe-landmark-canvas" style={{ opacity: (tutorialActive && tutorialStep === 1) ? 0 : 1 }} />
 
       {/* Tutorial overlay */}
       {tutorialActive && (
@@ -173,62 +280,65 @@ export function StepSwipe({
               </div>
             </div>
 
-            {/* Gesture buttons — same icon, same component as everywhere else */}
-            <div className="swipe-gesture-btns" style={{ pointerEvents: tutorialActive ? "none" : "auto" }}>
-              <button
-                className={`swipe-gesture-btn swipe-gesture-btn--like${gestureType === "thumbsUp" ? " swipe-gesture-btn--active" : ""}`}
-                onClick={() => onVote(true)}
-                title="Like"
-              >
-                <GestureProgressIcon
-                  gesture="thumbsUp"
-                  progress={gestureType === "thumbsUp" ? gestureProgress : 0}
-                  size={34}
-                />
-              </button>
+            <div className="swipe-bottom__actions">
+              <div className="swipe-gesture-btns" style={{ pointerEvents: tutorialActive ? "none" : "auto" }}>
+                <button
+                  className={`swipe-gesture-btn swipe-gesture-btn--like${gestureType === "thumbsUp" ? " swipe-gesture-btn--active" : ""}`}
+                  onClick={() => onVote(true)}
+                  title="Like"
+                >
+                  <GestureProgressIcon
+                    gesture="thumbsUp"
+                    progress={gestureType === "thumbsUp" ? gestureProgress : 0}
+                    size={60}
+                  />
+                </button>
 
-              <button
-                className={`swipe-gesture-btn swipe-gesture-btn--undo${gestureType === "stopHand" ? " swipe-gesture-btn--active" : ""}`}
-                onClick={onGoBack}
-                title="Undo"
-                style={{ opacity: deckIndex > 0 ? 1 : 0.35, pointerEvents: !tutorialActive && deckIndex > 0 ? "auto" : "none" }}
-              >
-                <GestureProgressIcon
-                  gesture="stopHand"
-                  progress={gestureType === "stopHand" ? gestureProgress : 0}
-                  size={26}
-                />
-              </button>
+                <button
+                  className={`swipe-gesture-btn swipe-gesture-btn--undo${gestureType === "stopHand" ? " swipe-gesture-btn--active" : ""}`}
+                  onClick={onGoBack}
+                  title="Undo"
+                  style={{ opacity: deckIndex > 0 ? 1 : 0.80, pointerEvents: !tutorialActive && deckIndex > 0 ? "auto" : "none" }}
+                >
+                  <GestureProgressIcon
+                    gesture="stopHand"
+                    progress={gestureType === "stopHand" ? gestureProgress : 0}
+                    size={65}
+                  />
+                </button>
 
-              <button
-                className={`swipe-gesture-btn swipe-gesture-btn--dislike${gestureType === "thumbsDown" ? " swipe-gesture-btn--active" : ""}`}
-                onClick={() => onVote(false)}
-                title="Dislike"
-              >
-                <GestureProgressIcon
-                  gesture="thumbsDown"
-                  progress={gestureType === "thumbsDown" ? gestureProgress : 0}
-                  size={34}
-                />
-              </button>
-            </div>
-
-            {/* Location card */}
-            {currentCard && (
-              <div
-                className={`swipe-location-card${cardSwipeClass ? ` ${cardSwipeClass}` : ""}`}
-                ref={cardRef}
-                style={{ pointerEvents: tutorialActive ? "none" : "auto" }}
-              >
-                <div className="swipe-location-card__map" />
-                <div className="swipe-location-card__info">
-                  <div className="swipe-location-card__name">{currentCard.name}</div>
-                  <div className="swipe-location-card__type">{categoryLabel}</div>
-                </div>
-                <div className="card-vote-overlay like" style={{ opacity: overlayLike }}>LIKE ✓</div>
-                <div className="card-vote-overlay nope" style={{ opacity: overlayNope }}>NOPE ✗</div>
+                <button
+                  className={`swipe-gesture-btn swipe-gesture-btn--dislike${gestureType === "thumbsDown" ? " swipe-gesture-btn--active" : ""}`}
+                  onClick={() => onVote(false)}
+                  title="Dislike"
+                >
+                  <GestureProgressIcon
+                    gesture="thumbsDown"
+                    progress={gestureType === "thumbsDown" ? gestureProgress : 0}
+                    size={60}
+                  />
+                </button>
               </div>
-            )}
+
+              {currentCard && (
+                <div
+                  className={`swipe-location-card${cardSwipeClass ? ` ${cardSwipeClass}` : ""}`}
+                  ref={cardRef}
+                  style={{ pointerEvents: tutorialActive ? "none" : "auto" }}
+                >
+                  <div className="swipe-location-card__map">
+                    <SwipeMiniMap latitude={currentCard.latitude} longitude={currentCard.longitude} />
+                  </div>
+                  <div className="swipe-location-card__info">
+                    <div className="swipe-location-card__name">{currentCard.name}</div>
+                    <div className="swipe-location-card__type">{currentCard.specialization_categories?.name || categoryLabel}</div>
+                  </div>
+                  <div className="card-vote-overlay like" style={{ opacity: overlayLike }}>LIKE ✓</div>
+                  <div className="card-vote-overlay nope" style={{ opacity: overlayNope }}>NOPE ✗</div>
+                </div>
+              )}
+
+            </div>
           </div>
 
           {noCameraNotice && (
@@ -237,7 +347,7 @@ export function StepSwipe({
         </>
       )}
 
-      <MatchPopup location={matchLocation} onDismiss={() => setMatchLocation(null)} />
+      <MatchPopup location={matchLocation} onDismiss={() => setMatchLocation && setMatchLocation(null)} />
 
       <DoneOverlay
         visible={swipeDone}

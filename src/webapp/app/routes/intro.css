@@ -1,11 +1,13 @@
 .intro {
-  padding-top: 2vh;
-  padding-bottom: 2vh;
   background: var(--color-blood-orange);
   color: var(--color-creamy-vanilla);
   max-width: 100%;
   overflow: hidden;
   min-height: 100vh;
+}
+
+.mobile-container {
+  margin-top: 1vh;
 }
 
 .header-section {
@@ -15,16 +17,19 @@
 
 .header-text-wrapper {
   display: flex;
-  align-items: center;
+  align-items: end;
   justify-content: center;
 }
 
 .welcome-text {
   font-family: var(--font-primary);
   font-size: 4.375rem;
-  /* keep hero h1 custom size for massive impact */
   font-weight: var(--weight-regular);
   text-transform: uppercase;
+}
+
+.welcome-name {
+  height: 14vh;
 }
 
 .subtitle {

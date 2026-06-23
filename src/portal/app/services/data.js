@@ -156,7 +156,7 @@ export async function getFilteredLocations({ categoryId, vibeIds, budget, distan
   try {
     let query = supabase
       .from("locations")
-      .select("*, location_vibes!inner(vibe_category_id)")
+      .select("*, specialization_categories(name), location_vibes!inner(vibe_category_id)")
       .not("image", "is", null);
 
     // Safely check categoryId before adding the filter
