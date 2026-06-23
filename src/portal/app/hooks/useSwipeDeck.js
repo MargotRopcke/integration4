@@ -84,6 +84,8 @@ export function useSwipeDeck({
   const tutorialStepRef    = useRef(1);
   const cardLoadedTimeRef  = useRef(0);
   const cardRef            = useRef(null);
+  const onResetRef         = useRef(null);
+  const onShowResultsRef   = useRef(null);
 
   // ── capturePhoto ref — written by index.jsx after camera initialises ─────────
   // useSwipeCamera.capturePhoto() returns a dataUrl string or null.
@@ -329,10 +331,20 @@ export function useSwipeDeck({
 
   const handleGestureAction = useCallback((gesture) => {
     if (tutorialActiveRef.current) { handleTutorialGesture(gesture); return; }
+
+    if (swipeDone) {
+      if (gesture === "thumbsDown") {
+        if (onResetRef.current) onResetRef.current();
+      } else if (gesture === "thumbsUp") {
+        if (onShowResultsRef.current) onShowResultsRef.current();
+      }
+      return;
+    }
+
     if (gesture === "thumbsUp")        handleVote(true);
     else if (gesture === "thumbsDown") handleVote(false);
     else if (gesture === "stopHand")   handleGoBack();
-  }, [handleTutorialGesture, handleVote, handleGoBack]);
+  }, [handleTutorialGesture, handleVote, handleGoBack, swipeDone]);
 
   // ── Reset ────────────────────────────────────────────────────────────────────
   const resetDeck = useCallback(() => {
@@ -420,6 +432,8 @@ export function useSwipeDeck({
     countdownActiveRef, tutorialActiveRef, tutorialStepRef, cardLoadedTimeRef,
     capturePhotoRef,
     cardRef,
+    onResetRef,
+    onShowResultsRef,
     // actions
     handleVote, handleGoBack, handleGestureAction,
     nextTutorialStep, finishTutorial,

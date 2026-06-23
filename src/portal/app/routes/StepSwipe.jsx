@@ -160,9 +160,9 @@ function DoneOverlay({ visible, likesCount, gestureType, gestureProgress, onShow
       <div className="done-card">
         <div className="done-gesture-hint">
           <GestureProgressIcon
-            gesture={gestureType || "thumbsUp"}
-            progress={gestureType ? gestureProgress : 0}
-            size={56}
+            gesture="thumbsUp"
+            progress={gestureType === "thumbsUp" ? gestureProgress : 0}
+            size={48}
           />
         </div>
         <h2 className="done-title">You've seen it all.</h2>
@@ -172,19 +172,19 @@ function DoneOverlay({ visible, likesCount, gestureType, gestureProgress, onShow
             : `You have ${MAX_LIKES - likesCount} likes left.`}
         </p>
         <div className="done-actions">
-          <button className="done-action-btn" onClick={onShowResults}>
-            <GestureProgressIcon
-              gesture="thumbsUp"
-              progress={gestureType === "thumbsUp" ? gestureProgress : 0}
-              size={48}
-            />
-            <span>Swipe again</span>
-          </button>
           <button className="done-action-btn" onClick={onReset}>
             <GestureProgressIcon
               gesture="thumbsDown"
               progress={gestureType === "thumbsDown" ? gestureProgress : 0}
               size={48}
+            />
+            <span>Swipe again</span>
+          </button>
+          <button className="done-action-btn" onClick={onShowResults}>
+            <GestureProgressIcon
+              gesture={gestureType || "thumbsUp"}
+              progress={gestureType ? gestureProgress : 0}
+              size={56}
             />
             <span>Finish</span>
           </button>
