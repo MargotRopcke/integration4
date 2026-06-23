@@ -41,7 +41,6 @@ function SwipeMiniMap({ latitude, longitude }) {
       }
     }, 100);
 
-    // Custom coloring to match screenshot styles
     map.on("styledata", () => {
       if (map.getLayer("water")) {
         map.setPaintProperty("water", "fill-color", "#74a3cc");
