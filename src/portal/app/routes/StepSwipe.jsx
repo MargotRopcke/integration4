@@ -23,7 +23,7 @@ function SwipeMiniMap({ latitude, longitude }) {
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-      center: [lng - 0.025, lat + 0.010],
+      center: [lng - 0.010, lat + 0.004],
       zoom: 12.0,
       attributionControl: false,
       interactive: false,
@@ -114,7 +114,7 @@ function SwipeMiniMap({ latitude, longitude }) {
     if (isNaN(lat) || isNaN(lng) || !mapRef.current) return;
 
     mapRef.current.jumpTo({
-      center: [lng - 0.025, lat + 0.010],
+      center: [lng - 0.010, lat + 0.004],
       zoom: 12.0,
     });
 
