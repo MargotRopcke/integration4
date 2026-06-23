@@ -53,15 +53,20 @@ export function StepIntro({ onStart }) {
         </span>
       </div>
 
-      <div className="intro-card">
-        <div className="intro-card-photo">
-          <div className="intro-card-photo-wrap">
-            <SilhouetteSVG />
-          </div>
+      <div className="intro-card-wrapper">
+        <div className="intro-street-photo-bg">
+          <StreetPhoto />
         </div>
-        <p className="intro-subheading">
-          One step and you enter your version of Antwerp.
-        </p>
+        <div className="intro-card">
+          <div className="intro-card-photo">
+            <div className="intro-card-photo-wrap">
+              <SilhouetteSVG />
+            </div>
+          </div>
+          <p className="intro-subheading">
+            One step and you enter your version of Antwerp.
+          </p>
+        </div>
       </div>
 
       <div className="intro-cta">
