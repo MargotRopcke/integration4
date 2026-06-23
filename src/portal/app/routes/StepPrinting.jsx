@@ -17,8 +17,8 @@ export function StepPrinting({ status, collageUrl, errorMsg, onRetry, onSkip }) 
       {/* Status text top */}
       <div className="printing-top">
         {status === "printing" && <h2 className="printing-title">Printing...</h2>}
-        {status === "done"     && <h2 className="printing-title printing-title--done">Done! ✓</h2>}
-        {status === "error"    && <h2 className="printing-title printing-title--error">Error</h2>}
+        {status === "done" && <h2 className="printing-title printing-title--done">Done! ✓</h2>}
+        {status === "error" && <h2 className="printing-title printing-title--error">Error</h2>}
       </div>
 
       {/* Collage sliding up from the bottom */}
@@ -36,7 +36,7 @@ export function StepPrinting({ status, collageUrl, errorMsg, onRetry, onSkip }) 
       {/* Error actions */}
       {status === "error" && (
         <div className="printing-error-actions">
-          <p className="printing-error-msg">{errorMsg || "Couldn't reach the printer."}</p>
+          <p className="printing-error-msg">{"Couldn't reach the printer."}</p>
           <button className="btn-form" onClick={onRetry}>↺ Try Again</button>
           <button className="btn-form btn-form--secondary" onClick={onSkip}>Skip →</button>
         </div>

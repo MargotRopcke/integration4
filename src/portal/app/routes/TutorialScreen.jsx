@@ -71,7 +71,6 @@ export function TutorialScreen({ tutorialStep, tutorialHoldBars, nextTutorialSte
     );
   }
 
-
   const cfg = TUTORIAL_CONFIG[tutorialStep];
   if (!cfg) return null;
 
@@ -81,18 +80,16 @@ export function TutorialScreen({ tutorialStep, tutorialHoldBars, nextTutorialSte
     <div
       className="tutorial-screen tutorial-screen--gesture"
       style={{
-        background: `${cfg.panelBg}40`, /* 25% opacity colored overlay */
+        background: "rgba(250, 252, 240, 0.45)",
         transition: "background 0.3s ease",
       }}
     >
 
       <div className="tutorial-icons">
-        {/* Small progress icon — fills as user holds */}
         <div className="tutorial-icon tutorial-icon--progress">
           <GestureProgressIcon gesture={cfg.gesture} progress={progress} size={72} />
         </div>
 
-        {/* Large instruction icon — always fully shown so user knows what gesture to make */}
         <div className="tutorial-icon tutorial-icon--instruction">
           <GestureProgressIcon gesture={cfg.gesture} progress={100} size={150} />
         </div>

@@ -127,10 +127,10 @@ function SwipeMiniMap({ latitude, longitude }) {
 }
 
 // ── Match popup ───────────────────────────────────────────────────────────────
-function MatchPopup({ location, onDismiss }) {
+function MatchPopup({ location, onDismiss, takePictures }) {
   useEffect(() => {
     if (!location) return;
-    const t = setTimeout(onDismiss, 1500); // reduced from 2200 to 1500ms
+    const t = setTimeout(onDismiss, 2500);
     return () => clearTimeout(t);
   }, [location, onDismiss]);
 
@@ -139,14 +139,33 @@ function MatchPopup({ location, onDismiss }) {
   return (
     <div className="match-popup-overlay" onClick={onDismiss}>
       <div className="match-popup-card" onClick={e => e.stopPropagation()}>
-        <div className="match-popup-photo">
-          {location.image && <img src={location.image} alt={location.name} />}
-          <div className="match-popup-sticker">
-            <img src="/assets/match.svg" alt="It's a match!" />
+        <h1 className="match-popup-title">This one seems to fit you.</h1>
+
+        <div className="match-popup-middle-row">
+          <svg className="match-popup-side match-popup-side--left" width="86" height="168" viewBox="0 0 86 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.860524 0.50941 0.50941 0.860524 70.7171 108.236)" fill="#FFCD00" />
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.99958 0.0289681 0.0289681 0.99958 66.7171 64.3145)" fill="#FFCD00" />
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.931333 -0.36417 -0.36417 0.931333 78.7171 24.3066)" fill="#FFCD00" />
+          </svg>
+
+          <div className="match-popup-polaroid">
+            <div className="match-popup-sticker">
+              <img src="/assets/match.svg" alt="It's a match!" />
+            </div>
+            <div className="match-popup-photo-wrap">
+              {location.image && <img src={location.image} alt={location.name} className="match-popup-img" />}
+            </div>
+            <h2 className="match-popup-name">{location.name}</h2>
           </div>
+
+          <svg className="match-popup-side match-popup-side--right" width="86" height="168" viewBox="0 0 86 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.860524 0.50941 0.50941 0.860524 70.7171 108.236)" fill="#FFCD00" />
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.99958 0.0289681 0.0289681 0.99958 66.7171 64.3145)" fill="#FFCD00" />
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.931333 -0.36417 -0.36417 0.931333 78.7171 24.3066)" fill="#FFCD00" />
+          </svg>
         </div>
-        <h2 className="match-popup-name">{location.name}</h2>
-        <p className="match-popup-sub">Ready to take a picture?</p>
+
+        {takePictures === "yes" && <p className="match-popup-sub">Ready to take a picture?</p>}
       </div>
     </div>
   );
@@ -210,6 +229,7 @@ export function StepSwipe({
   likedLocations,
   matchLocation,
   setMatchLocation,
+  takePictures,
 }) {
 
   if (loading) {
@@ -261,12 +281,19 @@ export function StepSwipe({
         </div>
       )}
 
-      {/* Live swipe UI */}
       {!tutorialActive && (
         <>
-          <div className="swipe-bottom">
+          {gestureDetected && gestureType && (
+            <div className="swipe-top-gesture-hint">
+              <GestureProgressIcon
+                gesture={gestureType}
+                progress={gestureProgress}
+                size={80}
+              />
+            </div>
+          )}
 
-            {/* Polaroid stack */}
+          <div className="swipe-bottom">
             <div className="swipe-polaroid-stack">
               <div className="swipe-counter">{likesCount}/{MAX_LIKES}</div>
               <div className="swipe-stack-cards">
@@ -289,7 +316,8 @@ export function StepSwipe({
                 >
                   <GestureProgressIcon
                     gesture="thumbsUp"
-                    progress={gestureType === "thumbsUp" ? gestureProgress : 0}
+                    progress={100}
+                    pulse={false}
                     size={60}
                   />
                 </button>
@@ -302,7 +330,8 @@ export function StepSwipe({
                 >
                   <GestureProgressIcon
                     gesture="stopHand"
-                    progress={gestureType === "stopHand" ? gestureProgress : 0}
+                    progress={100}
+                    pulse={false}
                     size={65}
                   />
                 </button>
@@ -314,7 +343,8 @@ export function StepSwipe({
                 >
                   <GestureProgressIcon
                     gesture="thumbsDown"
-                    progress={gestureType === "thumbsDown" ? gestureProgress : 0}
+                    progress={100}
+                    pulse={false}
                     size={60}
                   />
                 </button>
@@ -347,7 +377,11 @@ export function StepSwipe({
         </>
       )}
 
-      <MatchPopup location={matchLocation} onDismiss={() => setMatchLocation && setMatchLocation(null)} />
+      <MatchPopup
+        location={matchLocation}
+        onDismiss={() => setMatchLocation && setMatchLocation(null)}
+        takePictures={takePictures}
+      />
 
       <DoneOverlay
         visible={swipeDone}
