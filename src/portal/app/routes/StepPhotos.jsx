@@ -11,7 +11,7 @@ export function StepPhotos({ takePictures, onChoose, onBack }) {
 
   return (
     <FormStepLayout id="step-6" current={6} onBack={onBack} title={"Take pictures during the experience?"} >
-
+      <div className="sticker-photo-container"><img src="../../assets/photo.svg" alt="photo sticker" className="sticker-photo" /></div>
       <div className="photos-header">
         <p className="photos-desc">
           <strong>6 Pictures</strong> will be taken of you during the

@@ -8,7 +8,7 @@ const BUDGET_OPTIONS = [
 ];
 
 const DISTANCE_OPTIONS = [
-  { value: "walking (0-2km)", label: "walking", sub: "0-2km", icon: "../../assets/icons/walk.svg" },
+  { value: "walk (0-2km)", label: "walking", sub: "0-2km", icon: "../../assets/icons/walk.svg" },
   { value: "bike (2-5km)", label: "bike", sub: "2-5km", icon: "../../assets/icons/bike.svg" },
   { value: "tram (if possible)", label: "tram", sub: "if possible", icon: "../../assets/icons/tram.svg" },
 ];
@@ -27,6 +27,9 @@ export function StepBudgetDistance({ budget, distance, onBudget, onDistance, onN
 
   return (
     <FormStepLayout id="step-5" current={5} onBack={onBack} title={"Shape the path to where you want to be."}>
+      <div className="sticker-money-container">
+        <img className="sticker-money" src="../../assets/money.png" alt="money sticker" />
+      </div>
       <div className="bd-container">
 
         {/* ── BUDGET ── */}
@@ -68,6 +71,9 @@ export function StepBudgetDistance({ budget, distance, onBudget, onDistance, onN
           </div>
         </div>
 
+      </div>
+      <div className="sticker-distance-container">
+        <img className="sticker-distance" src="../../assets/distance.svg" alt="distance sticker" />
       </div>
     </FormStepLayout>
   );

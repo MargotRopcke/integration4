@@ -14,13 +14,14 @@
   justify-content: center;
   gap: var(--space-xxl);
   width: 100%;
+
 }
 
 .bd-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-xl);
 }
 
 .bd-group-title {
@@ -48,33 +49,38 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-md);
   flex: 1;
-  max-width: 130px;
+  width: 60vw;
+
 }
 
 .bd-btn {
-  width: 100%;
+
   padding: var(--space-md) var(--space-sm);
   border-radius: var(--border-radius);
   border: 3px solid var(--color-blood-orange);
   background: var(--color-blood-orange);
   color: var(--color-creamy-vanilla);
-  font-family: var(--font-primary);
-  font-size: clamp(1.3rem, 4vw, 1.8rem);
+  font-family: var(--font-secondary);
+  font-size: clamp(2.5rem, 4vw, 1.8rem);
   font-weight: var(--weight-regular);
-  cursor: pointer;
+
   transition: background 0.2s, color 0.2s, transform 0.15s;
-  min-height: 64px;
+  min-height: 6rem;
+  min-width: 10rem;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+
+
 }
 
 .bd-btn:active {
   transform: scale(0.95);
+  color: var(--color-blood-orange);
+  background: var(--color-creamy-vanilla);
 }
 
 .bd-btn--active {
@@ -98,6 +104,11 @@
   font-size: var(--size-xs);
   font-weight: var(--weight-bold);
   line-height: 1;
+  color: var(--style-creamy-vanilla, #FDFEEF);
+  font-size: 3.4375rem;
+  font-weight: 350;
+
+
 }
 
 .bd-sub {
@@ -106,4 +117,32 @@
   color: var(--color-text-blue);
   opacity: 0.6;
   text-align: center;
+  color: var(--style-text-blue, #144552);
+  font-size: 2.25rem;
+
+}
+
+.sticker-money-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100vw;
+  margin: 0 0 -20rem;
+  overflow: hidden;
+}
+
+.sticker-distance-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100vw;
+  height: 10vh;
+
+}
+
+
+.sticker-distance {
+
+  width: 31.9375rem;
+  height: 20.4375rem;
 }
