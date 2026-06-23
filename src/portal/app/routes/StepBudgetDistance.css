@@ -52,11 +52,9 @@
   gap: var(--space-md);
   flex: 1;
   width: 60vw;
-
 }
 
 .bd-btn {
-
   padding: var(--space-md) var(--space-sm);
   border-radius: var(--border-radius);
   border: 3px solid var(--color-blood-orange);
@@ -65,22 +63,14 @@
   font-family: var(--font-secondary);
   font-size: clamp(2.5rem, 4vw, 1.8rem);
   font-weight: var(--weight-regular);
-
   transition: background 0.2s, color 0.2s, transform 0.15s;
   min-height: 6rem;
   min-width: 10rem;
   display: flex;
   flex-direction: row;
+  gap: var(--space-md);
   align-items: center;
   justify-content: center;
-
-
-}
-
-.bd-btn:active {
-  transform: scale(0.95);
-  color: var(--color-blood-orange);
-  background: var(--color-creamy-vanilla);
 }
 
 .bd-btn--active {
@@ -88,15 +78,21 @@
   color: var(--color-blood-orange);
 }
 
-.bd-btn__icon-img {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  filter: invert(1);
+.bd-btn--active .bd-btn__label {
+  color: var(--color-blood-orange);
 }
 
-.bd-btn--active .bd-btn__icon-img {
-  filter: none;
+.bd-btn__icon {
+  display: block;
+}
+
+.bd-btn__icon path {
+  stroke: var(--color-creamy-vanilla);
+  transition: stroke 0.2s;
+}
+
+.bd-btn--active .bd-btn__icon path {
+  stroke: var(--color-blood-orange);
 }
 
 .bd-btn__label {
@@ -107,8 +103,6 @@
   color: var(--style-creamy-vanilla, #FDFEEF);
   font-size: 3.4375rem;
   font-weight: 350;
-
-
 }
 
 .bd-sub {
@@ -140,9 +134,7 @@
 
 }
 
-
 .sticker-distance {
-
   width: 31.9375rem;
   height: 20.4375rem;
 }

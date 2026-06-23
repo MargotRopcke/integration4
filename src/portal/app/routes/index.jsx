@@ -287,6 +287,7 @@ export default function FormPage({ loaderData }) {
             likedLocations={deck.likedLocations}
             matchLocation={deck.matchLocation}
             setMatchLocation={deck.setMatchLocation}
+            takePictures={takePictures}
           />
         )}
 

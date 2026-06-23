@@ -127,7 +127,7 @@ function SwipeMiniMap({ latitude, longitude }) {
 }
 
 // ── Match popup ───────────────────────────────────────────────────────────────
-function MatchPopup({ location, onDismiss }) {
+function MatchPopup({ location, onDismiss, takePictures }) {
   useEffect(() => {
     if (!location) return;
     const t = setTimeout(onDismiss, 1500); // reduced from 2200 to 1500ms
@@ -165,7 +165,7 @@ function MatchPopup({ location, onDismiss }) {
           </svg>
         </div>
 
-        <p className="match-popup-sub">Ready to take a picture?</p>
+        {takePictures === "yes" && <p className="match-popup-sub">Ready to take a picture?</p>}
       </div>
     </div>
   );
@@ -229,6 +229,7 @@ export function StepSwipe({
   likedLocations,
   matchLocation,
   setMatchLocation,
+  takePictures,
 }) {
 
   if (loading) {
@@ -366,7 +367,11 @@ export function StepSwipe({
         </>
       )}
 
-      <MatchPopup location={matchLocation} onDismiss={() => setMatchLocation && setMatchLocation(null)} />
+      <MatchPopup
+        location={matchLocation}
+        onDismiss={() => setMatchLocation && setMatchLocation(null)}
+        takePictures={takePictures}
+      />
 
       <DoneOverlay
         visible={swipeDone}
