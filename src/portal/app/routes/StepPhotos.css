@@ -2,8 +2,8 @@
 
 .photos-header {
   flex-shrink: 0;
-  margin-bottom: -8rem 0 var(--space-xxl) 0;
-
+  margin: 0 auto;
+  width: 60vw;
 }
 
 .photos-heading {
@@ -17,25 +17,12 @@
 
 .photos-desc {
   font-family: var(--font-secondary);
-  font-size: var(--size-sm);
   color: var(--color-text-blue);
-  opacity: 0.8;
   line-height: 1.6;
   margin: 0 0 var(--space-sm);
-}
-
-.photos-desc strong {
-  font-weight: var(--weight-bold);
-  opacity: 1;
-
   color: var(--style-text-blue, #144552);
-  font-family: SunAntwerpen;
-  font-size: 2.25rem;
-  font-style: normal;
-  font-weight: 450;
+  font-size: clamp(1.25rem, 2.25vw, 2rem);
   line-height: 130%;
-  /* 2.925rem */
-  width: 70vw;
 }
 
 .photos-desc strong {
@@ -45,14 +32,14 @@
 
 .photos-privacy {
   font-family: var(--font-secondary);
-  font-size: var(--size-sm);
+  font-size: clamp(1.25rem, 2.25vw, 2rem);
   font-weight: var(--weight-bold);
   color: var(--color-blood-orange);
   line-height: 1.5;
   margin: var(--space-sm) 0 0;
   color: var(--style-blood-orange, #E03C31);
   font-family: SunAntwerpen;
-  font-size: 1.875rem;
+
 
   font-weight: 450;
   line-height: 130%;
@@ -61,7 +48,7 @@
 }
 
 .sticker-photo-container {
-  margin-top: -8rem 8rem 0 0;
+  margin: -4rem 0 2rem 0;
   width: 100vw;
   height: 10rem;
   display: flex;
@@ -80,29 +67,19 @@
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 0 calc(-1 * var(--space-xl));
-  min-height: 0;
+  justify-content: spa;
+  margin-top: 8rem;
+  background: url(../../assets/bg-grid.svg);
+  max-height: fit-content;
 }
 
-.photos-gridlines {
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(to right, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%),
-    repeating-linear-gradient(to bottom, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%);
-  opacity: 0.08;
-  pointer-events: none;
-  background: url(../../assets/bg-grid.svg);
-  width: 100vw;
-}
 
 
 .photos-cards {
   position: relative;
   z-index: 1;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: flex-start;
   gap: var(--space-xl);
   padding: var(--space-xl) var(--space-xl) var(--space-xxl);
@@ -120,6 +97,7 @@
   transition: transform 0.2s ease;
   flex: 1;
   max-width: clamp(20rem, 40vw, 210px);
+
 }
 
 .polaroid:active {
@@ -162,6 +140,7 @@
   object-fit: cover;
   display: block;
   border-radius: 2px;
+  border: 3px solid var(--color-blood-orange);
 }
 
 .polaroid__label {
@@ -171,12 +150,70 @@
   right: 0;
   text-align: center;
   font-family: var(--font-secondary);
-  font-size: var(--size-base);
   color: var(--color-blood-orange);
-
   font-size: 1.875rem;
-  font-style: normal;
   font-weight: 500;
   line-height: normal;
 
+}
+
+/* ── "Are you sure?" popup — figma node 2404:4164 ───────────────────────── */
+.popup-card--photos {
+  background: var(--style-text-blue, #144552);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(1rem, 2.5vw, 1.5625rem);
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(2rem, 6vw, 4.375rem);
+  width: clamp(24rem, 60vw, 40rem);
+  text-align: left;
+}
+
+.popup-title--photos {
+  font-family: var(--font-primary);
+  font-size: clamp(1.75rem, 4.5vw, 3.125rem);
+  font-weight: var(--weight-regular);
+  color: var(--style-creamy-vanilla, #FDFEEF);
+  margin: 0;
+}
+
+.popup-desc--photos {
+  font-family: var(--font-secondary);
+  font-size: clamp(1.1rem, 2.5vw, 2.25rem);
+  font-weight: var(--weight-regular);
+  line-height: 1.4;
+  color: var(--style-creamy-vanilla, #FDFEEF);
+  margin: 0;
+}
+
+.popup-actions--photos {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5625rem);
+  padding-top: clamp(1.5rem, 4vw, 3.125rem);
+}
+
+.popup-actions--photos .btn-form {
+  width: auto;
+  border-radius: 5px;
+  padding: clamp(0.75rem, 2vw, 0.9375rem) clamp(1rem, 3vw, 1.25rem);
+  font-family: var(--font-secondary);
+  font-size: clamp(1rem, 2.2vw, 1.875rem);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+}
+
+.btn-form--photos-light {
+  background: var(--style-creamy-vanilla, #FDFEEF);
+  border: 1px solid var(--style-text-blue, #144552);
+  color: var(--style-text-blue, #144552);
+}
+
+.btn-form--photos-red {
+  background: var(--style-blood-orange, #E03C31);
+  border: none;
+  color: var(--style-creamy-vanilla, #FDFEEF);
 }

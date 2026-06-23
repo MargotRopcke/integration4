@@ -53,9 +53,9 @@ const BUDGET_OPTIONS = [
 ];
 
 const DISTANCE_OPTIONS = [
-  { value: "walk (0-2km)", label: "walking", sub: "0-2km", icon: <WalkIcon /> },
-  { value: "bike (2-5km)", label: "bike", sub: "2-5km", icon: <BikeIcon /> },
-  { value: "tram (if possible)", label: "tram", sub: "if possible", icon: <TramIcon /> },
+  { value: "walk (0-2km)", label: "walking", sub: "0-2km", icon: "../../assets/icons/walk.svg" },
+  { value: "bike (2-5km)", label: "bike", sub: "2-5km", icon: "../../assets/icons/bike.svg" },
+  { value: "tram (if possible)", label: "tram", sub: "+5km", icon: "../../assets/icons/tram.svg" },
 ];
 
 export function StepBudgetDistance({ budget, distance, onBudget, onDistance, onNext, onBack }) {
@@ -115,11 +115,11 @@ export function StepBudgetDistance({ budget, distance, onBudget, onDistance, onN
             ))}
           </div>
         </div>
+        <div className="sticker-distance-container">
+          <img className="sticker-distance" src="../../assets/distance.svg" alt="distance sticker" />
+        </div>
+      </div>
 
-      </div>
-      <div className="sticker-distance-container">
-        <img className="sticker-distance" src="../../assets/distance.svg" alt="distance sticker" />
-      </div>
     </FormStepLayout>
   );
 }

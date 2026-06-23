@@ -7,7 +7,7 @@
   align-items: center;
   width: 100%;
   gap: var(--space-md);
-  margin: 8rem;
+
 }
 
 /* ── Grid: [card] [pencil col] ──────────────────────────────────────────── */
@@ -25,11 +25,13 @@
 
 /* ── Banner ─────────────────────────────────────────────────────────────── */
 .canvas-banner {
+  position: absolute;
   grid-area: card;
   align-self: center;
   height: 2.5rem;
   width: 150%;
-  margin-bottom: -8rem;
+  top: 50%;
+
   background: #9ac44a;
   color: #2a4a08;
   font-family: var(--font-secondary);

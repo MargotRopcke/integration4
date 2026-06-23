@@ -131,10 +131,12 @@
   justify-content: flex-end;
   width: 100vw;
   height: 10vh;
+  margin: 0 10rem 2rem 0;
 
 }
 
 .sticker-distance {
-  width: 31.9375rem;
-  height: 20.4375rem;
+  width: 25rem;
+  height: 15rem;
+
 }

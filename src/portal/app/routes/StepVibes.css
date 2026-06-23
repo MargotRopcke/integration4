@@ -16,6 +16,7 @@
   pointer-events: none;
   user-select: none;
   transform: rotate(10.205deg);
+  z-index: 5;
 }
 
 /* ── Grid wrap ── */
@@ -47,18 +48,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: var(--space-md) var(--space-xxl);
-  margin: var(--space-md) var(--space-xl);
+  margin: var(--space-xs) var(--space-xl);
   /* inset from the grid lines */
-  padding: var(--space-md) var(--space-lg);
   border-radius: var(--border-radius);
   border: none;
   font-family: var(--font-secondary);
   font-size: clamp(3.75rem, 3.5vw, 1.4rem);
   text-align: center;
-  min-height: clamp(4rem, 10vh, 90px);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  max-height: 7rem;
   color: var(--style-creamy-vanilla, #FDFEEF);
 
 }

@@ -2,8 +2,13 @@ import { useState, useCallback } from "react";
 import { saveCollage } from "../services/data";
 import bagSvg  from "../../assets/stickers/bag-yellow.svg";
 import lipsSvg from "../../assets/stickers/lips-green.svg";
+import aLogoSvg from "../../assets/icons/a-logo.svg";
 
-const CARD_COLORS = ["#e8b4bc", "#5b9bd5", "#e07070", "#7bc67e", "#f0d060", "#4a7a8a"];
+const BG_COLOR = "#fdfeef";       // style/creamy vanilla
+const BRAND_RED = "#e03c31";      // style/blood orange
+
+const CARD_COLORS = ["#fadae0", "#007fa3", "#e03c31", "#b5e28d", "#ffcd00", "#144552"];
+const CARD_TEXT_COLORS = ["#e03c31", "#fdfeef", "#fdfeef", "#e03c31", "#e03c31", "#fdfeef"];
 
 const CATEGORY_STICKER = {
   style:   bagSvg,
@@ -47,11 +52,11 @@ export function usePrint() {
     c.height  = H;
     const ctx = c.getContext("2d");
 
-    ctx.fillStyle = "#f5f0e8";
+    ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, W, H);
 
     const cols    = 3, rows  = 2;
-    const padX    = 96,  padTop  = 96;
+    const padX    = 160, padTop  = 120;
     const gapX    = 48,  gapY   = 32;
     const labelH  = 104, borderW = 14;
     const cellW   = Math.floor((W - padX * 2 - gapX * (cols - 1)) / cols);
@@ -81,15 +86,17 @@ export function usePrint() {
     const stickerImg = await loadImage(stickerSrc);
 
     for (let i = 0; i < Math.min(photos.length, 6); i++) {
-      const col   = i % cols;
-      const row   = Math.floor(i / cols);
-      const x     = padX + col * (cellW + gapX);
-      const y     = padTop + row * (cellH + gapY + labelH);
-      const color = CARD_COLORS[i % CARD_COLORS.length];
-      const img   = photoImgs[i];
+      const col       = i % cols;
+      const row       = Math.floor(i / cols);
+      const x         = padX + col * (cellW + gapX);
+      const y         = padTop + row * (cellH + gapY + labelH);
+      const color     = CARD_COLORS[i % CARD_COLORS.length];
+      const textColor = CARD_TEXT_COLORS[i % CARD_TEXT_COLORS.length];
+      const img       = photoImgs[i];
 
+      // Card frame: a single rounded shape spanning photo + label band
       ctx.fillStyle = color;
-      roundRect(ctx, x - borderW, y - borderW, cellW + borderW * 2, cellH + borderW * 2, 28);
+      roundRect(ctx, x - borderW, y - borderW, cellW + borderW * 2, cellH + borderW * 2 + labelH, 28);
       ctx.fill();
 
       ctx.save();
@@ -105,19 +112,27 @@ export function usePrint() {
       }
       ctx.restore();
 
-      ctx.fillStyle = color;
+      ctx.fillStyle = textColor;
       ctx.font      = "700 48px SunAntwerpen, Georgia, serif";
       ctx.textAlign = "center";
-      ctx.fillText(photos[i].locationName || "", x + cellW / 2, y + cellH + labelH - 20);
+      ctx.textBaseline = "middle";
+      ctx.fillText(photos[i].locationName || "", x + cellW / 2, y + cellH + borderW + labelH / 2);
       ctx.textAlign = "left";
+      ctx.textBaseline = "alphabetic";
     }
 
     const bottomY = padTop + rows * (cellH + gapY + labelH) + 64;
 
-    ctx.fillStyle = "#d63b2f";
+    ctx.fillStyle = BRAND_RED;
     ctx.font      = "normal 200px AntwerpenTallTall, Georgia, serif";
     ctx.fillText("THE",    padX, bottomY + 200);
     ctx.fillText("PORTAL", padX, bottomY + 430);
+
+    const logoImg = await loadImage(aLogoSvg);
+    if (logoImg) {
+      const lsz = 100;
+      ctx.drawImage(logoImg, padX, bottomY + 470, lsz, lsz);
+    }
 
     if (qrImg) {
       const qrSize = 480, qrX = W - padX - qrSize, qrY = bottomY + 40;
@@ -127,7 +142,7 @@ export function usePrint() {
     }
 
     if (stickerImg) {
-      const sz = 360, sx = W / 2 - sz / 2, sy = bottomY - 80;
+      const sz = 360, sx = W / 2 - sz / 2, sy = padTop + rows * (cellH + gapY + labelH) - sz * 0.45;
       ctx.drawImage(stickerImg, sx, sy, sz, sz);
     }
 
