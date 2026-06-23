@@ -47,7 +47,10 @@ export function StepIntro({ onStart }) {
           <span className="intro-title-the">THE</span>
           <div className="intro-sticker--bag"><BagSVG /></div>
         </div>
-        <span className="intro-title-portal">PORTAL</span>
+        <span className="intro-title-portal">
+          PORTAL
+          <div className="intro-portal-overlay-line" />
+        </span>
       </div>
 
       <div className="intro-card">
