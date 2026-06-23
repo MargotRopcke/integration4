@@ -1,16 +1,7 @@
 /* ── StepCategory ────────────────────────────────────────────────────────── */
 
-.step-category-wrap .form-heading {
-  font-size: clamp(1.4rem, 4.5vw, 2rem);
-  color: var(--color-text-blue);
+.step-category-wrap .title-container {
   margin-bottom: 0;
-}
-
-.step-category-wrap .form-subheading {
-  font-size: var(--size-sm);
-  color: var(--color-text-blue);
-  opacity: 0.7;
-  margin: 0 0 var(--space-xs);
 }
 
 .category-choice-grid {
@@ -26,13 +17,14 @@
   position: relative;
   background: var(--color-blood-orange);
   border-radius: var(--border-radius);
-  padding: var(--space-md);
+  padding: var(--space-xxl);
   display: flex;
   flex-direction: column;
   align-items: stretch;
   cursor: pointer;
   transition: transform 0.2s ease;
   overflow: visible;
+  width: 30vw;
 }
 
 .category-card:active {
@@ -59,13 +51,13 @@
 }
 
 .category-card__inner {
-  background: #fff;
-  border-radius: calc(var(--border-radius) - 4px);
-  padding: var(--space-xl) var(--space-md);
+  background: var(--color-creamy-vanilla);
+  padding: var(--space-xxl);
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: clamp(100px, 18vh, 160px);
+
 }
 
 .category-card__name {
@@ -74,15 +66,25 @@
   font-weight: var(--weight-regular);
   color: var(--color-blood-orange);
   text-align: center;
+  color: var(--style-blood-orange, #E03C31);
+
+  font-size: 3.75rem;
+  font-style: normal;
+  font-weight: 450;
+
 }
 
 .category-card__desc {
-  font-family: var(--font-secondary);
-  font-size: var(--size-sm);
-  font-weight: var(--weight-bold);
-  color: var(--color-creamy-vanilla);
-  text-align: center;
-  line-height: var(--lh-loose);
+
+
   margin-top: var(--space-md);
   padding: 0 var(--space-sm);
+  color: var(--style-creamy-vanilla, #FDFEEF);
+  text-align: center;
+  font-family: SunAntwerpen;
+  font-size: 2.1875rem;
+  font-style: normal;
+  font-weight: 450;
+  line-height: normal;
+
 }

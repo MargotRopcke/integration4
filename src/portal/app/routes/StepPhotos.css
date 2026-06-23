@@ -2,7 +2,8 @@
 
 .photos-header {
   flex-shrink: 0;
-  margin-bottom: var(--space-md);
+  margin-bottom: -8rem 0 var(--space-xxl) 0;
+
 }
 
 .photos-heading {
@@ -26,6 +27,20 @@
 .photos-desc strong {
   font-weight: var(--weight-bold);
   opacity: 1;
+
+  color: var(--style-text-blue, #144552);
+  font-family: SunAntwerpen;
+  font-size: 2.25rem;
+  font-style: normal;
+  font-weight: 450;
+  line-height: 130%;
+  /* 2.925rem */
+  width: 70vw;
+}
+
+.photos-desc strong {
+  font-weight: var(--weight-bold);
+  opacity: 1;
 }
 
 .photos-privacy {
@@ -35,6 +50,28 @@
   color: var(--color-blood-orange);
   line-height: 1.5;
   margin: var(--space-sm) 0 0;
+  color: var(--style-blood-orange, #E03C31);
+  font-family: SunAntwerpen;
+  font-size: 1.875rem;
+
+  font-weight: 450;
+  line-height: 130%;
+
+  width: 70vw;
+}
+
+.sticker-photo-container {
+  margin-top: -8rem 8rem 0 0;
+  width: 100vw;
+  height: 10rem;
+  display: flex;
+  justify-content: flex-end;
+
+}
+
+.sticker-photo {
+  width: 13.17181rem;
+  height: 12.31438rem;
 }
 
 /* Grid with crosshair lines */
@@ -56,7 +93,10 @@
     repeating-linear-gradient(to bottom, var(--color-text-blue) 0, var(--color-text-blue) 1px, transparent 1px, transparent 50%);
   opacity: 0.08;
   pointer-events: none;
+  background: url(../../assets/bg-grid.svg);
+  width: 100vw;
 }
+
 
 .photos-cards {
   position: relative;
@@ -79,7 +119,11 @@
   align-items: center;
   transition: transform 0.2s ease;
   flex: 1;
-  max-width: clamp(140px, 40vw, 210px);
+  max-width: clamp(20rem, 40vw, 210px);
+}
+
+.polaroid:active {
+  transform: scale(0.96) !important;
 }
 
 .polaroid:active {
@@ -94,14 +138,23 @@
   transform: rotate(5deg) translateY(10px);
 }
 
+.polaroid--yes {
+  transform: rotate(-6deg) translateY(-10px);
+}
+
+.polaroid--no {
+  transform: rotate(5deg) translateY(10px);
+}
+
 .polaroid__photo {
   width: 100%;
-  background: #fff;
+  background: var(--color-creamy-vanilla);
   border: 5px solid var(--color-blood-orange);
   border-radius: 4px;
   padding: var(--space-sm) var(--space-sm) 2.5rem;
   position: relative;
 }
+
 
 .polaroid__photo img {
   width: 100%;
@@ -111,17 +164,19 @@
   border-radius: 2px;
 }
 
-.polaroid__photo--no img {
-  filter: saturate(0.5) brightness(0.85);
-}
-
 .polaroid__label {
   position: absolute;
   bottom: 0.5rem;
   left: 0;
   right: 0;
   text-align: center;
-  font-family: var(--font-primary);
+  font-family: var(--font-secondary);
   font-size: var(--size-base);
   color: var(--color-blood-orange);
+
+  font-size: 1.875rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+
 }

@@ -23,25 +23,19 @@ export function StepVibes({ vibes, chosenCategory, selectedVibes, onToggle, onDo
   const categoryKey = chosenCategory?.name?.trim().toLowerCase() ?? "style";
 
   return (
-    <FormStepLayout id="step-4" current={4} onBack={onBack}>
-      <div className="vibes-header">
-        <div className="vibes-heading-row">
-          <h1 className="form-heading vibes-heading">
-            Choose the vibe(s) that fit your taste:
-          </h1>
-          {/* Decorative image from primary_categories.image */}
-          {CATEGORY_DECO[categoryKey] && (
-            <img
-              src={CATEGORY_DECO[categoryKey]}
-              alt=""
-              className="vibes-deco"
-              aria-hidden="true"
-            />
-          )}
-        </div>
-        <p className="form-subheading vibes-subheading">
-          Your taste shapes a more personal journey.
-        </p>
+    <FormStepLayout id="step-4" current={4} onBack={onBack} title={"Choose the vibe(s) that fit your taste:"} subtitle={" Your taste shapes a more personal journey."}>
+
+      <div className="vibes-heading-row">
+        {/* Decorative image from primary_categories.image */}
+        {CATEGORY_DECO[categoryKey] && (
+          <img
+            src={CATEGORY_DECO[categoryKey]}
+            alt=""
+            className="vibes-deco"
+            aria-hidden="true"
+          />
+        )}
+
       </div>
 
       <div className="vibes-grid-wrap">

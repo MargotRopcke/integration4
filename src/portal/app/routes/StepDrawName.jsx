@@ -1,31 +1,20 @@
 import "./StepDrawName.css";
 import { FormStepLayout } from "../layouts/FormStepLayout";
-
+const BANNER_REPEATS = Array.from({ length: 20 }, () => "Your version");
 export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
   return (
-    <FormStepLayout id="step-1" current={1} className="step-draw">
-      <div className="form-header step-draw__header">
-        <h1 className="form-heading">Hey there! <br /> Ready to make your own version of Antwerp?</h1>
-        <p className="form-subheading">
-          Most visitors see the same city. The Portal helps you discover local Antwerp your way.
-        </p>
-      </div>
-
+    <FormStepLayout id="step-1" current={1} className="step-draw" title={"Hey there! Ready to make your own version of Antwerp?"} subtitle="Most visitors see the same city. The Portal helps you discover local Antwerp your way.">
       <div className="canvas-wrapper">
-        {/* grid: banner and card share the same area, banner sits behind via z-index */}
+        <div className="canvas-banner" aria-hidden="true">
+          {BANNER_REPEATS.map((text, i) => (
+            <span key={i} className="canvas-banner-item">{text}</span>
+          ))}
+        </div>
         <div className="canvas-grid">
 
-          {/* Banner spans full grid area, behind the card */}
-          <div className="canvas-banner" aria-hidden="true">
-            <span>Your version</span>
-          </div>
+          {/* Banner: rendered first so card sits on top of it via z-index */}
 
-          {/* Pencil sits in its own column to the right */}
-          <div className="canvas-pencil-col" aria-hidden="true">
-            <img src="../../assets/stickers/pencil.svg" alt="" className="canvas-pencil" />
-          </div>
-
-          {/* Centre: the red drawing card */}
+          {/* Card: same grid area as banner, z-index 1 covers it */}
           <div className="canvas-container">
             <div className="canvas-title-row">
               <span className="canvas-title">What is your name?</span>
@@ -35,7 +24,8 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
               <canvas ref={canvasRef} id="canvas" width={950} height={700} className="canvas-element" />
             </div>
             <div className="canvas-actions">
-              <button onClick={onSave} className="canvas-action-btn" disabled={!hasDrawn}
+              <button
+                onClick={onSave} className="canvas-action-btn" disabled={!hasDrawn}
                 style={{ opacity: hasDrawn ? 1 : 0.4, cursor: hasDrawn ? "pointer" : "not-allowed" }}
                 id="save" aria-label="Save name">
                 <svg xmlns="http://www.w3.org/2000/svg" width="89" height="76" viewBox="0 0 89 76" fill="none">
@@ -55,10 +45,15 @@ export function StepDrawName({ canvasRef, hasDrawn, onClear, onSave }) {
             </div>
           </div>
 
+          {/* Pencil: own grid column, peeks out from right edge of card */}
+          <div className="canvas-pencil-col" aria-hidden="true">
+            <img src="../../assets/icons/pencil.svg" alt="pencil icon" className="canvas-pencil" />
+          </div>
+
         </div>
 
         <p className="canvas-privacy-note">Your experience is private and only visible to you.</p>
       </div>
-    </FormStepLayout>
+    </FormStepLayout >
   );
 }

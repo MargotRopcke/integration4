@@ -12,12 +12,20 @@ import { StepProgress } from "../components/StepProgress";
  *   total      — total number of steps (default 6)
  *   onBack     — back button handler (omit to hide back button)
  *   className  — extra class on the step-container div
+ *   title      — the step title
+ *   subtitle   — the step subtitle
  *   children
  */
-export function FormStepLayout({ id, current, total = 6, onBack, className = "", children }) {
+export function FormStepLayout({ id, current, total = 6, onBack, className = "", title, subtitle = "", children }) {
   return (
     <div className={`step-container ${className}`} id={id}>
-      {onBack && <BackButton onClick={onBack} />}
+      <div className="header-container">
+        {onBack && <BackButton onClick={onBack} />}
+        <div className="title-container">
+          {title && <h1 className="title">{title}</h1>}
+          {subtitle && <p className="subtitle">{subtitle}</p>}
+        </div>
+      </div>
       {children}
       <StepProgress current={current} total={total} />
     </div>

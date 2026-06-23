@@ -1,6 +1,6 @@
 /* ==========================================================================
    BASE — reset, html/body defaults
-   Imported once in root.jsx after fonts.css and root.css
+   Kiosk: portrait fullscreen ~1080×1920. Font scale set for large display.
    ========================================================================== */
 
 *,
@@ -13,13 +13,16 @@
 
 html,
 body {
-    font-size: 16px;
-    -webkit-text-size-adjust: 100%;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    margin: 0;
-    padding: 0;
+    /*
+    Base font sized to the kiosk viewport height.
+    1vh on a 1920px tall screen = 19.2px.
+    1.25vh ≈ 24px — makes rem scale feel right on the large display.
+    Clamped so it degrades gracefully on smaller dev screens.
+  */
+    font-size: clamp(16px, 1.25vh, 22px);
 }
 
 body {
@@ -32,12 +35,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* React root — must fill viewport */
 #root {
     width: 100%;
     height: 100%;
-    position: fixed;
-    inset: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 img,
