@@ -139,13 +139,32 @@ function MatchPopup({ location, onDismiss }) {
   return (
     <div className="match-popup-overlay" onClick={onDismiss}>
       <div className="match-popup-card" onClick={e => e.stopPropagation()}>
-        <div className="match-popup-photo">
-          {location.image && <img src={location.image} alt={location.name} />}
-          <div className="match-popup-sticker">
-            <img src="/assets/match.svg" alt="It's a match!" />
+        <h1 className="match-popup-title">This one seems to fit you.</h1>
+
+        <div className="match-popup-middle-row">
+          <svg className="match-popup-side match-popup-side--left" width="86" height="168" viewBox="0 0 86 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.860524 0.50941 0.50941 0.860524 70.7171 108.236)" fill="#FFCD00" />
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.99958 0.0289681 0.0289681 0.99958 66.7171 64.3145)" fill="#FFCD00" />
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.931333 -0.36417 -0.36417 0.931333 78.7171 24.3066)" fill="#FFCD00" />
+          </svg>
+
+          <div className="match-popup-polaroid">
+            <div className="match-popup-photo-wrap">
+              {location.image && <img src={location.image} alt={location.name} className="match-popup-img" />}
+              <div className="match-popup-sticker">
+                <img src="/assets/match.svg" alt="It's a match!" />
+              </div>
+            </div>
+            <h2 className="match-popup-name">{location.name}</h2>
           </div>
+
+          <svg className="match-popup-side match-popup-side--right" width="86" height="168" viewBox="0 0 86 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.860524 0.50941 0.50941 0.860524 70.7171 108.236)" fill="#FFCD00" />
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.99958 0.0289681 0.0289681 0.99958 66.7171 64.3145)" fill="#FFCD00" />
+            <rect width="66.7457" height="29" rx="5" transform="matrix(-0.931333 -0.36417 -0.36417 0.931333 78.7171 24.3066)" fill="#FFCD00" />
+          </svg>
         </div>
-        <h2 className="match-popup-name">{location.name}</h2>
+
         <p className="match-popup-sub">Ready to take a picture?</p>
       </div>
     </div>
