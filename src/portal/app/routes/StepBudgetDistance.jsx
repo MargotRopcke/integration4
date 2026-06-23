@@ -70,11 +70,11 @@ export function StepBudgetDistance({ budget, distance, onBudget, onDistance, onN
             ))}
           </div>
         </div>
+        <div className="sticker-distance-container">
+          <img className="sticker-distance" src="../../assets/distance.svg" alt="distance sticker" />
+        </div>
+      </div>
 
-      </div>
-      <div className="sticker-distance-container">
-        <img className="sticker-distance" src="../../assets/distance.svg" alt="distance sticker" />
-      </div>
     </FormStepLayout>
   );
 }
