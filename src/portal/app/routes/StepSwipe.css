@@ -79,6 +79,7 @@
 }
 
 .tutorial-screen--step1 {
+  background: var(--color-creamy-vanilla);
   padding: var(--space-xl) var(--space-xl) var(--space-xxl);
   position: relative;
   justify-content: flex-start;
