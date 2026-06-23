@@ -1,29 +1,28 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { saveSession, saveSessionPhotos } from "../data";
-import { FALLBACK_TRAVELERS } from "./constants";
+import { saveSession, saveSessionPhotos } from "../services/data";
+import { FALLBACK_TRAVELERS } from "../constants/constants";
 
 // Hooks
-import { useCanvasDrawing } from "./hooks/useCanvasDrawing";
-import { useSwipeDeck } from "./hooks/useSwipeDeck";
-import { useSwipeCamera } from "./hooks/useSwipeCamera";
-import { useSummaryCamera } from "./hooks/useSummaryCamera";
-import { usePrint } from "./hooks/usePrint";
+import { useCanvasDrawing } from "../hooks/useCanvasDrawing";
+import { useSwipeDeck } from "../hooks/useSwipeDeck";
+import { useSwipeCamera } from "../hooks/useSwipeCamera";
+import { useSummaryCamera } from "../hooks/useSummaryCamera";
+import { usePrint } from "../hooks/usePrint";
 
 // Steps
-import { StepIntro } from "./steps/StepIntro";
-import { StepDrawName } from "./steps/StepDrawName";
-import { StepTravelerCarousel } from "./steps/StepTravelerCarousel";
-import { StepCategory } from "./steps/StepCategory";
-import { StepVibes } from "./steps/StepVibes";
-import { StepBudgetDistance } from "./steps/StepBudgetDistance";
-import { StepPhotos } from "./steps/StepPhotos";
-import { StepSwipe } from "./steps/StepSwipe";
-import { StepSummary } from "./steps/StepSummary";
-import { StepPrinting } from "./steps/StepPrinting";
-import { StepQR } from "./steps/StepQR";
-import "./styles/form.css";
+import { StepIntro } from "./StepIntro";
+import { StepDrawName } from "./StepDrawName";
+import { StepTravelerCarousel } from "./StepTravelerCarousel";
+import { StepCategory } from "./StepCategory";
+import { StepVibes } from "./StepVibes";
+import { StepBudgetDistance } from "./StepBudgetDistance";
+import { StepPhotos } from "./StepPhotos";
+import { StepSwipe } from "./StepSwipe";
+import { StepSummary } from "./StepSummary";
+import { StepPrinting } from "./StepPrinting";
+import { StepQR } from "./StepQR";
 
-export { clientLoader } from "./clientLoader";
+export { clientLoader } from "../services/clientLoader";
 
 export default function FormPage({ loaderData }) {
   const {
@@ -144,7 +143,8 @@ export default function FormPage({ loaderData }) {
       deck.reactionPhotosRef.current,
       sessionUserId,
       chosenCategory?.name ?? "",
-      () => setStep(9)
+      () => setStep(9),
+      deck.likedLocationsRef.current
     );
   }, [step, sessionUserId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -167,37 +167,20 @@ export default function FormPage({ loaderData }) {
     setStep(0);
   }, [deck, print, camera]);
 
+  // Bind DoneOverlay callback refs for gestures
+  deck.onResetRef.current = handleReset;
+  deck.onShowResultsRef.current = () => setStep(8);
+
   // ── Derived values ───────────────────────────────────────────────────────────
   const currentCard = deck.deck[deck.deckIndex] ?? null;
   const progressPct = deck.deck.length > 0 ? (deck.deckIndex / deck.deck.length) * 100 : 0;
   const categoryLabel = chosenCategory?.name?.trim() ?? "All Spots";
 
   // ── Render ───────────────────────────────────────────────────────────────────
-  const isFullscreen = step === 7 || step === 8;
 
   return (
-    <div
-      className={[
-        "form-page",
-        step === 7 ? "form-page--swipe" : "",
-        step === 8 ? "form-page--summary" : "",
-      ].join(" ").trim()}
-      id="form-screen"
-    >
-      {!isFullscreen && (
-        <>
-          <div className="form-glow form-glow--top" />
-          <div className="form-glow form-glow--bottom" />
-        </>
-      )}
-
-      <div
-        className={[
-          "form-card",
-          isFullscreen ? "form-card--fullscreen" : "",
-        ].join(" ").trim()}
-        id="form-content-card"
-      >
+    <div className="form-page" id="form-screen">
+      <div className="form-card" id="form-content-card">
         {step === 0 && (
           <StepIntro onStart={() => setStep(1)} />
         )}
@@ -287,6 +270,8 @@ export default function FormPage({ loaderData }) {
             nextTutorialStep={deck.nextTutorialStep}
             gestureStatus={camera.gestureStatus}
             gestureDetected={camera.gestureDetected}
+            gestureProgress={camera.gestureProgress}
+            gestureType={camera.gestureType}
             noCameraNotice={camera.noCameraNotice}
             videoRef={camera.videoRef}
             canvasOverlayRef={camera.canvasOverlayRef}
@@ -300,6 +285,8 @@ export default function FormPage({ loaderData }) {
             categoryLabel={categoryLabel}
             progressPct={progressPct}
             likedLocations={deck.likedLocations}
+            matchLocation={deck.matchLocation}
+            setMatchLocation={deck.setMatchLocation}
           />
         )}
 
@@ -330,7 +317,8 @@ export default function FormPage({ loaderData }) {
                 deck.reactionPhotosRef.current,
                 sessionUserId,
                 chosenCategory?.name ?? "",
-                () => setStep(9)
+                () => setStep(9),
+                deck.likedLocationsRef.current
               )
             }
             onSkip={() => setStep(9)}

@@ -1,0 +1,122 @@
+/* ── StepTravelerCarousel ────────────────────────────────────────────────── */
+
+.step-traveler .form-header {
+  flex-shrink: 0;
+  margin-bottom: var(--space-md);
+}
+
+.step-traveler .form-heading {
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+  color: var(--color-text-blue);
+  margin-bottom: 0;
+  line-height: 1.25;
+}
+
+.step-traveler .form-subheading {
+  font-size: var(--size-sm);
+  color: var(--color-text-blue);
+  opacity: 0.7;
+  margin: 0 0 var(--space-xs);
+}
+
+/* Stage: fills vertical space between header and description */
+.traveler-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  margin: var(--space-md) 0 0;
+}
+
+.traveler-card {
+  position: absolute;
+  width: clamp(220px, 62vw, 300px);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  border: clamp(10px, 2.5vw, 16px) solid var(--card-color, #E03C31);
+  background: #fff;
+  transform-origin: bottom center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.traveler-card__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #ddd;
+}
+
+.traveler-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.traveler-card__label {
+  padding: 0.6rem 0.8rem 0.8rem;
+  background: var(--card-color);
+}
+
+.traveler-card__name {
+  font-family: var(--font-primary);
+  font-size: clamp(1rem, 3.5vw, 1.4rem);
+  color: #fff;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.02em;
+}
+
+/* Description below the card stage */
+.traveler-active-desc {
+  font-family: var(--font-secondary);
+  font-size: var(--size-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-blue);
+  text-align: center;
+  max-width: 300px;
+  line-height: var(--lh-loose);
+  min-height: 3rem;
+  flex-shrink: 0;
+  margin: var(--space-sm) auto var(--space-xs);
+}
+
+.carousel-select-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) 0 var(--space-sm);
+  flex-shrink: 0;
+}
+
+.carousel-btn--square {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: var(--color-blood-orange);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.carousel-btn--square:active {
+  transform: scale(0.93);
+  opacity: 0.85;
+}
+
+.btn-form--traveler-select {
+  background: transparent;
+  color: var(--color-blood-orange);
+  border: 3px solid var(--color-blood-orange);
+  box-shadow: none;
+  font-size: var(--size-base);
+  font-weight: var(--weight-bold);
+  padding: 0.75rem 2rem;
+}

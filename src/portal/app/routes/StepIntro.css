@@ -1,0 +1,124 @@
+.step-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  background: var(--color-blood-orange);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.intro-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 5vh;
+  margin-bottom: -5.3vh;
+  z-index: 1;
+}
+
+.intro-title-block-first {
+  display: grid;
+  grid-template-columns: 20vh 1fr 20vh;
+  align-items: end;
+  margin-bottom: -6vh;
+}
+
+.intro-sticker--lips {
+  align-self: end;
+  width: 19vw;
+  z-index: 2;
+  padding-bottom: 3vh;
+  position: relative;
+  left: 7vw;
+}
+
+.intro-sticker--bag {
+  width: 19vw;
+}
+
+.intro-sticker--lips img,
+.intro-sticker--bag img {
+  width: 100%;
+  height: auto;
+}
+
+.intro-title-the {
+  font-family: var(--font-primary);
+  font-size: 20vw;
+  font-weight: 400;
+  color: var(--color-creamy-vanilla);
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 2vw;
+}
+
+.intro-title-portal {
+  font-family: var(--font-primary);
+  font-size: 18vw;
+  color: var(--color-dark-teal);
+  font-weight: 400;
+  line-height: 0.85;
+  text-align: center;
+  grid-column: 2;
+}
+
+.intro-card {
+  background-color: var(--color-creamy-vanilla);
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: var(--size-lg);
+}
+
+.intro-card-photo {
+  max-width: 40vw;
+  box-sizing: border-box;
+}
+
+.intro-subheading {
+  font-family: var(--font-secondary);
+  font-size: var(--size-md);
+  color: var(--color-text-blue);
+  max-width: 40vw;
+  text-align: center;
+}
+
+.intro-cta {
+  justify-items: center;
+  margin-top: auto;
+  margin-bottom: 5vh;
+}
+
+.btn-intro {
+  font-family: var(--font-secondary);
+  font-size: var(--size-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-creamy-vanilla);
+  background: transparent;
+  border: none;
+}
+
+.intro-portal-icon {
+  grid-area: cta-icon;
+  width: 80px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+}
+
+.intro-antwerp-badge {
+  position: fixed;
+  bottom: var(--space-md);
+  right: var(--space-md);
+  width: 56px;
+  height: 56px;
+  background: var(--color-blood-orange);
+  border: 2.5px solid var(--color-creamy-vanilla);
+  border-radius: 6px;
+}

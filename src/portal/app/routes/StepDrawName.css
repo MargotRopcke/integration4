@@ -1,0 +1,177 @@
+/* ── StepDrawName ────────────────────────────────────────────────────────── */
+
+.step-draw__header {
+  padding-top: var(--space-xl, 2rem);
+}
+
+.step-draw__header .form-heading {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  color: var(--color-text-blue);
+  margin-bottom: var(--space-sm, 0.5rem);
+  line-height: 1.2;
+}
+
+.step-draw__header .form-subheading {
+  font-size: var(--size-sm);
+  color: var(--color-text-blue);
+  opacity: 0.7;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Canvas wrapper ─────────────────────────────────────────────────────── */
+
+.canvas-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: var(--space-xl, 2rem) 0 var(--space-lg, 1.5rem);
+  min-height: 0;
+}
+
+/* ── Grid: banner and card share "main" area; pencil gets its own column ─── */
+
+.canvas-grid {
+  display: grid;
+  /* card takes remaining space, pencil col is fixed width */
+  grid-template-columns: 1fr 3rem;
+  /* single row — banner and card both placed in row 1 */
+  grid-template-rows: 1fr;
+  grid-template-areas: "main pencil";
+  align-items: center;
+  width: 100%;
+  max-width: 520px;
+}
+
+/* Banner occupies the same "main" cell as the card, sits behind it */
+.canvas-banner {
+  grid-area: main;
+  align-self: stretch;
+  background: #9AC44A;
+  color: #2a4a08;
+  font-family: var(--font-secondary);
+  font-size: 0.75rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  /* rotate a wide strip diagonally across the card */
+  transform: rotate(-25deg) scaleX(2.5);
+  transform-origin: center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
+}
+
+/* Card sits in the same "main" cell, on top of the banner */
+.canvas-container {
+  grid-area: main;
+  width: 100%;
+  background: var(--color-blood-orange);
+  border-radius: 16px;
+  overflow: hidden;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+/* ── Pencil column ──────────────────────────────────────────────────────── */
+
+.canvas-pencil-col {
+  grid-area: pencil;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.canvas-pencil-svg {
+  width: 36px;
+  height: auto;
+  transform: rotate(15deg);
+}
+
+/* ── Canvas title ───────────────────────────────────────────────────────── */
+
+.canvas-title-row {
+  padding: 1.25rem 1.5rem 0.75rem;
+  text-align: center;
+}
+
+.canvas-title {
+  font-family: var(--font-primary);
+  font-size: clamp(1.3rem, 4vw, 1.9rem);
+  color: var(--color-creamy-vanilla);
+  font-weight: var(--weight-regular);
+}
+
+/* ── Draw area: canvas + hint stacked via grid ──────────────────────────── */
+
+.canvas-draw-area {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+}
+
+.canvas-element {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  display: block;
+  touch-action: none;
+  grid-area: 1 / 1;
+}
+
+.canvas-hint {
+  grid-area: 1 / 1;
+  color: rgba(253, 254, 239, 0.45);
+  font-family: var(--font-secondary);
+  font-size: var(--size-xl);
+  font-weight: var(--weight-light);
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.canvas-hint.hidden {
+  opacity: 0;
+}
+
+/* ── Action buttons ─────────────────────────────────────────────────────── */
+
+.canvas-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl, 2rem);
+  padding: 0.75rem 1.5rem 1.5rem;
+}
+
+.canvas-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  line-height: 0;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.canvas-action-btn:active {
+  transform: scale(0.92);
+}
+
+/* ── Privacy note ───────────────────────────────────────────────────────── */
+
+.canvas-privacy-note {
+  font-family: var(--font-secondary);
+  font-size: var(--size-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-blue);
+  text-align: center;
+  margin-top: var(--space-md, 1rem);
+  opacity: 0.7;
+}

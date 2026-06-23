@@ -2,5 +2,5 @@ import { index, route } from "@react-router/dev/routes";
 
 export default [
   index("routes/index.jsx"),
-  route("print", "routes/print.js"),
+  route("print", "services/print.js"),
 ];
