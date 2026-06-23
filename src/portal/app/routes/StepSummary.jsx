@@ -19,7 +19,6 @@ export function StepSummary({
       <canvas ref={canvasRef} className="summary-gesture-canvas" />
       <div className={`flash-overlay${flash ? " flash" : ""}`} />
 
-      {/* Gesture hint — shows the active gesture filling up, empty spacer when idle */}
       <div className="summary-top-icon">
         <GestureProgressIcon
           gesture={gestureType || "thumbsUp"}

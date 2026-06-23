@@ -1,7 +1,15 @@
 import "./StepQR.css";
+import { useEffect } from "react";
 import aLogo from "../../assets/icons/a-logo.svg";
 
 export function StepQR({ sessionUserId, sessionSaving, likesCount, likedLocations, travelerType, onReset }) {
+  // Auto-reset to start screen after 60 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onReset();
+    }, 60_000);
+    return () => clearTimeout(timer);
+  }, [onReset]);
   const qrUrl = sessionUserId
     ? `https://api.qrserver.com/v1/create-qr-code/?size=400x400&color=e13b2c&bgcolor=fafcf0&data=${encodeURIComponent(
         `https://margotropcke.github.io/integration4/?user=${sessionUserId}`

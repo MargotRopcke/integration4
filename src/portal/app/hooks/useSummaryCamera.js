@@ -109,19 +109,6 @@ export function useSummaryCamera({ active, gestureRecRef, onThumbsUp, onThumbsDo
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Miniature hand preview (bottom-right corner)
-            if (result?.landmarks?.length > 0 && window.drawConnectors && window.drawLandmarks) {
-              const mapped = result.landmarks[0].map((lm) => ({
-                x: 0.75 + lm.x * 0.25,
-                y: 0.70 + lm.y * 0.30,
-                z: lm.z,
-              }));
-              window.drawConnectors(ctx, mapped, window.HAND_CONNECTIONS,
-                { color: "rgba(78,205,196,0.4)", lineWidth: 1.5 });
-              window.drawLandmarks(ctx, mapped,
-                { color: "rgba(255,107,53,0.7)", lineWidth: 1, radius: 3 });
-            }
-
             // Classify
             let gesture = null;
             if (result?.gestures?.length > 0) {

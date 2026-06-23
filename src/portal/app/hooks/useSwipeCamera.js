@@ -176,14 +176,6 @@ export function useSwipeCamera({
 
               ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-              // Draw hand landmarks
-              if (result?.landmarks?.length > 0 && window.drawConnectors && window.drawLandmarks) {
-                window.drawConnectors(ctx, result.landmarks[0], window.HAND_CONNECTIONS,
-                  { color: "rgba(78,205,196,0.5)", lineWidth: 2 });
-                window.drawLandmarks(ctx, result.landmarks[0],
-                  { color: "rgba(255,107,53,0.8)", lineWidth: 1, radius: 4 });
-              }
-
               // Block gestures during countdown or card-load grace period
               const inGrace = !tutorialActiveRef.current &&
                 (performance.now() - cardLoadedTimeRef.current < 2000);
